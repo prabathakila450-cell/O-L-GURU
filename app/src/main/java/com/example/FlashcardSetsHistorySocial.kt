@@ -7,23 +7,22 @@ package com.example
 object FlashcardSetsHistorySocial {
 
   fun getHistoryCard(setNum: Int, cardNum: Int, grade: String, theme: String): CardContentTuple {
-    return when (setNum) {
-      1 -> getHistorySet1(cardNum) // ඓතිහාසික මූලාශ්‍ර සහ ප්‍රාග් ඓතිහාසික යුගය
-      2 -> getHistorySet2(cardNum) // අනුරාධපුර යුගයේ ආරම්භය & පණ්ඩුකාභය රජු
-      3 -> getHistorySet3(cardNum) // මහින්දාගමනය & දේවානම්පියතිස්ස රජු
-      4 -> getHistorySet4(cardNum) // දුටුගැමුණු රජු & එක්සේසත් කිරීම
-      5 -> getHistorySet5(cardNum) // වළගම්බා රජු & ත්‍රිපිටකය ග්‍රන්ථාරූඪ කිරීම
-      6 -> getHistorySet6(cardNum) // වාරි ශිෂ්ටාචාරය (වසභ, මහසෙන්, ධාතුසේන)
-      7 -> getHistorySet7(cardNum) // පොළොන්නරු යුගය (1 වන විජයබාහු & මහා පරාක්‍රමබාහු)
-      8 -> getHistorySet8(cardNum) // දඹදෙණි, යාපහුව, කුරුණෑගල & ගම්පොළ යුග
-      9 -> getHistorySet9(cardNum) // කෝට්ටේ සහ සීතාවක රාජධානි
-      10 -> getHistorySet10(cardNum) // උඩරට රාජධානිය (1 වන විමලධර්මසූරිය & 2 වන රාජසිංහ)
-      11 -> getHistorySet11(cardNum) // පෘතුගීසි & ලන්දේසි පාලනය
-      12 -> getHistorySet12(cardNum) // බ්‍රිතාන්‍ය පාලනය & 1815 උඩරට ගිවිසුම
-      13 -> getHistorySet13(cardNum) // 1818 ඌව වෙල්ලස්ස & 1848 මාතලේ නිදහස් අරගල
-      14 -> getHistorySet14(cardNum) // ආණ්ඩුක්‍රම ප්‍රතිසංස්කරණ (කෝල්බෲක්, ඩොනමෝර්, සෝල්බරි) & 1948 නිදහස
-      15 -> getHistorySet15(cardNum) // ලෝක ඉතිහාසය (කාර්මික විප්ලවය, ලෝක යුද්ධ, එක්සත් ජාතීන්)
-      else -> getHistorySet1(cardNum)
+    val c = cardNum.coerceIn(1, 20)
+    return when (grade) {
+      "11" -> when (setNum) {
+        1 -> FlashcardBankHistorySetsPart2.getHistorySet(12, c) ?: getHistorySet12(c) // බ්‍රිතාන්‍ය පාලනය & 1815 උඩරට ගිවිසුම
+        2 -> FlashcardBankHistorySetsPart2.getHistorySet(13, c) ?: getHistorySet13(c) // 1818 ඌව වෙල්ලස්ස & 1848 මාතලේ නිදහස් අරගල
+        3 -> FlashcardBankHistorySetsPart2.getHistorySet(14, c) ?: getHistorySet14(c) // ආණ්ඩුක්‍රම ප්‍රතිසංස්කරණ & 1948 නිදහස
+        4 -> FlashcardBankHistorySetsPart2.getHistorySet(17, c) ?: getHistorySet15(c) // 19 වන සියවසේ ජාතික, ආගමික හා සාහිත්‍ය පුනරුදය
+        else -> getHistorySet1(c)
+      }
+      else -> when (setNum) { // Grade 10
+        1 -> getHistorySet1(c) // ඓතිහාසික මූලාශ්‍ර සහ ප්‍රාග් ඓතිහාසික යුගය
+        2 -> FlashcardBankHistorySetsPart1.getHistorySet(2, c) ?: getHistorySet2(c) // අනුරාධපුර යුගයේ ආරම්භය & පණ්ඩුකාභය රජු
+        3 -> FlashcardBankHistorySetsPart1.getHistorySet(3, c) ?: getHistorySet3(c) // මහින්දාගමනය & දේවානම්පියතිස්ස රජු
+        4 -> FlashcardBankHistorySetsPart1.getHistorySet(4, c) ?: getHistorySet4(c) // දුටුගැමුණු රජු & එක්සේසත් කිරීම
+        else -> getHistorySet1(c)
+      }
     }
   }
 

@@ -7,7 +7,7 @@ package com.example
  */
 object FlashcardBankIctSetsPart2 {
 
-  fun getIctSet(s: Int, c: Int): CardContentTuple? {
+  fun getIctSet(s: Int, c: Int, grade: String): CardContentTuple? {
     return when (s) {
       11 -> getSet11(c)
       12 -> getSet12(c)

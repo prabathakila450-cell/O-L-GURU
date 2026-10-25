@@ -66,15 +66,6 @@ data class SubjectHubData(
   val quiz_sets: List<QuizSet>
 )
 
-data class ActiveAudioState(
-  val chapter: ChapterItem,
-  val grade: String,
-  val subject: String,
-  val pdfUrl: String,
-  val isPlaying: Boolean = true,
-  val speed: Float = 1.0f,
-  val progress: Float = 0.0f
-)
 
 // --------------------------------------------------
 // 2. CHAPTER REPOSITORY (100+ Pages Indexed Data)

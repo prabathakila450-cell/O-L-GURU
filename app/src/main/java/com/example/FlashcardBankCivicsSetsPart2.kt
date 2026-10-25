@@ -7,7 +7,7 @@ package com.example
  */
 object FlashcardBankCivicsSetsPart2 {
 
-  fun getCard(setNum: Int, cardNum: Int): CardContentTuple {
+  fun getCard(setNum: Int, cardNum: Int, grade: String): CardContentTuple {
     val c = cardNum.coerceIn(1, 20)
     return when (setNum) {
       11 -> set11[(c - 1) % set11.size]

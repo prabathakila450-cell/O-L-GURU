@@ -769,7 +769,7 @@ fun StudentPortalApp() {
   var englishInitialSubTab by remember { mutableStateOf(0) }
   var selectedGrade by remember { mutableStateOf("11") } // Options: "11", "10", "09", "08", "07", "06"
   var selectedSubjectItem by remember { mutableStateOf<SubjectItem?>(null) }
-  var selectedContentTab by remember { mutableStateOf(0) } // 0: කෙටි සටහන් (PDFs), 1: ප්‍රශ්න පත්‍ර (PDFs), 2: ස්වයං පුහුණු (Quizzes), 3: Audio Notes, 4: AI Assistant
+  var selectedContentTab by remember { mutableStateOf(0) } // 0: කෙටි සටහන් (PDFs), 1: ප්‍රශ්න පත්‍ර (PDFs), 2: ස්වයං පුහුණු (Quizzes), 3: AI Assistant
   var selectedSectionIndex by remember { mutableStateOf(0) } // 0: සියල්ල, 1: විෂයන්, 2: කෙටි සටහන්, 3: ප්‍රශ්න පත්‍ර
   var selectedTabNav by remember { mutableStateOf(0) }
   var activeDetailTitle by remember { mutableStateOf<String?>(null) }
@@ -884,9 +884,6 @@ fun StudentPortalApp() {
   var showFlashcardsDialog by remember { mutableStateOf(false) }
   var showPdfQuizBottomSheet by remember { mutableStateOf(false) }
 
-  // AI Audio Podcasts & Deep Index State
-  var activeAudioState by remember { mutableStateOf<ActiveAudioState?>(null) }
-
   // Automatic redirect back to initial HOME screen when the 12-hour free trial expires
   // Note: Admin approval dialog is NOT shown automatically; it only triggers when user clicks a protected feature
   LaunchedEffect(isFeatureTrialActive, isApprovedUser) {
@@ -901,7 +898,6 @@ fun StudentPortalApp() {
       activeQuizSet = null
       showFlashcardsDialog = false
       showPdfQuizBottomSheet = false
-      activeAudioState = null
     }
   }
 
@@ -919,36 +915,6 @@ fun StudentPortalApp() {
       } else {
         showPaymentApprovalDialog = true
       }
-    }
-  }
-
-  fun playChapterAudio(chapter: ChapterItem, subjectName: String, grade: String, pdfUrl: String, speed: Float = 1.0f) {
-    performProtectedAction {
-      activeAudioState = ActiveAudioState(
-        chapter = chapter,
-        subject = subjectName,
-        grade = grade,
-        pdfUrl = pdfUrl,
-        isPlaying = true,
-        speed = speed
-      )
-      Toast.makeText(context, "🎧 ධාවනය වෙමින්: ${chapter.title}", Toast.LENGTH_SHORT).show()
-    }
-  }
-
-  fun pauseAudio() {
-    activeAudioState = activeAudioState?.copy(isPlaying = false)
-  }
-
-  fun resumeAudio() {
-    activeAudioState = activeAudioState?.copy(isPlaying = true)
-  }
-
-  fun toggleAudioSpeed() {
-    activeAudioState?.let { current ->
-      val newSpeed = if (current.speed == 1.0f) 1.5f else 1.0f
-      activeAudioState = current.copy(speed = newSpeed)
-      Toast.makeText(context, "වේගය: ${newSpeed}x", Toast.LENGTH_SHORT).show()
     }
   }
 
@@ -2252,7 +2218,7 @@ fun StudentPortalApp() {
             )
           }
 
-          // STEP 3: CONTENT SCREEN (5-Section Subject Hub: Short Notes | Papers | Quizzes | Audio Podcasts | AI Smart Assistant)
+          // STEP 3: CONTENT SCREEN (4-Section Subject Hub: Short Notes | Papers | Quizzes | AI Smart Assistant)
           else if (effectiveScreen == "CONTENT" && selectedSubjectItem != null) {
             SubjectContentScreen(
               grade = selectedGrade,
@@ -2307,14 +2273,6 @@ fun StudentPortalApp() {
                   showFlashcardsDialog = true
                 }
               },
-              activeAudio = activeAudioState,
-              onPlayAudio = { chapter, speed ->
-                val noteMatch = currentNotes.firstOrNull { it.subject.contains(selectedSubjectItem?.nameSinhala ?: "", ignoreCase = true) || it.topicSinhala.contains(selectedSubjectItem?.nameSinhala ?: "", ignoreCase = true) }
-                val noteUrl = noteMatch?.pdfUri ?: "https://drive.google.com/file/d/1TU2t7cxxTohimis_VsIPzswy0CW7p2v8/preview"
-                playChapterAudio(chapter, selectedSubjectItem?.nameSinhala ?: "විද්‍යාව", selectedGrade, noteUrl, speed)
-              },
-              onPauseAudio = { pauseAudio() },
-              onResumeAudio = { resumeAudio() },
               onOpenPdfAtPage = { url, title, page -> openPdfAtPage(url, title, page) },
               onOpenAnalytics = {
                 currentScreen = "ANALYTICS"
@@ -3870,25 +3828,6 @@ fun StudentPortalApp() {
             showFlashcardsDialog = true
           }
         )
-      }
-
-      // Persistent Audio Mini-Player (Active Podcast across screens)
-      activeAudioState?.let { activeAudio ->
-        Box(
-          modifier = Modifier
-            .fillMaxSize()
-            .padding(bottom = 8.dp),
-          contentAlignment = Alignment.BottomCenter
-        ) {
-          PersistentAudioMiniPlayer(
-            activeAudio = activeAudio,
-            onPause = { pauseAudio() },
-            onResume = { resumeAudio() },
-            onToggleSpeed = { toggleAudioSpeed() },
-            onOpenPdfAtPage = { pdfUrl, title, page -> openPdfAtPage(pdfUrl, title, page) },
-            onDismiss = { activeAudioState = null }
-          )
-        }
       }
 
       // Eye-Care & Night Study Mode Settings Bottom Sheet

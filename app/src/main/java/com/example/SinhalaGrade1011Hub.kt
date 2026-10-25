@@ -14,7 +14,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -44,136 +47,306 @@ fun SinhalaGrade10And11MasterHub(
   currentGrade: String = "10",
   modifier: Modifier = Modifier
 ) {
+  var activeGrade by remember { mutableStateOf(if (currentGrade.contains("11")) "11" else "10") }
+  var selectedCategoryIndex by remember { mutableIntStateOf(-1) }
   var showFullScreenModal by remember { mutableStateOf(false) }
-  var initialSelectedTab by remember { mutableIntStateOf(0) }
-  val activeGrade = if (currentGrade.contains("11")) "11" else "10"
+  
+  val categories = remember { SubjectMasterSinhala20x20.getCategories() }
 
-  // Compact Header Card on the Subject Detail Screen
+  // Main Card Container with rich gradients to match Science Hub
   Card(
     shape = RoundedCornerShape(14.dp),
-    colors = CardDefaults.cardColors(
-      containerColor = Color(0xFF1E1B4B) // Deep Indigo
-    ),
-    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+    colors = CardDefaults.cardColors(containerColor = Color(0xFF1E1B4B)), // Deep Indigo
+    border = BorderStroke(1.2.dp, Color(0xFF6366F1).copy(alpha = 0.6f)),
     modifier = modifier
       .fillMaxWidth()
-      .clip(RoundedCornerShape(14.dp))
-      .clickable {
-        initialSelectedTab = 0
-        showFullScreenModal = true
-      }
-      .testTag("sinhala_grade_10_11_master_hub_card")
+      .testTag("sinhala_grade_10_11_master_hub")
   ) {
     Column(modifier = Modifier.padding(12.dp)) {
-      // Top Title Bar
+      // Header Row
       Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
       ) {
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f, fill = false)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
           Box(
             modifier = Modifier
-              .size(36.dp)
+              .size(32.dp)
               .clip(CircleShape)
-              .background(Brush.linearGradient(listOf(Color(0xFF2563EB), Color(0xFF4F46E5)))),
+              .background(Brush.linearGradient(listOf(Color(0xFF6366F1), Color(0xFF8B5CF6)))),
             contentAlignment = Alignment.Center
           ) {
-            Text("✍️", fontSize = 18.sp)
+            Text("✍️", fontSize = 16.sp)
           }
-          Spacer(modifier = Modifier.width(10.dp))
+          Spacer(modifier = Modifier.width(8.dp))
           Column {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-              Text(
-                text = "10 & 11 සිංහල විෂය නිර්දේශ Hub",
-                color = Color.White,
-                fontSize = 13.5.sp,
-                fontWeight = FontWeight.Bold
-              )
-              Spacer(modifier = Modifier.width(6.dp))
-              Surface(
-                color = Color(0xFF2563EB),
-                shape = RoundedCornerShape(4.dp)
-              ) {
-                Text(
-                  text = "100% O/L",
-                  color = Color.White,
-                  fontSize = 8.5.sp,
-                  fontWeight = FontWeight.ExtraBold,
-                  modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.dp)
-                )
-              }
-            }
             Text(
-              text = "ව්‍යාකරණ • 10/11 සාහිත්‍ය විචාර • සාරාංශ • පිරුළු • MCQs",
+              text = "සිංහල විෂය නිර්දේශ Master Hub",
+              color = Color.White,
+              fontSize = 13.sp,
+              fontWeight = FontWeight.Bold
+            )
+            Text(
+              text = "ව්‍යාකරණ • සාහිත්‍යය • රචනා • කරුණු 400",
               color = Color(0xFFC7D2FE),
-              fontSize = 10.5.sp,
-              maxLines = 1,
-              overflow = TextOverflow.Ellipsis
+              fontSize = 9.5.sp
             )
           }
         }
 
-        IconButton(
-          onClick = {
-            initialSelectedTab = 0
-            showFullScreenModal = true
-          },
-          modifier = Modifier.size(32.dp)
+        Surface(
+          color = Color(0xFF6366F1),
+          shape = RoundedCornerShape(6.dp)
         ) {
-          Icon(
-            imageVector = Icons.Default.Fullscreen,
-            contentDescription = "Full Screen",
-            tint = Color(0xFF93C5FD)
+          Text(
+            text = "100% ආවරණය",
+            color = Color.White,
+            fontSize = 8.5.sp,
+            fontWeight = FontWeight.ExtraBold,
+            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
           )
+        }
+      }
+
+      Spacer(modifier = Modifier.height(10.dp))
+
+      // Grade Toggle Pills: 10 ශ්‍රේණිය vs 11 ශ්‍රේණිය
+      Row(
+        modifier = Modifier
+          .fillMaxWidth()
+          .clip(RoundedCornerShape(10.dp))
+          .background(Color(0xFF0F172A))
+          .padding(3.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
+      ) {
+        listOf("10", "11").forEach { g ->
+          val isSelected = activeGrade == g
+          Surface(
+            onClick = { activeGrade = g },
+            shape = RoundedCornerShape(8.dp),
+            color = if (isSelected) Color(0xFF6366F1) else Color.Transparent,
+            modifier = Modifier.weight(1f)
+          ) {
+            Row(
+              modifier = Modifier.padding(vertical = 5.dp),
+              horizontalArrangement = Arrangement.Center,
+              verticalAlignment = Alignment.CenterVertically
+            ) {
+              Text(
+                text = if (g == "10") "📘 10 ශ්‍රේණිය" else "📙 11 ශ්‍රේණිය",
+                fontSize = 11.sp,
+                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                color = if (isSelected) Color.White else Color(0xFF94A3B8)
+              )
+            }
+          }
+        }
+      }
+
+      Spacer(modifier = Modifier.height(10.dp))
+
+      // Module Selector Strip (Compact Horizontal Grid)
+      LazyRow(
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        modifier = Modifier.fillMaxWidth()
+      ) {
+        itemsIndexed(categories) { index, cat ->
+          val isSelected = selectedCategoryIndex == index
+          Surface(
+            onClick = {
+              selectedCategoryIndex = if (isSelected) -1 else index
+            },
+            shape = RoundedCornerShape(8.dp),
+            color = if (isSelected) cat.color else Color(0xFF1E293B),
+            border = BorderStroke(1.dp, if (isSelected) Color.White else cat.color.copy(alpha = 0.4f))
+          ) {
+            Row(
+              modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
+              verticalAlignment = Alignment.CenterVertically
+            ) {
+              Text(cat.icon, fontSize = 11.sp)
+              Spacer(modifier = Modifier.width(4.dp))
+              Text(
+                text = cat.titleSinhala,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.widthIn(max = 120.dp)
+              )
+            }
+          }
         }
       }
 
       Spacer(modifier = Modifier.height(8.dp))
 
-      // Compact Chips Scroll Row
-      LazyRow(
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-        modifier = Modifier.fillMaxWidth()
-      ) {
-        itemsIndexed(SinhalaSectionType.values()) { index, section ->
-          Surface(
-            color = section.badgeColor.copy(alpha = 0.2f),
-            shape = RoundedCornerShape(8.dp),
-            border = BorderStroke(0.8.dp, section.badgeColor.copy(alpha = 0.6f)),
-            modifier = Modifier
-              .clickable {
-                initialSelectedTab = index
-                showFullScreenModal = true
-              }
-              .height(28.dp)
-          ) {
-            Row(
-              verticalAlignment = Alignment.CenterVertically,
-              modifier = Modifier.padding(horizontal = 8.dp)
-            ) {
-              Text(section.icon, fontSize = 11.sp)
-              Spacer(modifier = Modifier.width(4.dp))
-              Text(
-                text = section.titleSinhala,
-                color = Color.White,
-                fontSize = 10.sp,
-                fontWeight = FontWeight.SemiBold
-              )
-            }
-          }
-        }
+      // Content Display Area depending on Selected Module
+      if (selectedCategoryIndex == -1) {
+        SinhalaQuickOverviewGrid(
+          categories = categories,
+          onSelectModule = { selectedCategoryIndex = it }
+        )
+      } else {
+        SinhalaInlineModuleContent(
+          activeGrade = activeGrade,
+          categories = categories,
+          selectedCategoryIndex = selectedCategoryIndex,
+          onClose = { selectedCategoryIndex = -1 },
+          onOpenFullscreen = { showFullScreenModal = true }
+        )
       }
     }
   }
 
-  // Full Screen Modal Dialog
-  if (showFullScreenModal) {
+  // Full Screen Modal Dialog for deep study
+  if (showFullScreenModal && selectedCategoryIndex != -1) {
     SinhalaGrade10And11MasterHubDialog(
       initialGrade = activeGrade,
-      initialTab = initialSelectedTab,
+      initialCategoryIndex = selectedCategoryIndex,
+      categories = categories,
       onDismiss = { showFullScreenModal = false }
     )
+  }
+}
+
+@Composable
+fun SinhalaInlineModuleContent(
+  activeGrade: String,
+  categories: List<SubjectMasterCategory>,
+  selectedCategoryIndex: Int,
+  onClose: () -> Unit,
+  onOpenFullscreen: () -> Unit
+) {
+  var searchQuery by remember { mutableStateOf("") }
+  val category = categories[selectedCategoryIndex]
+
+  Column(
+    modifier = Modifier
+      .fillMaxWidth()
+      .clip(RoundedCornerShape(10.dp))
+      .background(Color(0xFF0F172A))
+      .padding(8.dp)
+  ) {
+    // Header & Control Row
+    Row(
+      modifier = Modifier.fillMaxWidth(),
+      horizontalArrangement = Arrangement.SpaceBetween,
+      verticalAlignment = Alignment.CenterVertically
+    ) {
+      Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(category.icon, fontSize = 14.sp)
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(
+          text = category.titleSinhala,
+          fontSize = 11.5.sp,
+          fontWeight = FontWeight.Bold,
+          color = category.color
+        )
+      }
+
+      Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        IconButton(
+          onClick = onOpenFullscreen,
+          modifier = Modifier.size(26.dp)
+        ) {
+          Icon(Icons.Default.Fullscreen, contentDescription = "Fullscreen", tint = category.color, modifier = Modifier.size(18.dp))
+        }
+        IconButton(
+          onClick = onClose,
+          modifier = Modifier.size(26.dp)
+        ) {
+          Icon(Icons.Default.Close, contentDescription = "Close", tint = Color(0xFF94A3B8), modifier = Modifier.size(18.dp))
+        }
+      }
+    }
+
+    // Search bar
+    OutlinedTextField(
+      value = searchQuery,
+      onValueChange = { searchQuery = it },
+      placeholder = { Text("කරුණු අතර සොයන්න...", fontSize = 9.5.sp, color = Color(0xFF94A3B8)) },
+      singleLine = true,
+      modifier = Modifier
+        .fillMaxWidth()
+        .height(44.dp)
+        .padding(vertical = 2.dp),
+      colors = OutlinedTextFieldDefaults.colors(
+        focusedTextColor = Color.White,
+        unfocusedTextColor = Color.White,
+        focusedBorderColor = category.color,
+        unfocusedBorderColor = Color(0xFF334155),
+        focusedContainerColor = Color(0xFF1E293B),
+        unfocusedContainerColor = Color(0xFF1E293B)
+      ),
+      trailingIcon = {
+        if (searchQuery.isNotEmpty()) {
+          IconButton(onClick = { searchQuery = "" }) {
+            Icon(Icons.Default.Close, contentDescription = "Clear", tint = Color.LightGray, modifier = Modifier.size(14.dp))
+          }
+        }
+      }
+    )
+
+    Spacer(modifier = Modifier.height(6.dp))
+
+    // Sub-section List
+    Column(
+      modifier = Modifier.fillMaxWidth(),
+      verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+      val items = category.points.filter {
+        searchQuery.isBlank() || it.title.contains(searchQuery, true) || it.detail.contains(searchQuery, true)
+      }.take(3) // Show a few in inline view
+
+      if (items.isEmpty()) {
+        Text("ගැළපෙන කරුණු හමු නොවීය.", color = Color(0xFF94A3B8), fontSize = 10.sp)
+      } else {
+        items.forEach { point ->
+          SinhalaFactCompactCard(point, category.color)
+        }
+      }
+
+      Button(
+        onClick = onOpenFullscreen,
+        colors = ButtonDefaults.buttonColors(containerColor = category.color),
+        modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+        shape = RoundedCornerShape(8.dp)
+      ) {
+        Text("සියලු කරුණු 20 බලන්න (View All)", fontSize = 10.sp, fontWeight = FontWeight.Bold)
+      }
+    }
+  }
+}
+
+@Composable
+fun SinhalaFactCompactCard(point: SubjectFactPoint, themeColor: Color) {
+  Surface(
+    shape = RoundedCornerShape(8.dp),
+    color = Color(0xFF1E293B),
+    border = BorderStroke(0.8.dp, Color(0xFF334155)),
+    modifier = Modifier.fillMaxWidth()
+  ) {
+    Row(
+      modifier = Modifier.padding(8.dp),
+      verticalAlignment = Alignment.Top
+    ) {
+      Box(
+        modifier = Modifier
+          .size(20.dp)
+          .background(themeColor.copy(alpha = 0.2f), CircleShape),
+        contentAlignment = Alignment.Center
+      ) {
+        Text(text = "${point.number}", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = themeColor)
+      }
+      Spacer(modifier = Modifier.width(8.dp))
+      Column {
+        Text(text = point.title, color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+        Text(text = point.detail, color = Color(0xFF94A3B8), fontSize = 9.5.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
+      }
+    }
   }
 }
 
@@ -184,15 +357,19 @@ fun SinhalaGrade10And11MasterHub(
 @Composable
 fun SinhalaGrade10And11MasterHubDialog(
   initialGrade: String,
-  initialTab: Int = 0,
+  initialCategoryIndex: Int = -1,
+  categories: List<SubjectMasterCategory>,
   onDismiss: () -> Unit
 ) {
   var activeGrade by remember { mutableStateOf(initialGrade) }
-  var selectedTabIndex by remember { mutableIntStateOf(initialTab) }
-  var searchQuery by remember { mutableStateOf("") }
+  var selectedCategoryIndex by remember { mutableIntStateOf(initialCategoryIndex) }
 
   BackHandler {
-    onDismiss()
+    if (selectedCategoryIndex != -1) {
+      selectedCategoryIndex = -1
+    } else {
+      onDismiss()
+    }
   }
 
   Dialog(
@@ -207,12 +384,12 @@ fun SinhalaGrade10And11MasterHubDialog(
       modifier = Modifier
         .fillMaxSize()
         .testTag("sinhala_10_11_fullscreen_dialog"),
-      color = Color(0xFFF8FAFC) // Crisp light background
+      color = Color(0xFF0F172A) // Deep background
     ) {
       Column(modifier = Modifier.fillMaxSize()) {
         // TOP APP BAR
         Surface(
-          color = Color(0xFF581C87), // Royal Purple
+          color = Color(0xFF1E1B4B),
           tonalElevation = 4.dp,
           modifier = Modifier.fillMaxWidth()
         ) {
@@ -224,12 +401,14 @@ fun SinhalaGrade10And11MasterHubDialog(
             ) {
               Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(
-                  onClick = onDismiss,
+                  onClick = {
+                    if (selectedCategoryIndex != -1) selectedCategoryIndex = -1 else onDismiss()
+                  },
                   modifier = Modifier.size(36.dp)
                 ) {
                   Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "Close",
+                    imageVector = if (selectedCategoryIndex == -1) Icons.Default.Close else Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back",
                     tint = Color.White
                   )
                 }
@@ -237,14 +416,14 @@ fun SinhalaGrade10And11MasterHubDialog(
                 Column {
                   Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                      text = "10 & 11 සිංහල සම්පූර්ණ Hub",
+                      text = if (selectedCategoryIndex == -1) "සිංහල විෂය නිර්දේශ Hub" else categories[selectedCategoryIndex].titleSinhala,
                       color = Color.White,
                       fontSize = 15.sp,
                       fontWeight = FontWeight.Bold
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Surface(
-                      color = Color(0xFF2563EB),
+                      color = Color(0xFF4F46E5),
                       shape = RoundedCornerShape(4.dp)
                     ) {
                       Text(
@@ -259,125 +438,78 @@ fun SinhalaGrade10And11MasterHubDialog(
                   Text(
                     text = "G.C.E. O/L විභාග නිර්දේශය 100% ආවරණය",
                     color = Color(0xFF94A3B8),
-                    fontSize = 10.5.sp
+                    fontSize = 10.sp
                   )
                 }
               }
+            }
 
-              // Grade Switcher Pills (10 ශ්‍රේණිය vs 11 ශ්‍රේණිය)
-              Row(
-                modifier = Modifier
-                  .clip(RoundedCornerShape(8.dp))
-                  .background(Color(0xFF334155))
-                  .padding(2.dp)
-              ) {
-                listOf("10", "11").forEach { g ->
-                  val isSelected = activeGrade == g
-                  Box(
-                    modifier = Modifier
-                      .clip(RoundedCornerShape(6.dp))
-                      .background(if (isSelected) Color(0xFF2563EB) else Color.Transparent)
-                      .clickable { activeGrade = g }
-                      .padding(horizontal = 8.dp, vertical = 4.dp),
-                    contentAlignment = Alignment.Center
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // Grade Switcher Pills (10 ශ්‍රේණිය vs 11 ශ්‍රේණිය)
+            Row(
+              modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(10.dp))
+                .background(Color(0xFF020617))
+                .padding(3.dp),
+              horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+              listOf("10", "11").forEach { g ->
+                val isSelected = activeGrade == g
+                Surface(
+                  onClick = { activeGrade = g },
+                  shape = RoundedCornerShape(8.dp),
+                  color = if (isSelected) Color(0xFF4F46E5) else Color.Transparent,
+                  modifier = Modifier.weight(1f)
+                ) {
+                  Row(
+                    modifier = Modifier.padding(vertical = 5.dp),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
                   ) {
                     Text(
-                      text = "Grade $g",
-                      color = if (isSelected) Color.White else Color(0xFFCBD5E1),
+                      text = if (g == "10") "📘 10 ශ්‍රේණිය" else "📙 11 ශ්‍රේණිය",
                       fontSize = 11.sp,
-                      fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                      fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                      color = if (isSelected) Color.White else Color(0xFF94A3B8)
                     )
                   }
                 }
               }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
-            // Search Bar
-            OutlinedTextField(
-              value = searchQuery,
-              onValueChange = { searchQuery = it },
-              placeholder = {
-                Text(
-                  "ව්‍යාකරණ, සාහිත්‍ය පාඩම්, සාරාංශ, පිරුළු සොයන්න...",
-                  fontSize = 11.5.sp,
-                  color = Color(0xFF64748B)
-                )
-              },
-              leadingIcon = {
-                Icon(
-                  Icons.Default.Search,
-                  contentDescription = "Search",
-                  tint = Color(0xFF94A3B8),
-                  modifier = Modifier.size(18.dp)
-                )
-              },
-              trailingIcon = {
-                if (searchQuery.isNotEmpty()) {
-                  IconButton(
-                    onClick = { searchQuery = "" },
-                    modifier = Modifier.size(24.dp)
-                  ) {
-                    Icon(
-                      Icons.Default.Clear,
-                      contentDescription = "Clear",
-                      tint = Color(0xFF94A3B8),
-                      modifier = Modifier.size(16.dp)
-                    )
-                  }
-                }
-              },
-              singleLine = true,
-              shape = RoundedCornerShape(10.dp),
-              colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = Color(0xFF0F172A),
-                unfocusedContainerColor = Color(0xFF0F172A),
-                focusedBorderColor = Color(0xFF38BDF8),
-                unfocusedBorderColor = Color(0xFF334155),
-                focusedTextColor = Color.White,
-                unfocusedTextColor = Color.White
-              ),
-              modifier = Modifier
-                .fillMaxWidth()
-                .height(44.dp)
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Horizontally Scrollable Tabs with Minimal Height & Bright Badges
-            ScrollableTabRow(
-              selectedTabIndex = selectedTabIndex,
-              edgePadding = 0.dp,
-              containerColor = Color.Transparent,
-              divider = {},
-              indicator = {},
+            // Module Selector Strip (Compact Horizontal Grid)
+            LazyRow(
+              horizontalArrangement = Arrangement.spacedBy(6.dp),
               modifier = Modifier.fillMaxWidth()
             ) {
-              SinhalaSectionType.values().forEachIndexed { index, section ->
-                val isSelected = selectedTabIndex == index
+              itemsIndexed(categories) { index, cat ->
+                val isSelected = selectedCategoryIndex == index
                 Surface(
-                  color = if (isSelected) section.badgeColor else Color(0xFF1E293B),
+                  onClick = {
+                    selectedCategoryIndex = if (isSelected) -1 else index
+                  },
                   shape = RoundedCornerShape(8.dp),
-                  border = BorderStroke(
-                    1.dp,
-                    if (isSelected) section.badgeColor else Color(0xFF334155)
-                  ),
-                  modifier = Modifier
-                    .padding(end = 6.dp)
-                    .clickable { selectedTabIndex = index }
+                  color = if (isSelected) cat.color else Color(0xFF1E293B),
+                  border = BorderStroke(1.dp, if (isSelected) Color.White else cat.color.copy(alpha = 0.4f))
                 ) {
                   Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
+                    verticalAlignment = Alignment.CenterVertically
                   ) {
-                    Text(section.icon, fontSize = 12.sp)
-                    Spacer(modifier = Modifier.width(5.dp))
+                    Text(cat.icon, fontSize = 11.sp)
+                    Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                      text = section.titleSinhala,
-                      fontSize = 11.sp,
-                      fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                      color = if (isSelected) Color.White else Color(0xFFCBD5E1)
+                      text = cat.titleSinhala,
+                      fontSize = 10.sp,
+                      fontWeight = FontWeight.Bold,
+                      color = Color.White,
+                      maxLines = 1,
+                      overflow = TextOverflow.Ellipsis,
+                      modifier = Modifier.widthIn(max = 120.dp)
                     )
                   }
                 }
@@ -386,124 +518,122 @@ fun SinhalaGrade10And11MasterHubDialog(
           }
         }
 
-        // CONTENT SECTION: Vertically scrollable with compact collapsible cards
-        LazyColumn(
-          modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 12.dp, vertical = 8.dp),
-          verticalArrangement = Arrangement.spacedBy(8.dp)
+        // CONTENT SECTION
+        Column(
+          modifier = Modifier.fillMaxSize()
         ) {
-          when (selectedTabIndex) {
-            0 -> {
-              // ✍️ GRAMMAR & SPELLING RULES
-              val items = SinhalaMasterRepository.grammarRulesList.filter {
-                (it.grade.contains(activeGrade) || it.grade == "10,11") &&
-                    (searchQuery.isBlank() ||
-                        it.ruleTitle.contains(searchQuery, true) ||
-                        it.ruleCategory.contains(searchQuery, true) ||
-                        it.corePrinciple.contains(searchQuery, true))
-              }
-              if (items.isEmpty()) {
-                item { SinhalaEmptySearchResultNotice() }
-              } else {
-                items(items, key = { it.id }) { rule ->
-                  SinhalaGrammarRuleCard(rule)
+          if (selectedCategoryIndex == -1) {
+            // Quick Overview Grid
+            Column(modifier = Modifier.padding(12.dp)) {
+              SinhalaQuickOverviewGrid(
+                categories = categories,
+                onSelectModule = { selectedCategoryIndex = it }
+              )
+            }
+          } else {
+            // Detailed Category View
+            SubjectMaster20CategoriesDetailView(
+              subjectName = "සිංහල",
+              categories = categories,
+              selectedCategoryNumber = categories[selectedCategoryIndex].categoryNumber,
+              onSelectCategory = { num ->
+                if (num == 0) selectedCategoryIndex = -1
+                else {
+                  val newIdx = categories.indexOfFirst { it.categoryNumber == num }
+                  if (newIdx != -1) selectedCategoryIndex = newIdx
                 }
-              }
-            }
-
-            1 -> {
-              // 📖 GRADE 11 LITERATURE CRITIQUES
-              val items = SinhalaMasterRepository.grade11LiteratureList.filter {
-                searchQuery.isBlank() ||
-                    it.title.contains(searchQuery, true) ||
-                    it.author.contains(searchQuery, true) ||
-                    it.sourceBook.contains(searchQuery, true)
-              }
-              if (items.isEmpty()) {
-                item { SinhalaEmptySearchResultNotice() }
-              } else {
-                items(items, key = { it.id }) { lesson ->
-                  SinhalaLiteratureLessonCard(lesson)
-                }
-              }
-            }
-
-            2 -> {
-              // 📜 GRADE 10 LITERATURE CRITIQUES
-              val items = SinhalaMasterRepository.grade10LiteratureList.filter {
-                searchQuery.isBlank() ||
-                    it.title.contains(searchQuery, true) ||
-                    it.author.contains(searchQuery, true) ||
-                    it.sourceBook.contains(searchQuery, true)
-              }
-              if (items.isEmpty()) {
-                item { SinhalaEmptySearchResultNotice() }
-              } else {
-                items(items, key = { it.id }) { lesson ->
-                  SinhalaLiteratureLessonCard(lesson)
-                }
-              }
-            }
-
-            3 -> {
-              // 📋 WRITING SKILLS & FORMATS
-              val items = SinhalaMasterRepository.writingSkillsList.filter {
-                searchQuery.isBlank() ||
-                    it.title.contains(searchQuery, true) ||
-                    it.category.contains(searchQuery, true)
-              }
-              if (items.isEmpty()) {
-                item { SinhalaEmptySearchResultNotice() }
-              } else {
-                items(items, key = { it.id }) { item ->
-                  SinhalaWritingSkillCard(item)
-                }
-              }
-            }
-
-            4 -> {
-              // 💡 PROVERBS, IDIOMS & VOCABULARY
-              val items = SinhalaMasterRepository.vocabList.filter {
-                searchQuery.isBlank() ||
-                    it.phrase.contains(searchQuery, true) ||
-                    it.contextualMeaning.contains(searchQuery, true) ||
-                    it.category.contains(searchQuery, true)
-              }
-              if (items.isEmpty()) {
-                item { SinhalaEmptySearchResultNotice() }
-              } else {
-                items(items, key = { it.id }) { item ->
-                  SinhalaVocabItemCard(item)
-                }
-              }
-            }
-
-            5 -> {
-              // ⚡ RAPID MCQS
-              val items = SinhalaMasterRepository.rapidMcqList.filter {
-                searchQuery.isBlank() ||
-                    it.question.contains(searchQuery, true) ||
-                    it.topic.contains(searchQuery, true)
-              }
-              if (items.isEmpty()) {
-                item { SinhalaEmptySearchResultNotice() }
-              } else {
-                items(items, key = { it.id }) { mcq ->
-                  SinhalaRapidMcqCard(mcq)
-                }
-              }
-            }
-
-            6 -> {
-              // 🎯 MARKING SECRETS & TIPS
-              items(SinhalaMasterRepository.examSecretsList) { pair ->
-                SinhalaExamSecretCard(title = pair.first, details = pair.second)
-              }
-            }
+              },
+              modifier = Modifier.fillMaxSize()
+            )
           }
         }
       }
+    }
+  }
+}
+
+@Composable
+fun SinhalaQuickOverviewGrid(
+  categories: List<SubjectMasterCategory>,
+  onSelectModule: (Int) -> Unit
+) {
+  Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+    // Grid Rows (2-column layout to match Science Hub)
+    for (i in categories.indices step 2) {
+      Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(6.dp)
+      ) {
+        SinhalaFeatureButton(
+          category = categories[i],
+          modifier = Modifier.weight(1f),
+          onClick = { onSelectModule(i) }
+        )
+        if (i + 1 < categories.size) {
+          SinhalaFeatureButton(
+            category = categories[i + 1],
+            modifier = Modifier.weight(1f),
+            onClick = { onSelectModule(i + 1) }
+          )
+        } else {
+          // Decorative fillers if odd number of sections
+          SinhalaFeatureButton(
+            category = null,
+            customTitle = "AI උපදේශක",
+            customIcon = "🤖",
+            customSubtitle = "සිංහල AI සහාය",
+            customColor = Color(0xFFDB2777),
+            modifier = Modifier.weight(1f),
+            onClick = { /* AI is already in AI tab, this is just for UI consistency */ }
+          )
+        }
+      }
+    }
+  }
+}
+
+@Composable
+fun SinhalaFeatureButton(
+  category: SubjectMasterCategory?,
+  customTitle: String = "",
+  customIcon: String = "",
+  customSubtitle: String = "",
+  customColor: Color = Color.Gray,
+  modifier: Modifier = Modifier,
+  onClick: () -> Unit
+) {
+  val title = category?.titleSinhala ?: customTitle
+  val icon = category?.icon ?: customIcon
+  val color = category?.color ?: customColor
+  val subtitle = category?.summary ?: customSubtitle
+
+  Surface(
+    onClick = onClick,
+    shape = RoundedCornerShape(8.dp),
+    color = color.copy(alpha = 0.25f),
+    border = BorderStroke(1.dp, color.copy(alpha = 0.6f)),
+    modifier = modifier
+  ) {
+    Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)) {
+      Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(icon, fontSize = 12.sp)
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(
+          text = title,
+          fontSize = 10.5.sp,
+          fontWeight = FontWeight.Bold,
+          color = Color.White,
+          maxLines = 1,
+          overflow = TextOverflow.Ellipsis
+        )
+      }
+      Text(
+        text = subtitle,
+        fontSize = 8.5.sp,
+        color = Color(0xFFC7D2FE),
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis
+      )
     }
   }
 }

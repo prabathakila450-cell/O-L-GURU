@@ -1546,10 +1546,6 @@ fun SubjectContentScreen(
   onAddContent: (String) -> Unit,
   onStartQuizSet: (QuizSet) -> Unit = {},
   onOpenFlashcards: () -> Unit = {},
-  activeAudio: ActiveAudioState? = null,
-  onPlayAudio: (ChapterItem, speed: Float) -> Unit = { _, _ -> },
-  onPauseAudio: () -> Unit = {},
-  onResumeAudio: () -> Unit = {},
   onOpenPdfAtPage: (pdfUrl: String, title: String, page: Int) -> Unit = { _, _, _ -> },
   onOpenAnalytics: () -> Unit = {},
   onOpenStructuredEssay: () -> Unit = {},
@@ -2826,7 +2822,7 @@ fun SubjectContentScreen(
       }
     }
 
-    // 5-Section Subject Hub: 1. කෙටි සටහන් | 2. ප්‍රශ්න පත්‍ර | 3. ස්වයං පුහුණු | 4. 🎧 Audio | 5. ⚡ AI Assistant
+    // 4-Section Subject Hub: 1. කෙටි සටහන් | 2. ප්‍රශ්න පත්‍ර | 3. ස්වයං පුහුණු | 4. ⚡ AI Assistant
     Surface(
       shape = RoundedCornerShape(16.dp),
       color = SurfaceVariantLight,
@@ -2852,14 +2848,12 @@ fun SubjectContentScreen(
           "කෙටි සටහන්",
           "ප්‍රශ්න පත්‍ර",
           "ස්වයං පුහුණු",
-          "🎧 Audio Notes",
           "⚡ AI Assistant"
         )
         val tabIcons = listOf(
           Icons.Default.Description,
           Icons.Default.Quiz,
           Icons.Default.MenuBook,
-          Icons.Default.Headphones,
           Icons.Default.AutoAwesome
         )
 
@@ -4508,22 +4502,9 @@ fun SubjectContentScreen(
       )
     }
 
-    // SECTION 4 (Tab 3): 🎧 Audio Notes & Podcasts (AI Powered)
-    if (selectedTab == 3) {
-      AudioNotesSection(
-        grade = grade,
-        subject = subject,
-        pdfUrl = activePdfUrl,
-        activeAudio = activeAudio,
-        onPlayAudio = onPlayAudio,
-        onPauseAudio = onPauseAudio,
-        onResumeAudio = onResumeAudio,
-        onOpenPdfAtPage = onOpenPdfAtPage
-      )
-    }
 
-    // SECTION 5 (Tab 4): ⚡ AI Smart Assistant & Voice Helper
-    if (selectedTab == 4) {
+    // SECTION 5 (Tab 3): ⚡ AI Smart Assistant & Voice Helper
+    if (selectedTab == 3) {
       // 🎙️ VOICE DOUBT SOLVER CALLOUT BANNER
       Card(
         shape = RoundedCornerShape(14.dp),

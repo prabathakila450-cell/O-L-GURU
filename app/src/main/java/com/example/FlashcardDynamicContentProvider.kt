@@ -21,9 +21,9 @@ object FlashcardDynamicContentProvider {
     // 0. GEOGRAPHY (භූගෝල විද්‍යාව) - Evaluated first to prevent matching on "විද්‍යාව"
     if (subject.contains("භූගෝල") || subject.contains("geography", ignoreCase = true)) {
       val card = if (s in 1..10) {
-        FlashcardBankGeographySetsPart1.getCard(s, c)
+        FlashcardBankGeographySetsPart1.getCard(s, c, grade)
       } else {
-        FlashcardBankGeographySetsPart2.getCard(s, c)
+        FlashcardBankGeographySetsPart2.getCard(s, c, grade)
       }
       if (card != null) return card
     }
@@ -43,8 +43,8 @@ object FlashcardDynamicContentProvider {
     // 2. MATHEMATICS (ගණිතය)
     if (subject.contains("ගණිතය") || subject.contains("ගණිත")) {
       val card = when {
-        s in 1..3 -> FlashcardSetsScienceMaths.getMathCard(s, c, grade, theme)
-        s in 4..9 -> FlashcardBankMathsSets.getMathSet(s, c)
+        s in 1..4 -> FlashcardSetsScienceMaths.getMathCard(s, c, grade, theme)
+        s in 5..9 -> FlashcardBankMathsSets.getMathSet(s, c)
         else -> FlashcardBankMathsSetsPart2.getMathSet(s, c)
       }
       if (card != null) return card
@@ -53,8 +53,8 @@ object FlashcardDynamicContentProvider {
     // 3. HISTORY (ඉතිහාසය)
     if (subject.contains("ඉතිහාසය") || subject.contains("ඉතිහාස")) {
       val card = when {
-        s == 1 -> FlashcardSetsHistorySocial.getHistoryCard(s, c, grade, theme)
-        s in 2..8 -> FlashcardBankHistorySetsPart1.getHistorySet(s, c)
+        s in 1..4 -> FlashcardSetsHistorySocial.getHistoryCard(s, c, grade, theme)
+        s in 5..8 -> FlashcardBankHistorySetsPart1.getHistorySet(s, c)
         else -> FlashcardBankHistorySetsPart2.getHistorySet(s, c)
       }
       if (card != null) return card
@@ -63,9 +63,9 @@ object FlashcardDynamicContentProvider {
     // 4. BUDDHISM (බුද්ධ ධර්මය)
     if (subject.contains("බුද්ධ") || subject.contains("ආගම")) {
       val card = if (s in 1..10) {
-        FlashcardBankBuddhismSets.getCard(s, c)
+        FlashcardBankBuddhismSets.getCard(s, c, grade)
       } else {
-        FlashcardBankBuddhismSetsPart2.getCard(s, c)
+        FlashcardBankBuddhismSetsPart2.getCard(s, c, grade)
       }
       if (card != null) return card
     }
@@ -73,9 +73,9 @@ object FlashcardDynamicContentProvider {
     // 5. SINHALA (සිංහල)
     if (subject.contains("සිංහල")) {
       val card = if (s in 1..10) {
-        FlashcardBankSinhalaSets.getCard(s, c)
+        FlashcardBankSinhalaSets.getCard(s, c, grade)
       } else {
-        FlashcardBankSinhalaSetsPart2.getCard(s, c)
+        FlashcardBankSinhalaSetsPart2.getCard(s, c, grade)
       }
       if (card != null) return card
     }
@@ -83,9 +83,9 @@ object FlashcardDynamicContentProvider {
     // 6. ENGLISH
     if (subject.contains("English") || subject.contains("ඉංග්‍රීසි")) {
       val card = if (s in 1..10) {
-        FlashcardBankEnglishSetsPart1.getCard(s, c)
+        FlashcardBankEnglishSetsPart1.getCard(s, c, grade)
       } else {
-        FlashcardBankEnglishSetsPart2.getCard(s, c)
+        FlashcardBankEnglishSetsPart2.getCard(s, c, grade)
       }
       if (card != null) return card
     }
@@ -93,9 +93,9 @@ object FlashcardDynamicContentProvider {
     // 7. GEOGRAPHY (භූගෝල විද්‍යාව)
     if (subject.contains("භූගෝල")) {
       val card = if (s in 1..10) {
-        FlashcardBankGeographySetsPart1.getCard(s, c)
+        FlashcardBankGeographySetsPart1.getCard(s, c, grade)
       } else {
-        FlashcardBankGeographySetsPart2.getCard(s, c)
+        FlashcardBankGeographySetsPart2.getCard(s, c, grade)
       }
       if (card != null) return card
     }
@@ -103,9 +103,9 @@ object FlashcardDynamicContentProvider {
     // 8. CIVICS (පුරවැසි අධ්‍යාපනය)
     if (subject.contains("පුරවැසි")) {
       val card = if (s in 1..10) {
-        FlashcardBankCivicsSetsPart1.getCard(s, c)
+        FlashcardBankCivicsSetsPart1.getCard(s, c, grade)
       } else {
-        FlashcardBankCivicsSetsPart2.getCard(s, c)
+        FlashcardBankCivicsSetsPart2.getCard(s, c, grade)
       }
       if (card != null) return card
     }
@@ -113,9 +113,9 @@ object FlashcardDynamicContentProvider {
     // 9. COMMERCE & ACCOUNTING (ව්‍යාපාර හා ගිණුම්කරණය)
     if (subject.contains("වාණිජ") || subject.contains("ගිණුම්") || subject.contains("ව්‍යාපාර")) {
       val card = if (s in 1..10) {
-        FlashcardBankCommerceSetsPart1.getCard(s, c)
+        FlashcardBankCommerceSetsPart1.getCard(s, c, grade)
       } else {
-        FlashcardBankCommerceSetsPart2.getCard(s, c)
+        FlashcardBankCommerceSetsPart2.getCard(s, c, grade)
       }
       if (card != null) return card
     }
@@ -123,9 +123,9 @@ object FlashcardDynamicContentProvider {
     // 10. ICT (තොරතුරු හා සන්නිවේදන තාක්ෂණය)
     if (subject.contains("ICT") || subject.contains("තොරතුරු")) {
       val card = if (s in 1..10) {
-        FlashcardBankIctSetsPart1.getIctSet(s, c)
+        FlashcardBankIctSetsPart1.getIctSet(s, c, grade)
       } else {
-        FlashcardBankIctSetsPart2.getIctSet(s, c)
+        FlashcardBankIctSetsPart2.getIctSet(s, c, grade)
       }
       if (card != null) return card
     }
@@ -133,7 +133,7 @@ object FlashcardDynamicContentProvider {
     // 11. HEALTH & PHYSICAL EDUCATION (සෞඛ්‍යය හා ශාරීරික)
     if (subject.contains("සෞඛ්‍ය") || subject.contains("ශාරීරික")) {
       val card = if (s in 1..10) {
-        FlashcardBankHealthSetsPart1.getHealthSet(s, c)
+        FlashcardBankHealthSetsPart1.getHealthSet(s, c, grade)
       } else {
         FlashcardBankHealthSetsPart2.getHealthSet(s, c)
       }
@@ -143,7 +143,7 @@ object FlashcardDynamicContentProvider {
     // 12. AGRICULTURE & FOOD TECHNOLOGY (කෘෂි හා ආහාර තාක්ෂණය)
     if (subject.contains("කෘෂි") || subject.contains("ආහාර")) {
       val card = if (s in 1..10) {
-        FlashcardBankAgriSetsPart1.getAgriSet(s, c)
+        FlashcardBankAgriSetsPart1.getAgriSet(s, c, grade)
       } else {
         FlashcardBankAgriSetsPart2.getAgriSet(s, c)
       }

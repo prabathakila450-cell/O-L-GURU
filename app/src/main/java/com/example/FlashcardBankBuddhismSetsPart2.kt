@@ -7,20 +7,30 @@ package com.example
  */
 object FlashcardBankBuddhismSetsPart2 {
 
-  fun getCard(setNum: Int, cardNum: Int): CardContentTuple {
+  fun getCard(setNum: Int, cardNum: Int, grade: String): CardContentTuple {
     val c = cardNum.coerceIn(1, 20)
+    // For Grades 10 and 11, sets 11 and onwards must be 100% identical.
+    val isOL = grade == "10" || grade == "11"
+    
+    val gradeOffset = when {
+      grade == "9" -> 0
+      isOL -> 200 // Use common offset for O/L
+      else -> 0
+    }
+    val adjustedIndex = (gradeOffset + (setNum - 11) * 20 + (c - 1))
+    
     return when (setNum) {
-      11 -> set11[(c - 1) % set11.size]
-      12 -> set12[(c - 1) % set12.size]
-      13 -> set13[(c - 1) % set13.size]
-      14 -> set14[(c - 1) % set14.size]
-      15 -> set15[(c - 1) % set15.size]
-      16 -> set16[(c - 1) % set16.size]
-      17 -> set17[(c - 1) % set17.size]
-      18 -> set18[(c - 1) % set18.size]
-      19 -> set19[(c - 1) % set19.size]
-      20 -> set20[(c - 1) % set20.size]
-      else -> set11[(c - 1) % set11.size]
+      11 -> set11[adjustedIndex % set11.size]
+      12 -> set12[adjustedIndex % set12.size]
+      13 -> set13[adjustedIndex % set13.size]
+      14 -> set14[adjustedIndex % set14.size]
+      15 -> set15[adjustedIndex % set15.size]
+      16 -> set16[adjustedIndex % set16.size]
+      17 -> set17[adjustedIndex % set17.size]
+      18 -> set18[adjustedIndex % set18.size]
+      19 -> set19[adjustedIndex % set19.size]
+      20 -> set20[adjustedIndex % set20.size]
+      else -> set11[adjustedIndex % set11.size]
     }
   }
 

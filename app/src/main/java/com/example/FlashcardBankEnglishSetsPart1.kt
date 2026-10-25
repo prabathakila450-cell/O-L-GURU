@@ -7,20 +7,20 @@ package com.example
  */
 object FlashcardBankEnglishSetsPart1 {
 
-  fun getCard(setNum: Int, cardNum: Int): CardContentTuple? {
+  fun getCard(setNum: Int, cardNum: Int, grade: String): CardContentTuple? {
     val c = cardNum.coerceIn(1, 20)
     return when (setNum) {
-      1 -> set1[(c - 1) % set1.size]
-      2 -> set2[(c - 1) % set2.size]
-      3 -> set3[(c - 1) % set3.size]
-      4 -> set4[(c - 1) % set4.size]
+      1 -> if (grade == "10") set1_Grade10[(c - 1) % set1_Grade10.size] else set1[(c - 1) % set1.size]
+      2 -> if (grade == "10") set2_Grade10[(c - 1) % set2_Grade10.size] else set2[(c - 1) % set2.size]
+      3 -> if (grade == "10") set3_Grade10[(c - 1) % set3_Grade10.size] else set3[(c - 1) % set3.size]
+      4 -> if (grade == "10") set4_Grade10[(c - 1) % set4_Grade10.size] else set4[(c - 1) % set4.size]
       5 -> set5[(c - 1) % set5.size]
       6 -> set6[(c - 1) % set6.size]
       7 -> set7[(c - 1) % set7.size]
       8 -> set8[(c - 1) % set8.size]
       9 -> set9[(c - 1) % set9.size]
       10 -> set10[(c - 1) % set10.size]
-      else -> FlashcardBankEnglishSetsPart2.getCard(setNum, cardNum)
+      else -> FlashcardBankEnglishSetsPart2.getCard(setNum, cardNum, grade)
     }
   }
 
@@ -262,5 +262,101 @@ object FlashcardBankEnglishSetsPart1 {
     CardContentTuple("Write a sentence apologising for absence from school.", "\"I am writing to explain that I was unable to attend school from 10th to 12th March due to a severe viral fever.\"", "Letter of excuse.", "Apology for absence"),
     CardContentTuple("What should be placed below the signature in a formal letter?", "The writer's full printed name and designation/post (e.g., 'Secretary, Science Club').", "Identifies sender clearly.", "Name & designation"),
     CardContentTuple("Why is spacing between paragraphs important?", "It creates visual clarity and distinctness, making the letter easy to read and evaluate.", "Leave one line between paragraphs.", "Paragraph spacing")
+  )
+
+  // --- GRADE 10 ENGLISH SET 1: Nouns, Articles (a/an/the) & Plural Forms ---
+  private val set1_Grade10 = listOf(
+    CardContentTuple("When do we use the indefinite article 'a' vs 'an'?", "Use 'a' before words starting with a consonant sound (a book, a university - /juː/); use 'an' before words starting with a vowel sound (an apple, an honest man - silent 'h').", "Sound matters, not just the starting letter.", "Sound rule: a book vs an hour"),
+    CardContentTuple("Why do we say 'a European country' and 'a university'?", "Because 'European' and 'university' begin with the consonant sound /j/ (y sound), not a vowel sound.", "Listen to the initial sound.", "Consonant sound /j/ takes 'a'"),
+    CardContentTuple("When do we use the definite article 'the'?", "When referring to a specific noun already mentioned, unique things in nature (the sun, the moon), superlative degrees (the tallest), or musical instruments (play the piano).", "Specific or unique nouns.", "Specific: 'the'"),
+    CardContentTuple("When is NO article (zero article) used?", "Before plural countable nouns used in general, uncountable nouns (water, milk), names of languages, meals (breakfast, dinner), and proper nouns (Sri Lanka, Colombo).", "General concepts: 'Cats love milk'.", "Zero article rule"),
+    CardContentTuple("What is the difference between Countable and Uncountable nouns?", "Countable nouns can be counted and have plural forms (book -> books, apple -> apples); Uncountable nouns cannot be counted in units and have no plural form (water, sugar, furniture, advice).", "Say 'pieces of advice', never 'advices'.", "Countable vs Uncountable"),
+    CardContentTuple("Give the plural form of irregular nouns: child, foot, tooth, mouse, person.", "children, feet, teeth, mice, people.", "Do not add '-s' to these nouns.", "Irregular plurals"),
+    CardContentTuple("What is the plural of nouns ending in -f or -fe (e.g., knife, leaf, life)?", "Change -f or -fe to -ves (knives, leaves, lives). Exceptions: roof -> roofs, cliff -> cliffs.", "f/fe changes to -ves.", "-ves plural rule"),
+    CardContentTuple("What is the plural of nouns ending in consonant + y (e.g., baby, city)?", "Change -y to -ies (babies, cities). But vowel + y just takes -s (boy -> boys, key -> keys).", "Consonant + y -> -ies.", "-ies rule"),
+    CardContentTuple("Give 3 examples of nouns that have the same singular and plural form.", "sheep, deer, fish, aircraft, species.", "Do not say 'two sheeps'; say 'two sheep'.", "Same singular and plural"),
+    CardContentTuple("Give 3 examples of nouns that are always plural and take a plural verb.", "trousers, scissors, spectacles, glasses, jeans, clothes.", "Say 'These scissors are sharp' or 'A pair of scissors is sharp'.", "Always plural nouns"),
+    CardContentTuple("Correct the error: 'He gave me many good advices.'", "He gave me much good advice (or 'many pieces of advice').", "'Advice' is uncountable; it never takes a plural '-s'.", "Advice is uncountable"),
+    CardContentTuple("Correct the error: 'The furnitures in our classroom are old.'", "The furniture in our classroom is old.", "'Furniture' is uncountable and takes a singular verb 'is'.", "Furniture is singular uncountable"),
+    CardContentTuple("When do we use 'many' vs 'much'?", "'many' is used with plural countable nouns (many books, many students); 'much' is used with uncountable nouns (much water, much time).", "Countable = many; Uncountable = much.", "Many (countable) vs Much (uncountable)"),
+    CardContentTuple("When do we use 'few' / 'a few' vs 'little' / 'a little'?", "'few / a few' with countable nouns (a few friends); 'little / a little' with uncountable nouns (a little milk). 'A few/a little' has a positive meaning; 'few/little' means almost none.", "'a few' = some; 'few' = scarcely any.", "Few (countable) vs Little (uncountable)"),
+    CardContentTuple("Correct the error: 'There are much children in the playground.'", "There are many children in the playground.", "'children' is a plural countable noun, so it takes 'many'.", "many children"),
+    CardContentTuple("What collective nouns refer to a group of birds, fish, and wolves?", "A flock of birds, a school (or shoal) of fish, a pack of wolves.", "Collective nouns for animals.", "Flock, school, pack"),
+    CardContentTuple("What is an abstract noun? Give 3 examples.", "A noun denoting an idea, quality, or state rather than a concrete object (e.g., honesty, freedom, courage, knowledge).", "You cannot touch an abstract noun.", "Abstract nouns (honesty, courage)"),
+    CardContentTuple("Form abstract nouns from the adjectives: brave, wise, kind.", "bravery, wisdom, kindness.", "Suffixes -ry, -dom, -ness.", "bravery, wisdom, kindness"),
+    CardContentTuple("Form nouns from the verbs: decide, educate, grow.", "decision, education, growth.", "Suffixes -ion, -tion, -th.", "decision, education, growth"),
+    CardContentTuple("Fill in the article: 'Sri Lanka is ________ island situated in the Indian Ocean.'", "an (island starts with a vowel sound /aɪ/).", "Vowel sound takes 'an'.", "an island")
+  )
+
+  // --- GRADE 10 ENGLISH SET 2: Prepositions & Phrasal Verbs ---
+  private val set2_Grade10 = listOf(
+    CardContentTuple("When do we use the prepositions of time 'in', 'on', and 'at'?", "'at' for precise times (at 5 o'clock, at noon, at night);\n'on' for days and dates (on Monday, on 4th February);\n'in' for months, years, centuries, and long periods (in May, in 2026, in the morning).", "at = specific time; on = day/date; in = long period.", "at (time), on (day), in (month/year)"),
+    CardContentTuple("Correct the error: 'The match will start on 3.30 p.m.'", "The match will start at 3.30 p.m.", "Specific clock time takes 'at'.", "at 3.30 p.m."),
+    CardContentTuple("Correct the error: 'I was born at 2010 in Monday.'", "I was born in 2010 on Monday.", "Year takes 'in'; Day of the week takes 'on'.", "in 2010, on Monday"),
+    CardContentTuple("What is the difference between 'between' and 'among'?", "'between' is used for two people or things (between Ruwan and Kamal);\n'among' is used for more than two or a group (among the students).", "Two = between; More than two = among.", "Between (2) vs Among (3+)"),
+    CardContentTuple("What is the difference between 'beside' and 'besides'?", "'beside' means 'next to' or 'at the side of' (Sit beside me);\n'besides' means 'in addition to' (Besides English, he speaks French).", "beside = location; besides = in addition.", "beside (next to) vs besides (in addition)"),
+    CardContentTuple("Explain the difference between 'since' and 'for' with the Present Perfect Tense.", "'since' refers to a specific starting point in time (since 2015, since morning);\n'for' refers to a duration or period of time (for five years, for two hours).", "since + point in time; for + duration.", "since (starting point) vs for (duration)"),
+    CardContentTuple("Fill in the blank: 'She has been studying in this school ________ 2020.'", "since", "2020 is a specific starting year.", "since 2020"),
+    CardContentTuple("Fill in the blank: 'He waited at the bus stop ________ forty minutes.'", "for", "Forty minutes is a duration of time.", "for forty minutes"),
+    CardContentTuple("What prepositions are used with transportation: bus, train, car, foot?", "on the bus, on the train, in the car, on foot (or 'by bus/by train/by car' without article).", "on foot, by bus, in a taxi.", "Prepositions of transport"),
+    CardContentTuple("What is a phrasal verb?", "A verb combined with an adverb or preposition (particle) that creates a meaning different from the original verb (e.g., give + up = surrender/quit).", "verb + preposition/adverb.", "Phrasal verb definition"),
+    CardContentTuple("What does the phrasal verb 'look after' mean? Give a sentence.", "To take care of someone or something. Example: 'She looks after her sick grandmother.'", "Synonym: care for.", "look after = take care of"),
+    CardContentTuple("What does the phrasal verb 'give up' mean? Give a sentence.", "To stop doing something or admit defeat. Example: 'Never give up your dreams.'", "Synonym: quit, surrender.", "give up = stop trying / quit"),
+    CardContentTuple("What does the phrasal verb 'put off' mean?", "To postpone or delay to a later date (e.g., 'The sports meet was put off due to rain').", "Synonym: postpone.", "put off = postpone"),
+    CardContentTuple("What does the phrasal verb 'call off' mean?", "To cancel an event completely (e.g., 'The strike was called off yesterday').", "Synonym: cancel.", "call off = cancel"),
+    CardContentTuple("What does the phrasal verb 'look up' mean when reading?", "To search for information in a dictionary, book, or online (e.g., 'Look up the new word in the dictionary').", "Search for meaning.", "look up = search in reference"),
+    CardContentTuple("What does the phrasal verb 'run out of' mean?", "To have none left of something (e.g., 'We have run out of sugar and petrol').", "Synonym: deplete supply.", "run out of = have none left"),
+    CardContentTuple("What preposition follows: interested, afraid, fond, good?", "interested IN, afraid OF, fond OF, good AT.", "Say 'good at Mathematics', NOT 'good in Mathematics'.", "interested in, afraid of, good at"),
+    CardContentTuple("Fill in the preposition: 'He is very keen ________ learning Japanese.'", "on (keen on)", "The adjective 'keen' takes the preposition 'on'.", "keen on"),
+    CardContentTuple("Fill in the preposition: 'The cat jumped ________ the table.'", "onto (or off / over)", "'onto' indicates movement to the surface of something.", "onto"),
+    CardContentTuple("Correct the error: 'The teacher congratulated me for my victory.'", "The teacher congratulated me on my victory.", "'congratulate' always takes the preposition 'on', never 'for'.", "congratulate on")
+  )
+
+  // --- GRADE 10 ENGLISH SET 3: Modals & Question Formations ---
+  private val set3_Grade10 = listOf(
+    CardContentTuple("What are modal auxiliary verbs? Name 6 common modals.", "Verbs that express ability, permission, obligation, possibility, or advice: can, could, may, might, must, shall, should, will, would.", "Followed by the bare infinitive (base verb).", "can, could, may, might, must, should"),
+    CardContentTuple("What modal verb expresses strong obligation or necessity imposed by rules?", "'must' (e.g., 'You must wear a helmet when riding a motorbike').", "Negative: 'must not' = strong prohibition.", "must = obligation"),
+    CardContentTuple("What is the difference between 'must' and 'have to'?", "'must' expresses personal obligation from the speaker; 'have to' expresses external obligation from laws, rules, or circumstances.", "Both express necessity.", "must (internal) vs have to (external)"),
+    CardContentTuple("What modal verb is used to give friendly advice or recommendations?", "'should' or 'ought to' (e.g., 'You should drink at least two litres of water daily').", "Synonym: ought to.", "should = advice"),
+    CardContentTuple("What modal verbs express permission politely?", "'May I...?' (formal), 'Could I...?' (polite), 'Can I...?' (informal).", "'May' is the most formal.", "May I? / Can I?"),
+    CardContentTuple("What modal verbs express possibility in the present or future?", "'may', 'might', or 'could' (e.g., 'It might rain this evening').", "'might' expresses weaker possibility than 'may'.", "may / might = possibility"),
+    CardContentTuple("What modal verb expresses past ability?", "'could' (e.g., 'When I was seven, I could swim across the river').", "Past form of 'can'.", "could = past ability"),
+    CardContentTuple("What is the negative of 'must' when expressing prohibition?", "'must not' / 'mustn't' (e.g., 'You must not use mobile phones inside the examination hall').", "Expresses strictly forbidden actions.", "must not = prohibition"),
+    CardContentTuple("What is the structure of a Yes/No question in English?", "Auxiliary verb (Be / Do / Have / Modal) + Subject + Main verb + Complement? (e.g., 'Do you play cricket?')", "Answered with 'Yes' or 'No'.", "Auxiliary + Subject + Verb?"),
+    CardContentTuple("Convert into a Yes/No question: 'Sunil can drive a car.'", "Can Sunil drive a car?", "Invert the modal auxiliary 'can' and subject 'Sunil'.", "Can Sunil drive a car?"),
+    CardContentTuple("Convert into a Yes/No question: 'They completed the project yesterday.'", "Did they complete the project yesterday?", "Simple Past uses 'Did' + base verb 'complete'.", "Did they complete...?"),
+    CardContentTuple("What are the 7 common Wh- question words and their meanings?", "Who (person), What (thing/action), Where (place), When (time), Why (reason), Which (choice), How (manner/degree).", "Begin Wh- interrogative sentences.", "Who, What, Where, When, Why, Which, How"),
+    CardContentTuple("What is the word order for Wh- questions with an auxiliary verb?", "Wh- word + Auxiliary verb + Subject + Main verb + (rest of sentence)?", "Example: 'Where do you live?'", "Wh- + Aux + Subject + Verb?"),
+    CardContentTuple("Make a question where the underlined word is the answer: 'He lives in Kandy.'", "Where does he live?", "'in Kandy' is a place, so use 'Where'.", "Where does he live?"),
+    CardContentTuple("Make a question where the underlined word is the answer: 'She woke up at 6.00 a.m.'", "What time (or When) did she wake up?", "Use 'What time' or 'When' + 'did' + base verb 'wake up'.", "When did she wake up?"),
+    CardContentTuple("Make a question where the underlined word is the answer: 'They cancelled the trip because of heavy rain.'", "Why did they cancel the trip?", "'because of' denotes reason, so use 'Why'.", "Why did they cancel the trip?"),
+    CardContentTuple("How do we form a question when the Wh- word is the subject itself?", "Wh- word + Verb + Object? (NO auxiliary 'do/does/did' is used). Example: 'Who broke the window?'", "Notice: 'Who broke...', NOT 'Who did break...'.", "Subject question: Who + Verb?"),
+    CardContentTuple("Correct the error: 'Where you are going for the holiday?'", "Where are you going for the holiday?", "Invert the auxiliary 'are' and subject 'you'.", "Where are you going?"),
+    CardContentTuple("Correct the error: 'Why did she went to hospital?'", "Why did she go to hospital?", "After the auxiliary 'did', the main verb must return to base form 'go'.", "Why did she go?"),
+    CardContentTuple("Form a polite request: 'Give me your pen.'", "\"Could you please lend me your pen?\" or \"May I borrow your pen, please?\"", "Use modal 'could' or 'may' for courtesy.", "Could you please lend me...?")
+  )
+
+  // --- GRADE 10 ENGLISH SET 4: Adjectives, Degrees of Comparison & Adverbs ---
+  private val set4_Grade10 = listOf(
+    CardContentTuple("What is an adjective? Give an example in a sentence.", "A word that describes, qualifies, or gives more information about a noun or pronoun (e.g., 'The clever student solved the difficult riddle').", "Modifies a noun.", "Adjective describes a noun"),
+    CardContentTuple("What are the 3 degrees of comparison for adjectives?", "1. Positive degree (tall, fast) 2. Comparative degree (taller, faster) 3. Superlative degree (tallest, fastest).", "Used to compare one, two, or more items.", "Positive, Comparative, Superlative"),
+    CardContentTuple("How do we form the comparative and superlative of one-syllable adjectives?", "Add '-er' for comparative and '-est' for superlative (e.g., tall -> taller -> tallest; small -> smaller -> smallest).", "Superlative always takes 'the' before it.", "-er and -est"),
+    CardContentTuple("What spelling rule applies to adjectives ending in consonant + vowel + consonant (CVC)?", "Double the final consonant before adding -er/-est (e.g., big -> bigger -> biggest; hot -> hotter -> hottest).", "CVC doubling rule.", "big -> bigger -> biggest"),
+    CardContentTuple("How do we form the comparative and superlative of adjectives with two or more syllables (e.g., beautiful)?", "Use 'more' for comparative and 'most' for superlative (more beautiful, most beautiful; more expensive, most expensive).", "Multi-syllable adjectives take more/most.", "more / most + adjective"),
+    CardContentTuple("Give the irregular comparative and superlative forms of: good, bad, far, little.", "good -> better -> best;\nbad -> worse -> worst;\nfar -> farther/further -> farthest/furthest;\nlittle -> less -> least.", "Memorize these irregular forms.", "good-better-best, bad-worse-worst"),
+    CardContentTuple("What word always follows a comparative adjective?", "'than' (e.g., 'An elephant is bigger than a buffalo'). Note spelling: 'than', NOT 'then'.", "than is used for comparison.", "Comparative + than"),
+    CardContentTuple("What word always precedes a superlative adjective?", "the definite article 'the' (e.g., 'Mount Everest is the highest peak in the world').", "the + superlative.", "the + superlative"),
+    CardContentTuple("How do we compare two equal qualities using the positive degree?", "as + adjective + as (e.g., 'Kamal is as tall as Nimal').", "Negative: 'not as/so ... as'.", "as ... as (equal comparison)"),
+    CardContentTuple("Correct the error: 'Nimal is more taller than his brother.'", "Nimal is taller than his brother (Never use 'more' with an '-er' adjective).", "Double comparatives are incorrect.", "taller (not more taller)"),
+    CardContentTuple("Correct the error: 'She is the most intelligent girl of the two sisters.'", "She is the more intelligent girl of the two sisters (Use comparative when comparing two items).", "Superlative is only for 3 or more.", "more intelligent (between two)"),
+    CardContentTuple("What is an adverb? What 3 things can an adverb modify?", "A word that modifies a verb, an adjective, or another adverb (e.g., 'He speaks softly', 'very tall', 'quite quickly').", "Answers how, when, where, how often.", "Adverb modifies verb/adjective/adverb"),
+    CardContentTuple("How are most adverbs of manner formed from adjectives?", "By adding the suffix '-ly' to the adjective (e.g., quick -> quickly, careful -> carefully, fluent -> fluently).", "If ending in -y: easy -> easily.", "Adjective + ly = Adverb"),
+    CardContentTuple("Give 3 examples of words that have the same form as both adjective and adverb.", "fast (a fast car / he runs fast), hard (hard work / works hard), early (early train / arrived early), late.", "Never say 'fastly'.", "fast, hard, early, late"),
+    CardContentTuple("What is the adverb of the adjective 'good'?", "'well' (e.g., 'He is a good singer' [adj]; 'He sings well' [adv]).", "Say 'She speaks English well', NOT 'She speaks English good'.", "good -> well"),
+    CardContentTuple("What are Adverbs of Frequency? Give 4 examples.", "Words that describe how often an action happens: always, usually, often, sometimes, rarely, never.", "Placed before the main verb, but after 'be'.", "always, often, rarely, never"),
+    CardContentTuple("Where is an adverb of frequency placed in a sentence?", "Before the main verb (e.g., 'She often visits the library') or after the verb 'to be' (e.g., 'He is always punctual').", "Position of frequency adverbs.", "Before main verb / After 'be'"),
+    CardContentTuple("Correct the error: 'He drives very careless.'", "He drives very carelessly (Modify the verb 'drives' with the adverb 'carelessly').", "Use adverb of manner to describe how he drives.", "drives carelessly"),
+    CardContentTuple("Explain the difference between 'hard' and 'hardly'.", "'hard' means with great effort/energy (He worked hard to pass);\n'hardly' means almost not / scarcely (He hardly worked at all).", "Totally different meanings.", "hard (diligently) vs hardly (barely)"),
+    CardContentTuple("Explain the difference between 'late' and 'lately'.", "'late' means after the expected time (He arrived late);\n'lately' means recently in recent times (I haven't seen him lately).", "lately = recently.", "late (not on time) vs lately (recently)")
   )
 }
