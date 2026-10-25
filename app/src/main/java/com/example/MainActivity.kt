@@ -5681,7 +5681,7 @@ fun AdminBarUnlockDialog(
             errorMessage = null
           },
           label = { Text("පරිශීලක නාමය (Username)") },
-          placeholder = { Text("Akila Prabhath Disanayaka") },
+          placeholder = { Text("පරිශීලක නාමය ඇතුළත් කරන්න") },
           leadingIcon = { Icon(Icons.Default.Person, contentDescription = "Username") },
           singleLine = true,
           modifier = Modifier
@@ -9444,7 +9444,7 @@ fun LoginAndApprovalDialog(
                 value = adminPhoneOrEmail,
                 onValueChange = { adminPhoneOrEmail = it },
                 label = { Text("පියවර 1: දුරකථන අංකය / Email") },
-                placeholder = { Text("දුරකථන අංකය හෝ Email") },
+                placeholder = { Text("දුරකථන අංකය හෝ Email ඇතුළත් කරන්න") },
                 leadingIcon = { Icon(Icons.Default.Phone, contentDescription = "Admin Phone") },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth().testTag("admin_login_phone_field")
@@ -9455,7 +9455,7 @@ fun LoginAndApprovalDialog(
                 value = adminUsername,
                 onValueChange = { adminUsername = it },
                 label = { Text("පියවර 2: පරිශීලක නාමය (Username)") },
-                placeholder = { Text("Akila Prabhath Disanayaka") },
+                placeholder = { Text("පරිශීලක නාමය ඇතුළත් කරන්න") },
                 leadingIcon = { Icon(Icons.Default.Person, contentDescription = "Admin Username") },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth().testTag("admin_login_username_field")
@@ -9466,7 +9466,7 @@ fun LoginAndApprovalDialog(
                 value = adminNic,
                 onValueChange = { adminNic = it },
                 label = { Text("පියවර 2: ජාතික හැඳුනුම්පත් අංකය (NIC)") },
-                placeholder = { Text("200214203683") },
+                placeholder = { Text("NIC අංකය ඇතුළත් කරන්න") },
                 leadingIcon = { Icon(Icons.Default.AccountBox, contentDescription = "Admin NIC") },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth().testTag("admin_login_nic_field")
@@ -9477,7 +9477,7 @@ fun LoginAndApprovalDialog(
                 value = adminPasscode,
                 onValueChange = { adminPasscode = it },
                 label = { Text("පියවර 2: මුරපදය (Password)") },
-                placeholder = { Text("A20020521PD") },
+                placeholder = { Text("මුරපදය ඇතුළත් කරන්න") },
                 leadingIcon = { Icon(Icons.Default.Lock, contentDescription = "Admin Password") },
                 visualTransformation = PasswordVisualTransformation(),
                 singleLine = true,
