@@ -115,10 +115,12 @@ import androidx.compose.material.icons.filled.Verified
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.IconButton
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedButton
@@ -5683,6 +5685,18 @@ fun AdminBarUnlockDialog(
           label = { Text("පරිශීලක නාමය (Username)") },
           placeholder = { Text("පරිශීලක නාමය ඇතුළත් කරන්න") },
           leadingIcon = { Icon(Icons.Default.Person, contentDescription = "Username") },
+          textStyle = TextStyle(color = Color.Black, fontSize = 14.sp),
+          colors = OutlinedTextFieldDefaults.colors(
+            focusedTextColor = Color.Black,
+            unfocusedTextColor = Color.Black,
+            focusedLabelColor = Color(0xFF1E3A8A),
+            unfocusedLabelColor = Color(0xFF4B5563),
+            focusedBorderColor = Color(0xFF1E3A8A),
+            unfocusedBorderColor = Color(0xFFD1D5DB),
+            cursorColor = Color.Black,
+            focusedPlaceholderColor = Color.Gray,
+            unfocusedPlaceholderColor = Color.Gray
+          ),
           singleLine = true,
           modifier = Modifier
             .fillMaxWidth()
@@ -5700,6 +5714,18 @@ fun AdminBarUnlockDialog(
           label = { Text("ජාතික හැඳුනුම්පත් අංකය (NIC)") },
           placeholder = { Text("NIC අංකය ඇතුළත් කරන්න") },
           leadingIcon = { Icon(Icons.Default.AccountBox, contentDescription = "NIC") },
+          textStyle = TextStyle(color = Color.Black, fontSize = 14.sp),
+          colors = OutlinedTextFieldDefaults.colors(
+            focusedTextColor = Color.Black,
+            unfocusedTextColor = Color.Black,
+            focusedLabelColor = Color(0xFF1E3A8A),
+            unfocusedLabelColor = Color(0xFF4B5563),
+            focusedBorderColor = Color(0xFF1E3A8A),
+            unfocusedBorderColor = Color(0xFFD1D5DB),
+            cursorColor = Color.Black,
+            focusedPlaceholderColor = Color.Gray,
+            unfocusedPlaceholderColor = Color.Gray
+          ),
           singleLine = true,
           modifier = Modifier
             .fillMaxWidth()
@@ -5724,6 +5750,18 @@ fun AdminBarUnlockDialog(
               )
             }
           },
+          textStyle = TextStyle(color = Color.Black, fontSize = 14.sp),
+          colors = OutlinedTextFieldDefaults.colors(
+            focusedTextColor = Color.Black,
+            unfocusedTextColor = Color.Black,
+            focusedLabelColor = Color(0xFF1E3A8A),
+            unfocusedLabelColor = Color(0xFF4B5563),
+            focusedBorderColor = Color(0xFF1E3A8A),
+            unfocusedBorderColor = Color(0xFFD1D5DB),
+            cursorColor = Color.Black,
+            focusedPlaceholderColor = Color.Gray,
+            unfocusedPlaceholderColor = Color.Gray
+          ),
           visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
           singleLine = true,
           modifier = Modifier
@@ -9112,6 +9150,18 @@ fun LoginAndApprovalDialog(
               onValueChange = { loginPhone = it },
               label = { Text("දුරකථන අංකය හෝ Email") },
               leadingIcon = { Icon(Icons.Default.Phone, contentDescription = "Phone") },
+              textStyle = TextStyle(color = Color.Black, fontSize = 14.sp),
+              colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black,
+                focusedLabelColor = Color(0xFF1E3A8A),
+                unfocusedLabelColor = Color(0xFF4B5563),
+                focusedBorderColor = Color(0xFF1E3A8A),
+                unfocusedBorderColor = Color(0xFFD1D5DB),
+                cursorColor = Color.Black,
+                focusedPlaceholderColor = Color.Gray,
+                unfocusedPlaceholderColor = Color.Gray
+              ),
               singleLine = true,
               modifier = Modifier.fillMaxWidth()
             )
@@ -9130,6 +9180,18 @@ fun LoginAndApprovalDialog(
                   )
                 }
               },
+              textStyle = TextStyle(color = Color.Black, fontSize = 14.sp),
+              colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black,
+                focusedLabelColor = Color(0xFF1E3A8A),
+                unfocusedLabelColor = Color(0xFF4B5563),
+                focusedBorderColor = Color(0xFF1E3A8A),
+                unfocusedBorderColor = Color(0xFFD1D5DB),
+                cursorColor = Color.Black,
+                focusedPlaceholderColor = Color.Gray,
+                unfocusedPlaceholderColor = Color.Gray
+              ),
               visualTransformation = if (showLoginPassword) VisualTransformation.None else PasswordVisualTransformation(),
               singleLine = true,
               modifier = Modifier.fillMaxWidth()
@@ -9333,6 +9395,18 @@ fun LoginAndApprovalDialog(
               onValueChange = { regName = it },
               label = { Text("සම්පූර්ණ නම (Full Name)") },
               leadingIcon = { Icon(Icons.Default.Person, contentDescription = "Name") },
+              textStyle = TextStyle(color = Color.Black, fontSize = 14.sp),
+              colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black,
+                focusedLabelColor = Color(0xFF1E3A8A),
+                unfocusedLabelColor = Color(0xFF4B5563),
+                focusedBorderColor = Color(0xFF1E3A8A),
+                unfocusedBorderColor = Color(0xFFD1D5DB),
+                cursorColor = Color.Black,
+                focusedPlaceholderColor = Color.Gray,
+                unfocusedPlaceholderColor = Color.Gray
+              ),
               singleLine = true,
               modifier = Modifier.fillMaxWidth()
             )
@@ -9343,6 +9417,18 @@ fun LoginAndApprovalDialog(
               onValueChange = { regPhone = it },
               label = { Text("දුරකථන අංකය (Phone Number)") },
               leadingIcon = { Icon(Icons.Default.Phone, contentDescription = "Phone") },
+              textStyle = TextStyle(color = Color.Black, fontSize = 14.sp),
+              colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black,
+                focusedLabelColor = Color(0xFF1E3A8A),
+                unfocusedLabelColor = Color(0xFF4B5563),
+                focusedBorderColor = Color(0xFF1E3A8A),
+                unfocusedBorderColor = Color(0xFFD1D5DB),
+                cursorColor = Color.Black,
+                focusedPlaceholderColor = Color.Gray,
+                unfocusedPlaceholderColor = Color.Gray
+              ),
               singleLine = true,
               modifier = Modifier.fillMaxWidth()
             )
@@ -9353,6 +9439,18 @@ fun LoginAndApprovalDialog(
               onValueChange = { regPassword = it },
               label = { Text("නව මුරපදය (Password)") },
               leadingIcon = { Icon(Icons.Default.Lock, contentDescription = "Password") },
+              textStyle = TextStyle(color = Color.Black, fontSize = 14.sp),
+              colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black,
+                focusedLabelColor = Color(0xFF1E3A8A),
+                unfocusedLabelColor = Color(0xFF4B5563),
+                focusedBorderColor = Color(0xFF1E3A8A),
+                unfocusedBorderColor = Color(0xFFD1D5DB),
+                cursorColor = Color.Black,
+                focusedPlaceholderColor = Color.Gray,
+                unfocusedPlaceholderColor = Color.Gray
+              ),
               visualTransformation = PasswordVisualTransformation(),
               singleLine = true,
               modifier = Modifier.fillMaxWidth()
@@ -9446,6 +9544,18 @@ fun LoginAndApprovalDialog(
                 label = { Text("පියවර 1: දුරකථන අංකය / Email") },
                 placeholder = { Text("දුරකථන අංකය හෝ Email ඇතුළත් කරන්න") },
                 leadingIcon = { Icon(Icons.Default.Phone, contentDescription = "Admin Phone") },
+                textStyle = TextStyle(color = Color.Black, fontSize = 14.sp),
+                colors = OutlinedTextFieldDefaults.colors(
+                  focusedTextColor = Color.Black,
+                  unfocusedTextColor = Color.Black,
+                  focusedLabelColor = Color(0xFF1E3A8A),
+                  unfocusedLabelColor = Color(0xFF4B5563),
+                  focusedBorderColor = Color(0xFF1E3A8A),
+                  unfocusedBorderColor = Color(0xFFD1D5DB),
+                  cursorColor = Color.Black,
+                  focusedPlaceholderColor = Color.Gray,
+                  unfocusedPlaceholderColor = Color.Gray
+                ),
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth().testTag("admin_login_phone_field")
               )
@@ -9457,6 +9567,18 @@ fun LoginAndApprovalDialog(
                 label = { Text("පියවර 2: පරිශීලක නාමය (Username)") },
                 placeholder = { Text("පරිශීලක නාමය ඇතුළත් කරන්න") },
                 leadingIcon = { Icon(Icons.Default.Person, contentDescription = "Admin Username") },
+                textStyle = TextStyle(color = Color.Black, fontSize = 14.sp),
+                colors = OutlinedTextFieldDefaults.colors(
+                  focusedTextColor = Color.Black,
+                  unfocusedTextColor = Color.Black,
+                  focusedLabelColor = Color(0xFF1E3A8A),
+                  unfocusedLabelColor = Color(0xFF4B5563),
+                  focusedBorderColor = Color(0xFF1E3A8A),
+                  unfocusedBorderColor = Color(0xFFD1D5DB),
+                  cursorColor = Color.Black,
+                  focusedPlaceholderColor = Color.Gray,
+                  unfocusedPlaceholderColor = Color.Gray
+                ),
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth().testTag("admin_login_username_field")
               )
@@ -9468,6 +9590,18 @@ fun LoginAndApprovalDialog(
                 label = { Text("පියවර 2: ජාතික හැඳුනුම්පත් අංකය (NIC)") },
                 placeholder = { Text("NIC අංකය ඇතුළත් කරන්න") },
                 leadingIcon = { Icon(Icons.Default.AccountBox, contentDescription = "Admin NIC") },
+                textStyle = TextStyle(color = Color.Black, fontSize = 14.sp),
+                colors = OutlinedTextFieldDefaults.colors(
+                  focusedTextColor = Color.Black,
+                  unfocusedTextColor = Color.Black,
+                  focusedLabelColor = Color(0xFF1E3A8A),
+                  unfocusedLabelColor = Color(0xFF4B5563),
+                  focusedBorderColor = Color(0xFF1E3A8A),
+                  unfocusedBorderColor = Color(0xFFD1D5DB),
+                  cursorColor = Color.Black,
+                  focusedPlaceholderColor = Color.Gray,
+                  unfocusedPlaceholderColor = Color.Gray
+                ),
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth().testTag("admin_login_nic_field")
               )
@@ -9479,6 +9613,18 @@ fun LoginAndApprovalDialog(
                 label = { Text("පියවර 2: මුරපදය (Password)") },
                 placeholder = { Text("මුරපදය ඇතුළත් කරන්න") },
                 leadingIcon = { Icon(Icons.Default.Lock, contentDescription = "Admin Password") },
+                textStyle = TextStyle(color = Color.Black, fontSize = 14.sp),
+                colors = OutlinedTextFieldDefaults.colors(
+                  focusedTextColor = Color.Black,
+                  unfocusedTextColor = Color.Black,
+                  focusedLabelColor = Color(0xFF1E3A8A),
+                  unfocusedLabelColor = Color(0xFF4B5563),
+                  focusedBorderColor = Color(0xFF1E3A8A),
+                  unfocusedBorderColor = Color(0xFFD1D5DB),
+                  cursorColor = Color.Black,
+                  focusedPlaceholderColor = Color.Gray,
+                  unfocusedPlaceholderColor = Color.Gray
+                ),
                 visualTransformation = PasswordVisualTransformation(),
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth().testTag("admin_login_password_field")
