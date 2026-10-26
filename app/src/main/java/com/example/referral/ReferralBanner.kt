@@ -59,12 +59,20 @@ fun ReferralBanner(modifier: Modifier = Modifier) {
         """.trimIndent()
         
         try {
-            val intent = Intent(Intent.ACTION_SEND).apply {
-                type = "text/plain"
-                putExtra(Intent.EXTRA_TEXT, shareText)
-                setPackage(packageName)
+            if (packageName.isNotEmpty()) {
+                val intent = Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_TEXT, shareText)
+                    setPackage(packageName)
+                }
+                context.startActivity(intent)
+            } else {
+                val intent = Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_TEXT, shareText)
+                }
+                context.startActivity(Intent.createChooser(intent, "ඇප් එක ශෙයා කරන්න (Share App)"))
             }
-            context.startActivity(intent)
         } catch (e: Exception) {
             val intent = Intent(Intent.ACTION_SEND).apply {
                 type = "text/plain"
@@ -125,25 +133,25 @@ fun ReferralBanner(modifier: Modifier = Modifier) {
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 // WhatsApp Button (Green)
                 Button(
                     onClick = { shareToApp("com.whatsapp", "WhatsApp", true) },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF25D366)),
-                    contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
+                    contentPadding = PaddingValues(horizontal = 6.dp, vertical = 4.dp),
                     modifier = Modifier.weight(1f).height(36.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Share,
                         contentDescription = "WhatsApp",
                         tint = Color.White,
-                        modifier = Modifier.size(16.dp)
+                        modifier = Modifier.size(14.dp)
                     )
-                    Spacer(modifier = Modifier.width(6.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = "WhatsApp",
-                        fontSize = 12.sp,
+                        fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
                     )
@@ -153,19 +161,41 @@ fun ReferralBanner(modifier: Modifier = Modifier) {
                 Button(
                     onClick = { shareToApp("org.telegram.messenger", "Telegram", false) },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF229ED9)),
-                    contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
+                    contentPadding = PaddingValues(horizontal = 6.dp, vertical = 4.dp),
                     modifier = Modifier.weight(1f).height(36.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Send,
                         contentDescription = "Telegram",
                         tint = Color.White,
-                        modifier = Modifier.size(16.dp)
+                        modifier = Modifier.size(14.dp)
                     )
-                    Spacer(modifier = Modifier.width(6.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = "Telegram",
-                        fontSize = 12.sp,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                }
+
+                // Any App / General Share Button (Indigo)
+                Button(
+                    onClick = { shareToApp("", "Share", true) },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6366F1)),
+                    contentPadding = PaddingValues(horizontal = 6.dp, vertical = 4.dp),
+                    modifier = Modifier.weight(1f).height(36.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Share,
+                        contentDescription = "Share",
+                        tint = Color.White,
+                        modifier = Modifier.size(14.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "වෙනත් (Share)",
+                        fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
                     )

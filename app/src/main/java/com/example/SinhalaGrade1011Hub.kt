@@ -387,151 +387,85 @@ fun SinhalaGrade10And11MasterHubDialog(
       color = Color(0xFF0F172A) // Deep background
     ) {
       Column(modifier = Modifier.fillMaxSize()) {
-        // TOP APP BAR
+        // ULTRA-COMPACT TOP APP BAR (Single slim row, ~44dp height)
         Surface(
           color = Color(0xFF1E1B4B),
-          tonalElevation = 4.dp,
+          tonalElevation = 2.dp,
           modifier = Modifier.fillMaxWidth()
         ) {
-          Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
+          Row(
+            modifier = Modifier
+              .fillMaxWidth()
+              .statusBarsPadding()
+              .padding(horizontal = 8.dp, vertical = 4.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+          ) {
             Row(
-              modifier = Modifier.fillMaxWidth(),
-              horizontalArrangement = Arrangement.SpaceBetween,
-              verticalAlignment = Alignment.CenterVertically
+              verticalAlignment = Alignment.CenterVertically,
+              modifier = Modifier.weight(1f)
             ) {
-              Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(
-                  onClick = {
-                    if (selectedCategoryIndex != -1) selectedCategoryIndex = -1 else onDismiss()
-                  },
-                  modifier = Modifier.size(36.dp)
-                ) {
-                  Icon(
-                    imageVector = if (selectedCategoryIndex == -1) Icons.Default.Close else Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
-                    tint = Color.White
-                  )
-                }
-                Spacer(modifier = Modifier.width(6.dp))
-                Column {
-                  Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                      text = if (selectedCategoryIndex == -1) "සිංහල විෂය නිර්දේශ Hub" else categories[selectedCategoryIndex].titleSinhala,
-                      color = Color.White,
-                      fontSize = 15.sp,
-                      fontWeight = FontWeight.Bold
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Surface(
-                      color = Color(0xFF4F46E5),
-                      shape = RoundedCornerShape(4.dp)
-                    ) {
-                      Text(
-                        text = "$activeGrade ශ්‍රේණිය",
-                        color = Color.White,
-                        fontSize = 9.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.dp)
-                      )
-                    }
-                  }
-                  Text(
-                    text = "G.C.E. O/L විභාග නිර්දේශය 100% ආවරණය",
-                    color = Color(0xFF94A3B8),
-                    fontSize = 10.sp
-                  )
-                }
+              IconButton(
+                onClick = {
+                  if (selectedCategoryIndex != -1) selectedCategoryIndex = -1 else onDismiss()
+                },
+                modifier = Modifier.size(36.dp)
+              ) {
+                Icon(
+                  imageVector = if (selectedCategoryIndex == -1) Icons.Default.Close else Icons.AutoMirrored.Filled.ArrowBack,
+                  contentDescription = "Back",
+                  tint = Color.White
+                )
               }
+              Spacer(modifier = Modifier.width(4.dp))
+              Text(
+                text = if (selectedCategoryIndex == -1) "සිංහල විෂය නිර්දේශ Hub" else categories[selectedCategoryIndex].titleSinhala,
+                color = Color.White,
+                fontSize = 13.5.sp,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+              )
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
-
-            // Grade Switcher Pills (10 ශ්‍රේණිය vs 11 ශ්‍රේණිය)
-            Row(
-              modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(10.dp))
-                .background(Color(0xFF020617))
-                .padding(3.dp),
-              horizontalArrangement = Arrangement.spacedBy(4.dp)
+            // Quick Grade Switcher Pill in Top Bar
+            Surface(
+              onClick = { activeGrade = if (activeGrade == "10") "11" else "10" },
+              shape = RoundedCornerShape(12.dp),
+              color = Color(0xFF4F46E5),
+              modifier = Modifier.padding(horizontal = 4.dp)
             ) {
-              listOf("10", "11").forEach { g ->
-                val isSelected = activeGrade == g
-                Surface(
-                  onClick = { activeGrade = g },
-                  shape = RoundedCornerShape(8.dp),
-                  color = if (isSelected) Color(0xFF4F46E5) else Color.Transparent,
-                  modifier = Modifier.weight(1f)
-                ) {
-                  Row(
-                    modifier = Modifier.padding(vertical = 5.dp),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                  ) {
-                    Text(
-                      text = if (g == "10") "📘 10 ශ්‍රේණිය" else "📙 11 ශ්‍රේණිය",
-                      fontSize = 11.sp,
-                      fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                      color = if (isSelected) Color.White else Color(0xFF94A3B8)
-                    )
-                  }
-                }
-              }
-            }
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            // Module Selector Strip (Compact Horizontal Grid)
-            LazyRow(
-              horizontalArrangement = Arrangement.spacedBy(6.dp),
-              modifier = Modifier.fillMaxWidth()
-            ) {
-              itemsIndexed(categories) { index, cat ->
-                val isSelected = selectedCategoryIndex == index
-                Surface(
-                  onClick = {
-                    selectedCategoryIndex = if (isSelected) -1 else index
-                  },
-                  shape = RoundedCornerShape(8.dp),
-                  color = if (isSelected) cat.color else Color(0xFF1E293B),
-                  border = BorderStroke(1.dp, if (isSelected) Color.White else cat.color.copy(alpha = 0.4f))
-                ) {
-                  Row(
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                  ) {
-                    Text(cat.icon, fontSize = 11.sp)
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                      text = cat.titleSinhala,
-                      fontSize = 10.sp,
-                      fontWeight = FontWeight.Bold,
-                      color = Color.White,
-                      maxLines = 1,
-                      overflow = TextOverflow.Ellipsis,
-                      modifier = Modifier.widthIn(max = 120.dp)
-                    )
-                  }
-                }
-              }
+              Text(
+                text = if (activeGrade == "10") "📘 10 වසර" else "📙 11 වසර",
+                color = Color.White,
+                fontSize = 10.5.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.5.dp)
+              )
             }
           }
         }
 
-        // CONTENT SECTION
-        Column(
-          modifier = Modifier.fillMaxSize()
-        ) {
+        // CONTENT SECTION - FULL HEIGHT SCROLLABLE
+        Box(modifier = Modifier.fillMaxSize()) {
           if (selectedCategoryIndex == -1) {
-            // Quick Overview Grid
-            Column(modifier = Modifier.padding(12.dp)) {
-              SinhalaQuickOverviewGrid(
-                categories = categories,
-                onSelectModule = { selectedCategoryIndex = it }
-              )
+            // Quick Overview Grid (Scrollable)
+            LazyColumn(
+              modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 12.dp),
+              contentPadding = PaddingValues(top = 8.dp, bottom = 28.dp),
+              verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+              item {
+                SinhalaQuickOverviewGrid(
+                  categories = categories,
+                  onSelectModule = { selectedCategoryIndex = it }
+                )
+              }
             }
           } else {
-            // Detailed Category View
+            // Detailed Category View (Full Screen Scrollable 20 Facts)
             SubjectMaster20CategoriesDetailView(
               subjectName = "සිංහල",
               categories = categories,

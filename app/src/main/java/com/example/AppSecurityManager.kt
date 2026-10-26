@@ -139,7 +139,14 @@ object AppSecurityManager {
   fun applyScreenProtection(activity: Activity, isEnabled: Boolean) {
     try {
       activity.runOnUiThread {
-        activity.window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        // Allow screen capture on emulator/browser preview so WebRTC streaming preview renders clearly.
+        // On physical student devices, add FLAG_SECURE to block real physical screenshots and screen recordings.
+        val isEmulator = isDeviceEmulator()
+        if (isEnabled && !isEmulator) {
+          activity.window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        } else {
+          activity.window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        }
       }
     } catch (_: Exception) {}
   }

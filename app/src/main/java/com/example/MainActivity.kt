@@ -508,6 +508,13 @@ class MainActivity : ComponentActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    // Pre-create Chromium WebView code cache directories to ensure clean initialization
+    try {
+      val webViewDir = java.io.File(cacheDir, "WebView/Default/HTTP Cache/Code Cache")
+      java.io.File(webViewDir, "wasm").mkdirs()
+      java.io.File(webViewDir, "js").mkdirs()
+    } catch (_: Exception) {}
+
     window.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(android.graphics.Color.parseColor("#F8FAFC")))
     AppSecurityManager.applyScreenProtection(this, !AppSecurityManager.isAdminSession)
 
@@ -609,6 +616,18 @@ fun StudentPortalApp() {
     }
 
     val merged = genuineSaved.toMutableList()
+    // Reset all previous non-admin student approvals so clean approval requests & approvals start from this moment
+    for (i in merged.indices) {
+      val user = merged[i]
+      if (!isAuthorizedAdminUser(user.usernameOrPhone)) {
+        merged[i] = user.copy(
+          isApproved = false,
+          paymentStatus = "Pending Approval",
+          approvedGrades = emptyList()
+        )
+      }
+    }
+
     // Guarantee that all admin accounts exist with full approved privileges
     for (admin in defaultAdminUsers) {
       val existingIndex = merged.indexOfFirst { it.usernameOrPhone.trim().equals(admin.usernameOrPhone.trim(), ignoreCase = true) }
@@ -662,6 +681,7 @@ fun StudentPortalApp() {
   }
 
   var showAuthRequiredDialog by remember { mutableStateOf(false) }
+  var authDialogInitialTab by remember { mutableStateOf(1) }
   var showPaymentApprovalDialog by remember { mutableStateOf(false) }
   var previewReceiptImageUrl by remember { mutableStateOf<String?>(null) }
   var showGradeNotApprovedDialog by remember { mutableStateOf(false) }
@@ -1899,7 +1919,10 @@ fun StudentPortalApp() {
             unreadNotificationCount = unreadNotificationsCount,
             onEyeCareClick = { showEyeCareSettingsSheet = true },
             onSecurityClick = { showSecurityPanelDialog = true },
-            onAuthClick = { showAuthRequiredDialog = true },
+            onAuthClick = {
+              authDialogInitialTab = 1
+              showAuthRequiredDialog = true
+            },
             onNotificationClick = {
               showNotificationCenterDialog = true
             },
@@ -2938,6 +2961,7 @@ fun StudentPortalApp() {
       if (showAuthRequiredDialog) {
         LoginAndApprovalDialog(
           registeredUsers = registeredUsers,
+          initialTab = authDialogInitialTab,
           onLoginSuccess = { user ->
             loggedInUser = user
             val isUserAdmin = isAuthorizedAdminUser(user.usernameOrPhone)
@@ -8891,7 +8915,7 @@ fun LoginAndApprovalDialog(
   onPickPdf: () -> Unit = {},
   selectedPdfFileName: String? = null,
   selectedPdfUri: Uri? = null,
-  initialTab: Int = 0,
+  initialTab: Int = 1,
   onPreviewReceipt: (String) -> Unit = {},
   adminBroadcastMessages: SnapshotStateList<AdminBroadcastMessage>? = null,
   onSendBroadcastMessage: (title: String, message: String, priority: BroadcastPriority, targetGrade: String) -> Unit = { _, _, _, _ -> },
@@ -8900,7 +8924,7 @@ fun LoginAndApprovalDialog(
   onOpenStagingDialog: () -> Unit = {},
   onAddNewContentClick: () -> Unit = {}
 ) {
-  var selectedTab by remember { mutableStateOf(initialTab) } // 0: Login, 1: Register, 2: Admin
+  var selectedTab by remember(initialTab) { mutableStateOf(initialTab) } // 0: Login, 1: Register, 2: Admin
 
   // Login Form State
   var loginPhone by remember { mutableStateOf("") }
@@ -9021,17 +9045,65 @@ fun LoginAndApprovalDialog(
             Tab(
               selected = selectedTab == 0,
               onClick = { selectedTab = 0 },
-              text = { Text("ඇතුළුවීම", fontWeight = FontWeight.Bold, fontSize = 12.sp) }
+              text = {
+                Surface(
+                  shape = RoundedCornerShape(8.dp),
+                  color = if (selectedTab == 0) Color.White else Color.Transparent,
+                  shadowElevation = if (selectedTab == 0) 1.dp else 0.dp,
+                  modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+                ) {
+                  Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(vertical = 6.dp)) {
+                    Text(
+                      "ඇතුළුවීම",
+                      fontWeight = if (selectedTab == 0) FontWeight.Bold else FontWeight.Medium,
+                      fontSize = 12.sp,
+                      color = if (selectedTab == 0) BluePrimary else NeutralMedium
+                    )
+                  }
+                }
+              }
             )
             Tab(
               selected = selectedTab == 1,
               onClick = { selectedTab = 1 },
-              text = { Text("ලියාපදිංචිය", fontWeight = FontWeight.Bold, fontSize = 12.sp) }
+              text = {
+                Surface(
+                  shape = RoundedCornerShape(8.dp),
+                  color = if (selectedTab == 1) Color.White else Color.Transparent,
+                  shadowElevation = if (selectedTab == 1) 1.dp else 0.dp,
+                  modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+                ) {
+                  Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(vertical = 6.dp)) {
+                    Text(
+                      "ලියාපදිංචිය",
+                      fontWeight = if (selectedTab == 1) FontWeight.Bold else FontWeight.Medium,
+                      fontSize = 12.sp,
+                      color = if (selectedTab == 1) Color(0xFF137333) else NeutralMedium
+                    )
+                  }
+                }
+              }
             )
             Tab(
               selected = selectedTab == 2,
               onClick = { selectedTab = 2 },
-              text = { Text("👑 ඇඩ්මින්", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = Color(0xFFB45309)) }
+              text = {
+                Surface(
+                  shape = RoundedCornerShape(8.dp),
+                  color = if (selectedTab == 2) Color.White else Color.Transparent,
+                  shadowElevation = if (selectedTab == 2) 1.dp else 0.dp,
+                  modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+                ) {
+                  Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(vertical = 6.dp)) {
+                    Text(
+                      "👑 ඇඩ්මින්",
+                      fontWeight = if (selectedTab == 2) FontWeight.Bold else FontWeight.Medium,
+                      fontSize = 12.sp,
+                      color = if (selectedTab == 2) Color(0xFFB45309) else NeutralMedium
+                    )
+                  }
+                }
+              }
             )
           }
         }
@@ -9456,6 +9528,21 @@ fun LoginAndApprovalDialog(
               Icon(Icons.Default.HowToReg, contentDescription = "Register")
               Spacer(modifier = Modifier.width(8.dp))
               Text("ලියාපදිංචි වී ඇතුළු වන්න", fontWeight = FontWeight.Bold)
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+            Row(
+              modifier = Modifier.fillMaxWidth(),
+              horizontalArrangement = Arrangement.Center,
+              verticalAlignment = Alignment.CenterVertically
+            ) {
+              Text("දැනටමත් ගිණුමක් තිබේද?", fontSize = 12.sp, color = NeutralMedium)
+              TextButton(
+                onClick = { selectedTab = 0 },
+                contentPadding = PaddingValues(horizontal = 6.dp, vertical = 0.dp)
+              ) {
+                Text("ඇතුළුවන්න (Login)", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = BluePrimary)
+              }
             }
           }
           2 -> {

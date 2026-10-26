@@ -56,129 +56,148 @@ fun SubjectMaster20CategoriesDetailView(
   LazyColumn(
     modifier = modifier
       .fillMaxSize()
-      .padding(horizontal = 14.dp, vertical = 10.dp),
-    verticalArrangement = Arrangement.spacedBy(14.dp)
+      .padding(horizontal = 12.dp, vertical = 6.dp),
+    verticalArrangement = Arrangement.spacedBy(10.dp)
   ) {
-    // Top Overview Banner
-    item {
-      Surface(
-        shape = RoundedCornerShape(14.dp),
-        color = Color(0xFF064E3B),
-        border = BorderStroke(1.dp, Color(0xFF10B981)),
-        modifier = Modifier.fillMaxWidth()
-      ) {
-        Column(modifier = Modifier.padding(14.dp)) {
+    // 1. When a specific category is selected: Slim Top Bar with Category Switcher & Back button
+    if (selectedCategoryNumber != 0) {
+      item(key = "category_header_controls") {
+        Column(modifier = Modifier.fillMaxWidth()) {
           Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
           ) {
+            Surface(
+              onClick = { onSelectCategory(0) },
+              shape = RoundedCornerShape(8.dp),
+              color = Color(0xFF0F172A),
+              border = BorderStroke(1.dp, Color(0xFF38BDF8).copy(alpha = 0.5f))
+            ) {
+              Row(
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically
+              ) {
+                Text("◀ සියලු කාණ්ඩ 20", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFF38BDF8))
+              }
+            }
+
+            FilterChip(
+              selected = showOnlyBookmarked,
+              onClick = { showOnlyBookmarked = !showOnlyBookmarked },
+              label = {
+                Text(
+                  "⭐ සුරැකි (${bookmarkedPointIds.size})",
+                  fontSize = 10.5.sp,
+                  color = if (showOnlyBookmarked) Color.Black else Color(0xFFFDE047)
+                )
+              },
+              colors = FilterChipDefaults.filterChipColors(
+                selectedContainerColor = Color(0xFFFDE047),
+                containerColor = Color(0xFF1E293B)
+              ),
+              modifier = Modifier.height(30.dp)
+            )
+          }
+
+          Spacer(modifier = Modifier.height(6.dp))
+
+          // Horizontal Category Navigator Strip (Scrolls with the content!)
+          androidx.compose.foundation.lazy.LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            modifier = Modifier.fillMaxWidth()
+          ) {
+            items(categories) { cat ->
+              val isCurrent = cat.categoryNumber == selectedCategoryNumber
+              Surface(
+                onClick = { onSelectCategory(cat.categoryNumber) },
+                shape = RoundedCornerShape(8.dp),
+                color = if (isCurrent) cat.color else Color(0xFF1E293B),
+                border = BorderStroke(1.dp, if (isCurrent) Color.White else cat.color.copy(alpha = 0.4f))
+              ) {
+                Row(
+                  modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                  verticalAlignment = Alignment.CenterVertically
+                ) {
+                  Text(cat.icon, fontSize = 11.sp)
+                  Spacer(modifier = Modifier.width(4.dp))
+                  Text(
+                    text = "${cat.categoryNumber}. ${cat.titleSinhala}",
+                    fontSize = 10.sp,
+                    fontWeight = if (isCurrent) FontWeight.Bold else FontWeight.Normal,
+                    color = Color.White,
+                    maxLines = 1
+                  )
+                }
+              }
+            }
+          }
+        }
+      }
+    } else {
+      // 2. When viewing ALL categories: Compact Overview Banner
+      item(key = "top_overview_banner") {
+        Surface(
+          shape = RoundedCornerShape(10.dp),
+          color = Color(0xFF064E3B),
+          border = BorderStroke(1.dp, Color(0xFF10B981)),
+          modifier = Modifier.fillMaxWidth()
+        ) {
+          Row(
+            modifier = Modifier
+              .fillMaxWidth()
+              .padding(horizontal = 12.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+          ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-              Text("📚", fontSize = 20.sp)
-              Spacer(modifier = Modifier.width(8.dp))
+              Text("📚", fontSize = 16.sp)
+              Spacer(modifier = Modifier.width(6.dp))
               Text(
                 text = "$subjectName නිල කරුණු බැංකුව",
-                fontSize = 15.sp,
+                fontSize = 13.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFFD1FAE5)
               )
             }
 
             Surface(
-              shape = RoundedCornerShape(12.dp),
+              shape = RoundedCornerShape(8.dp),
               color = Color(0xFF047857)
             ) {
               Text(
                 text = "කාණ්ඩ 20 • කරුණු 400",
-                fontSize = 10.sp,
+                fontSize = 9.5.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
               )
-            }
-          }
-
-          Spacer(modifier = Modifier.height(6.dp))
-          Text(
-            text = "සාමාන්‍ය පෙළ විභාග ප්‍රශ්න පත්‍ර I & II සඳහා 100% ක් නිවැරදි විෂය නිර්දේශගත කරුණු විවරණය.",
-            fontSize = 11.5.sp,
-            color = Color(0xFFA7F3D0)
-          )
-
-          if (onOpenInteractiveTool != null) {
-            Spacer(modifier = Modifier.height(10.dp))
-            Button(
-              onClick = onOpenInteractiveTool,
-              colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF059669)),
-              shape = RoundedCornerShape(8.dp),
-              contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
-              modifier = Modifier.testTag("open_interactive_tool_btn")
-            ) {
-              Text("🌟 අන්තර්ක්‍රියාකාරී සිතියම්/මෙවලම් බලන්න", fontSize = 11.5.sp, fontWeight = FontWeight.Bold)
             }
           }
         }
       }
-    }
 
-    // Search and Filter Bar
-    item {
-      Card(
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
-        modifier = Modifier.fillMaxWidth()
-      ) {
-        Column(modifier = Modifier.padding(10.dp)) {
-          OutlinedTextField(
-            value = searchQuery,
-            onValueChange = { searchQuery = it },
-            placeholder = { Text("කරුණු 400 අතර සොයන්න...", fontSize = 12.sp, color = Color(0xFF94A3B8)) },
-            leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search", tint = Color(0xFF34D399)) },
-            singleLine = true,
-            colors = OutlinedTextFieldDefaults.colors(
-              focusedTextColor = Color.White,
-              unfocusedTextColor = Color.White,
-              focusedBorderColor = Color(0xFF10B981),
-              unfocusedBorderColor = Color(0xFF334155)
-            ),
-            modifier = Modifier
-              .fillMaxWidth()
-              .testTag("fact_search_input")
-          )
-
-          Spacer(modifier = Modifier.height(8.dp))
-          Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-          ) {
-            FilterChip(
-              selected = showOnlyBookmarked,
-              onClick = { showOnlyBookmarked = !showOnlyBookmarked },
-              label = {
-                Text(
-                  "⭐ සුරැකි කරුණු (${bookmarkedPointIds.size})",
-                  fontSize = 11.sp,
-                  color = if (showOnlyBookmarked) Color.Black else Color(0xFFFDE047)
-                )
-              },
-              colors = FilterChipDefaults.filterChipColors(
-                selectedContainerColor = Color(0xFFFDE047),
-                containerColor = Color(0xFF0F172A)
-              ),
-              modifier = Modifier.testTag("filter_bookmarked_chip")
-            )
-
-            if (selectedCategoryNumber != 0) {
-              TextButton(
-                onClick = { onSelectCategory(0) },
-                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp)
-              ) {
-                Text("🌐 සියලු කාණ්ඩ 20 පෙන්වන්න", fontSize = 11.sp, color = Color(0xFF38BDF8))
-              }
-            }
-          }
-        }
+      // Compact Search Bar for All Categories
+      item(key = "all_search_bar") {
+        OutlinedTextField(
+          value = searchQuery,
+          onValueChange = { searchQuery = it },
+          placeholder = { Text("කරුණු 400 අතර සොයන්න...", fontSize = 11.5.sp, color = Color(0xFF94A3B8)) },
+          leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search", tint = Color(0xFF34D399), modifier = Modifier.size(16.dp)) },
+          singleLine = true,
+          shape = RoundedCornerShape(10.dp),
+          colors = OutlinedTextFieldDefaults.colors(
+            focusedTextColor = Color.White,
+            unfocusedTextColor = Color.White,
+            focusedBorderColor = Color(0xFF10B981),
+            unfocusedBorderColor = Color(0xFF334155),
+            focusedContainerColor = Color(0xFF1E293B),
+            unfocusedContainerColor = Color(0xFF1E293B)
+          ),
+          modifier = Modifier
+            .fillMaxWidth()
+            .height(48.dp)
+        )
       }
     }
 

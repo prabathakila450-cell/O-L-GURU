@@ -400,229 +400,77 @@ fun HistoryGrade10And11MasterHubDialog(
       color = Color(0xFF0F172A) // Deep background
     ) {
       Column(modifier = Modifier.fillMaxSize()) {
-        // TOP APP BAR
+        // ULTRA-COMPACT TOP APP BAR (Single slim row, ~44dp height)
         Surface(
           color = Color(0xFF1E1B4B),
-          tonalElevation = 4.dp,
+          tonalElevation = 2.dp,
           modifier = Modifier.fillMaxWidth()
         ) {
-          Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
+          Row(
+            modifier = Modifier
+              .fillMaxWidth()
+              .statusBarsPadding()
+              .padding(horizontal = 8.dp, vertical = 4.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+          ) {
             Row(
-              modifier = Modifier.fillMaxWidth(),
-              horizontalArrangement = Arrangement.SpaceBetween,
-              verticalAlignment = Alignment.CenterVertically
+              verticalAlignment = Alignment.CenterVertically,
+              modifier = Modifier.weight(1f)
             ) {
-              Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(
-                  onClick = {
-                    if (selectedCategoryIndex != -1) selectedCategoryIndex = -1 else onDismiss()
-                  },
-                  modifier = Modifier.size(36.dp)
-                ) {
-                  Icon(
-                    imageVector = if (selectedCategoryIndex == -1) Icons.Default.Close else Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
-                    tint = Color.White
-                  )
-                }
-                Spacer(modifier = Modifier.width(6.dp))
-                Column {
-                  Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                      text = if (selectedCategoryIndex == -1) "ඉතිහාසය විෂය නිර්දේශ Hub" else categories[selectedCategoryIndex].titleSinhala,
-                      color = Color.White,
-                      fontSize = 15.sp,
-                      fontWeight = FontWeight.Bold,
-                      maxLines = 1,
-                      overflow = TextOverflow.Ellipsis
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Surface(
-                      color = Color(0xFFD97706),
-                      shape = RoundedCornerShape(4.dp)
-                    ) {
-                      Text(
-                        text = "$activeGrade ශ්‍රේණිය",
-                        color = Color.White,
-                        fontSize = 9.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.dp)
-                      )
-                    }
-                  }
-                  Text(
-                    text = "G.C.E. O/L විභාග නිර්දේශය 100% ආවරණය",
-                    color = Color(0xFF94A3B8),
-                    fontSize = 10.sp
-                  )
-                }
-              }
-
-              IconButton(onClick = { isSearchExpanded = !isSearchExpanded }) {
-                Icon(
-                  imageVector = if (isSearchExpanded) Icons.Default.Close else Icons.Default.Search,
-                  contentDescription = "Search",
-                  tint = Color(0xFFFDE68A)
-                )
-              }
-            }
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            // Grade Switcher Pills (10 ශ්‍රේණිය vs 11 ශ්‍රේණිය)
-            Row(
-              modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(10.dp))
-                .background(Color(0xFF020617))
-                .padding(3.dp),
-              horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-              listOf("10", "11").forEach { g ->
-                val isSelected = activeGrade == g
-                Surface(
-                  onClick = { activeGrade = g },
-                  shape = RoundedCornerShape(8.dp),
-                  color = if (isSelected) Color(0xFFD97706) else Color.Transparent,
-                  modifier = Modifier.weight(1f)
-                ) {
-                  Row(
-                    modifier = Modifier.padding(vertical = 5.dp),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                  ) {
-                    Text(
-                      text = if (g == "10") "📘 10 ශ්‍රේණිය" else "📙 11 ශ්‍රේණිය",
-                      fontSize = 11.sp,
-                      fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                      color = if (isSelected) Color.White else Color(0xFF94A3B8)
-                    )
-                  }
-                }
-              }
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Mode Selector: 20 Categories (Fact Bank) vs Specialized Modules
-            Row(
-              modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(8.dp))
-                .background(Color(0xFF0F172A))
-                .padding(2.dp),
-              horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-              Surface(
-                onClick = { hubMode = 0 },
-                shape = RoundedCornerShape(6.dp),
-                color = if (hubMode == 0) Color(0xFFD97706) else Color.Transparent,
-                modifier = Modifier.weight(1f)
-              ) {
-                Text(
-                  text = "📚 කරුණු 400 බැංකුව (කාණ්ඩ 20)",
-                  fontSize = 10.sp,
-                  fontWeight = FontWeight.Bold,
-                  color = if (hubMode == 0) Color.White else Color(0xFFCBD5E1),
-                  textAlign = TextAlign.Center,
-                  modifier = Modifier.padding(vertical = 5.dp)
-                )
-              }
-              Surface(
-                onClick = { hubMode = 1 },
-                shape = RoundedCornerShape(6.dp),
-                color = if (hubMode == 1) Color(0xFF4F46E5) else Color.Transparent,
-                modifier = Modifier.weight(1f)
-              ) {
-                Text(
-                  text = "🏛️ විෂය ඒකක (Advanced Modules)",
-                  fontSize = 10.sp,
-                  fontWeight = FontWeight.Bold,
-                  color = if (hubMode == 1) Color.White else Color(0xFFCBD5E1),
-                  textAlign = TextAlign.Center,
-                  modifier = Modifier.padding(vertical = 5.dp)
-                )
-              }
-            }
-
-            if (hubMode == 0) {
-              Spacer(modifier = Modifier.height(8.dp))
-              // Category Selector Strip
-              LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                modifier = Modifier.fillMaxWidth()
-              ) {
-                itemsIndexed(categories) { index, cat ->
-                  val isSelected = selectedCategoryIndex == index
-                  Surface(
-                    onClick = {
-                      selectedCategoryIndex = if (isSelected) -1 else index
-                    },
-                    shape = RoundedCornerShape(8.dp),
-                    color = if (isSelected) cat.color else Color(0xFF1E293B),
-                    border = BorderStroke(1.dp, if (isSelected) Color.White else cat.color.copy(alpha = 0.4f))
-                  ) {
-                    Row(
-                      modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
-                      verticalAlignment = Alignment.CenterVertically
-                    ) {
-                      Text(cat.icon, fontSize = 11.sp)
-                      Spacer(modifier = Modifier.width(4.dp))
-                      Text(
-                        text = cat.titleSinhala,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.widthIn(max = 130.dp)
-                      )
-                    }
-                  }
-                }
-              }
-            } else {
-              Spacer(modifier = Modifier.height(6.dp))
-              // Specialized Module Tabs
-              ScrollableTabRow(
-                selectedTabIndex = selectedModuleTab,
-                containerColor = Color.Transparent,
-                contentColor = Color(0xFFFDE68A),
-                edgePadding = 0.dp,
-                indicator = { tabPositions ->
-                  TabRowDefaults.SecondaryIndicator(
-                    modifier = Modifier.tabIndicatorOffset(tabPositions[selectedModuleTab]),
-                    color = Color(0xFFD97706),
-                    height = 2.5.dp
-                  )
+              IconButton(
+                onClick = {
+                  if (selectedCategoryIndex != -1) selectedCategoryIndex = -1 else onDismiss()
                 },
-                divider = { HorizontalDivider(color = Color(0xFF334155), thickness = 0.6.dp) }
+                modifier = Modifier.size(36.dp)
               ) {
-                val modules = HistoryModuleType.values()
-                modules.forEachIndexed { index, module ->
-                  Tab(
-                    selected = selectedModuleTab == index,
-                    onClick = { selectedModuleTab = index },
-                    text = {
-                      Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(module.icon, fontSize = 11.sp)
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                          text = module.title,
-                          fontSize = 10.5.sp,
-                          fontWeight = if (selectedModuleTab == index) FontWeight.Bold else FontWeight.Normal,
-                          color = if (selectedModuleTab == index) Color(0xFFFDE68A) else Color(0xFF94A3B8)
-                        )
-                      }
-                    }
-                  )
-                }
+                Icon(
+                  imageVector = if (selectedCategoryIndex == -1) Icons.Default.Close else Icons.AutoMirrored.Filled.ArrowBack,
+                  contentDescription = "Back",
+                  tint = Color.White
+                )
               }
+              Spacer(modifier = Modifier.width(4.dp))
+              Text(
+                text = if (selectedCategoryIndex == -1) "ඉතිහාසය විෂය නිර්දේශ Hub" else categories[selectedCategoryIndex].titleSinhala,
+                color = Color.White,
+                fontSize = 13.5.sp,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+              )
+            }
+
+            // Quick Grade Switcher Pill in Top Bar
+            Surface(
+              onClick = { activeGrade = if (activeGrade == "10") "11" else "10" },
+              shape = RoundedCornerShape(12.dp),
+              color = Color(0xFFD97706),
+              modifier = Modifier.padding(horizontal = 4.dp)
+            ) {
+              Text(
+                text = if (activeGrade == "10") "📘 10 වසර" else "📙 11 වසර",
+                color = Color.White,
+                fontSize = 10.5.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.5.dp)
+              )
+            }
+
+            IconButton(
+              onClick = { isSearchExpanded = !isSearchExpanded },
+              modifier = Modifier.size(36.dp)
+            ) {
+              Icon(
+                imageVector = if (isSearchExpanded) Icons.Default.Close else Icons.Default.Search,
+                contentDescription = "Search",
+                tint = Color(0xFFFDE68A)
+              )
             }
           }
         }
 
-        // Search Bar (Expandable)
+        // Expandable Slim Search Bar
         AnimatedVisibility(visible = isSearchExpanded) {
           Surface(
             color = Color(0xFF1E1B4B),
@@ -631,7 +479,7 @@ fun HistoryGrade10And11MasterHubDialog(
             OutlinedTextField(
               value = searchQuery,
               onValueChange = { searchQuery = it },
-              placeholder = { Text("රජුගේ නම, රාජධානිය, වැව, අරගලය හෝ සෙල්ලිපිය සොයන්න...", fontSize = 11.sp, color = Color(0xFF94A3B8)) },
+              placeholder = { Text("රජුගේ නම, රාජධානිය, වැව, අරගලය සොයන්න...", fontSize = 11.sp, color = Color(0xFF94A3B8)) },
               leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = Color(0xFFFDE68A), modifier = Modifier.size(18.dp)) },
               trailingIcon = {
                 if (searchQuery.isNotEmpty()) {
@@ -651,95 +499,170 @@ fun HistoryGrade10And11MasterHubDialog(
               ),
               modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 6.dp)
+                .padding(horizontal = 10.dp, vertical = 4.dp)
+                .height(48.dp)
             )
           }
         }
 
-        // CONTENT SECTION
-        Column(modifier = Modifier.fillMaxSize()) {
-          if (hubMode == 0) {
-            // Mode 0: 20 Categories (Fact Bank)
-            if (selectedCategoryIndex == -1) {
-              LazyColumn(
-                modifier = Modifier
-                  .fillMaxSize()
-                  .padding(12.dp)
-              ) {
-                item {
+        // CONTENT SECTION - FULL HEIGHT SCROLLABLE
+        Box(modifier = Modifier.fillMaxSize()) {
+          if (selectedCategoryIndex != -1) {
+            // Category Detail View: Full-screen scrollable 20 facts
+            SubjectMaster20CategoriesDetailView(
+              subjectName = "ඉතිහාසය",
+              categories = categories,
+              selectedCategoryNumber = categories[selectedCategoryIndex].categoryNumber,
+              onSelectCategory = { num ->
+                if (num == 0) selectedCategoryIndex = -1
+                else {
+                  val newIdx = categories.indexOfFirst { it.categoryNumber == num }
+                  if (newIdx != -1) selectedCategoryIndex = newIdx
+                }
+              },
+              modifier = Modifier.fillMaxSize()
+            )
+          } else {
+            // Overview Mode: Entire screen scrolls together (Mode Selector + Content)
+            LazyColumn(
+              modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 12.dp),
+              contentPadding = PaddingValues(top = 8.dp, bottom = 28.dp),
+              verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+              // 1. Scrollable Mode Selector (400 Facts vs Advanced Modules)
+              item(key = "mode_selector") {
+                Row(
+                  modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color(0xFF0F172A))
+                    .padding(2.dp),
+                  horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                  Surface(
+                    onClick = { hubMode = 0 },
+                    shape = RoundedCornerShape(6.dp),
+                    color = if (hubMode == 0) Color(0xFFD97706) else Color.Transparent,
+                    modifier = Modifier.weight(1f)
+                  ) {
+                    Text(
+                      text = "📚 කරුණු 400 බැංකුව (කාණ්ඩ 20)",
+                      fontSize = 10.5.sp,
+                      fontWeight = FontWeight.Bold,
+                      color = if (hubMode == 0) Color.White else Color(0xFFCBD5E1),
+                      textAlign = TextAlign.Center,
+                      modifier = Modifier.padding(vertical = 6.dp)
+                    )
+                  }
+                  Surface(
+                    onClick = { hubMode = 1 },
+                    shape = RoundedCornerShape(6.dp),
+                    color = if (hubMode == 1) Color(0xFF4F46E5) else Color.Transparent,
+                    modifier = Modifier.weight(1f)
+                  ) {
+                    Text(
+                      text = "🏛️ විෂය ඒකක (Advanced Modules)",
+                      fontSize = 10.5.sp,
+                      fontWeight = FontWeight.Bold,
+                      color = if (hubMode == 1) Color.White else Color(0xFFCBD5E1),
+                      textAlign = TextAlign.Center,
+                      modifier = Modifier.padding(vertical = 6.dp)
+                    )
+                  }
+                }
+              }
+
+              if (hubMode == 0) {
+                // 20 Categories Quick Overview Grid
+                item(key = "overview_grid") {
                   HistoryQuickOverviewGrid(
                     categories = categories,
                     onSelectModule = { selectedCategoryIndex = it }
                   )
                 }
-              }
-            } else {
-              SubjectMaster20CategoriesDetailView(
-                subjectName = "ඉතිහාසය",
-                categories = categories,
-                selectedCategoryNumber = categories[selectedCategoryIndex].categoryNumber,
-                onSelectCategory = { num ->
-                  if (num == 0) selectedCategoryIndex = -1
-                  else {
-                    val newIdx = categories.indexOfFirst { it.categoryNumber == num }
-                    if (newIdx != -1) selectedCategoryIndex = newIdx
-                  }
-                },
-                modifier = Modifier.fillMaxSize()
-              )
-            }
-          } else {
-            // Mode 1: Specialized Modules (Clean Sinhala-Style Collapsible Cards)
-            val currentModule = HistoryModuleType.values()[selectedModuleTab]
-
-            LazyColumn(
-              modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 12.dp),
-              contentPadding = PaddingValues(top = 10.dp, bottom = 28.dp),
-              verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-              when (currentModule) {
-                HistoryModuleType.KINGDOMS_RULERS -> {
-                  val items = HistoryAdvancedSyllabusRepository.rulersList.filter {
-                    it.grade == activeGrade && (searchQuery.isBlank() || it.rulerName.contains(searchQuery, true) || it.kingdom.contains(searchQuery, true) || it.epithet.contains(searchQuery, true))
-                  }
-                  if (items.isEmpty()) {
-                    item { EmptySearchResultNotice() }
-                  } else {
-                    items(items, key = { it.id }) { ruler ->
-                      HistoryRulerCard(ruler)
+              } else {
+                // Specialized Modules Tabs & Content
+                item(key = "module_tabs") {
+                  ScrollableTabRow(
+                    selectedTabIndex = selectedModuleTab,
+                    containerColor = Color.Transparent,
+                    contentColor = Color(0xFFFDE68A),
+                    edgePadding = 0.dp,
+                    indicator = { tabPositions ->
+                      TabRowDefaults.SecondaryIndicator(
+                        modifier = Modifier.tabIndicatorOffset(tabPositions[selectedModuleTab]),
+                        color = Color(0xFFD97706),
+                        height = 2.5.dp
+                      )
+                    },
+                    divider = { HorizontalDivider(color = Color(0xFF334155), thickness = 0.6.dp) }
+                  ) {
+                    val modules = HistoryModuleType.values()
+                    modules.forEachIndexed { index, module ->
+                      Tab(
+                        selected = selectedModuleTab == index,
+                        onClick = { selectedModuleTab = index },
+                        text = {
+                          Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(module.icon, fontSize = 11.sp)
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                              text = module.title,
+                              fontSize = 10.5.sp,
+                              fontWeight = if (selectedModuleTab == index) FontWeight.Bold else FontWeight.Normal,
+                              color = if (selectedModuleTab == index) Color(0xFFFDE68A) else Color(0xFF94A3B8)
+                            )
+                          }
+                        }
+                      )
                     }
                   }
                 }
 
-                HistoryModuleType.IRRIGATION_CIVILIZATION -> {
-                  val items = HistoryAdvancedSyllabusRepository.irrigationList.filter {
-                    it.grade == activeGrade && (searchQuery.isBlank() || it.name.contains(searchQuery, true) || it.builtBy.contains(searchQuery, true) || it.technologyComponent.contains(searchQuery, true))
-                  }
-                  if (items.isEmpty()) {
-                    item { EmptySearchResultNotice() }
-                  } else {
-                    items(items, key = { it.id }) { irrigation ->
-                      HistoryIrrigationCard(irrigation)
+                val currentModule = HistoryModuleType.values()[selectedModuleTab]
+                when (currentModule) {
+                  HistoryModuleType.KINGDOMS_RULERS -> {
+                    val items = HistoryAdvancedSyllabusRepository.rulersList.filter {
+                      it.grade == activeGrade && (searchQuery.isBlank() || it.rulerName.contains(searchQuery, true) || it.kingdom.contains(searchQuery, true) || it.epithet.contains(searchQuery, true))
+                    }
+                    if (items.isEmpty()) {
+                      item { EmptySearchResultNotice() }
+                    } else {
+                      items(items, key = { it.id }) { ruler ->
+                        HistoryRulerCard(ruler)
+                      }
                     }
                   }
-                }
 
-                HistoryModuleType.HISTORICAL_SOURCES -> {
-                  val items = HistoryAdvancedSyllabusRepository.sourcesList.filter {
-                    it.grade == activeGrade && (searchQuery.isBlank() || it.sourceName.contains(searchQuery, true) || it.category.contains(searchQuery, true) || it.authorOrOrigin.contains(searchQuery, true))
-                  }
-                  if (items.isEmpty()) {
-                    item { EmptySearchResultNotice() }
-                  } else {
-                    items(items, key = { it.id }) { source ->
-                      HistorySourceCard(source)
+                  HistoryModuleType.IRRIGATION_CIVILIZATION -> {
+                    val items = HistoryAdvancedSyllabusRepository.irrigationList.filter {
+                      it.grade == activeGrade && (searchQuery.isBlank() || it.name.contains(searchQuery, true) || it.builtBy.contains(searchQuery, true) || it.technologyComponent.contains(searchQuery, true))
+                    }
+                    if (items.isEmpty()) {
+                      item { EmptySearchResultNotice() }
+                    } else {
+                      items(items, key = { it.id }) { irrigation ->
+                        HistoryIrrigationCard(irrigation)
+                      }
                     }
                   }
-                }
 
-                HistoryModuleType.FOREIGN_RULE_STRUGGLES -> {
+                  HistoryModuleType.HISTORICAL_SOURCES -> {
+                    val items = HistoryAdvancedSyllabusRepository.sourcesList.filter {
+                      it.grade == activeGrade && (searchQuery.isBlank() || it.sourceName.contains(searchQuery, true) || it.category.contains(searchQuery, true) || it.authorOrOrigin.contains(searchQuery, true))
+                    }
+                    if (items.isEmpty()) {
+                      item { EmptySearchResultNotice() }
+                    } else {
+                      items(items, key = { it.id }) { source ->
+                        HistorySourceCard(source)
+                      }
+                    }
+                  }
+
+                  HistoryModuleType.FOREIGN_RULE_STRUGGLES -> {
                   val items = HistoryAdvancedSyllabusRepository.colonialUprisingsList.filter {
                     it.grade == activeGrade && (searchQuery.isBlank() || it.title.contains(searchQuery, true) || it.leaders.any { l -> l.contains(searchQuery, true) })
                   }
@@ -928,6 +851,7 @@ fun HistoryGrade10And11MasterHubDialog(
       }
     }
   }
+}
 }
 
 /**

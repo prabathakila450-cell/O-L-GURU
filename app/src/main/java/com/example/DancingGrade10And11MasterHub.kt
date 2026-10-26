@@ -480,59 +480,57 @@ fun DancingGrade10And11MasterHubDialog(
       color = Color(0xFF1E0A12)
     ) {
       Column(modifier = Modifier.fillMaxSize()) {
-        // TOP APP BAR
+        // ULTRA-COMPACT TOP APP BAR (Single slim row, ~44dp height)
         Surface(
           color = Color(0xFF2A0815),
-          tonalElevation = 4.dp,
+          tonalElevation = 2.dp,
           modifier = Modifier.fillMaxWidth()
         ) {
-          Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp)) {
+          Row(
+            modifier = Modifier
+              .fillMaxWidth()
+              .statusBarsPadding()
+              .padding(horizontal = 8.dp, vertical = 4.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+          ) {
             Row(
-              modifier = Modifier.fillMaxWidth(),
-              horizontalArrangement = Arrangement.SpaceBetween,
-              verticalAlignment = Alignment.CenterVertically
+              verticalAlignment = Alignment.CenterVertically,
+              modifier = Modifier.weight(1f)
             ) {
-              Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(
-                  onClick = onDismiss,
-                  modifier = Modifier.size(36.dp)
-                ) {
-                  Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
-                    tint = Color.White
-                  )
-                }
-                Spacer(modifier = Modifier.width(6.dp))
-                Column {
-                  Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                      text = "නර්තනය විෂය නිර්දේශ Master Hub",
-                      color = Color.White,
-                      fontSize = 15.sp,
-                      fontWeight = FontWeight.Bold
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Surface(
-                      color = Color(0xFFE11D48),
-                      shape = RoundedCornerShape(4.dp)
-                    ) {
-                      Text(
-                        text = "100% O/L SYLLABUS",
-                        color = Color.White,
-                        fontSize = 8.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.dp)
-                      )
-                    }
-                  }
-                  Text(
-                    text = "ත්‍රිවිධ සම්ප්‍රදාය • වන්නම් 18 • අභිනය • කරුණු 400",
-                    color = Color(0xFFFECDD3),
-                    fontSize = 10.sp
-                  )
-                }
+              IconButton(
+                onClick = onDismiss,
+                modifier = Modifier.size(36.dp)
+              ) {
+                Icon(
+                  imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                  contentDescription = "Back",
+                  tint = Color.White
+                )
               }
+              Spacer(modifier = Modifier.width(4.dp))
+              Text(
+                text = if (selectedCategoryNumber > 0 && selectedCategoryNumber <= categories.size) categories[selectedCategoryNumber - 1].titleSinhala else "නර්තනය විෂය නිර්දේශ Master Hub",
+                color = Color.White,
+                fontSize = 13.5.sp,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+              )
+            }
+
+            Surface(
+              color = Color(0xFFE11D48),
+              shape = RoundedCornerShape(12.dp),
+              modifier = Modifier.padding(horizontal = 4.dp)
+            ) {
+              Text(
+                text = "💃 නර්තනය",
+                color = Color.White,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.5.dp)
+              )
             }
           }
         }
