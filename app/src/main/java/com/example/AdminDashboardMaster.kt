@@ -1445,6 +1445,54 @@ private fun AdminSettingsSection(
           Spacer(modifier = Modifier.width(6.dp))
           Text("නව මුරපදය සුරකින්න", fontWeight = FontWeight.Bold)
         }
+
+        Spacer(modifier = Modifier.height(20.dp))
+        HorizontalDivider(color = Color(0xFFE2E8F0))
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // GitHub Release Link Manager
+        var githubUrlInput by remember { mutableStateOf(getSavedGitHubShareUrl(context)) }
+        Text(
+          text = "📦 GitHub Release / Direct APK Share Link",
+          fontWeight = FontWeight.Bold,
+          fontSize = 12.sp,
+          color = Color(0xFF0F172A)
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+          text = "අලුතින් Push කරන GitHub Release APK ලින්ක් එක පහතින් යාවත්කාලීන කරන්න. Share කිරීමේදී පරිශීලකයින්ට මෙම ලින්ක් එක යොමු වේ.",
+          fontSize = 10.5.sp,
+          color = Color(0xFF64748B)
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedTextField(
+          value = githubUrlInput,
+          onValueChange = { githubUrlInput = it },
+          label = { Text("GitHub Release Direct APK Link") },
+          singleLine = true,
+          modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Button(
+          onClick = {
+            if (githubUrlInput.isNotBlank()) {
+              saveGitHubShareUrl(context, githubUrlInput.trim())
+              Toast.makeText(context, "✅ GitHub Share ලින්ක් එක සාර්ථකව යාවත්කාලීන විය!", Toast.LENGTH_SHORT).show()
+            } else {
+              Toast.makeText(context, "කරුණාකර වලංගු ලින්ක් එකක් ඇතුළත් කරන්න.", Toast.LENGTH_SHORT).show()
+            }
+          },
+          colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981)),
+          shape = RoundedCornerShape(10.dp),
+          modifier = Modifier.fillMaxWidth().height(44.dp)
+        ) {
+          Icon(Icons.Default.CloudUpload, contentDescription = "Update Link", modifier = Modifier.size(16.dp))
+          Spacer(modifier = Modifier.width(6.dp))
+          Text("GitHub ලින්ක් එක යාවත්කාලීන කරන්න (Update Share Link)", fontWeight = FontWeight.Bold, fontSize = 11.5.sp)
+        }
       }
     }
   }

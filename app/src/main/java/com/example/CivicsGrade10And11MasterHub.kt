@@ -12,6 +12,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
@@ -54,7 +55,7 @@ fun CivicsGrade10And11MasterHubDialog(
   onDismiss: () -> Unit
 ) {
   var selectedGradeTab by remember { mutableStateOf(initialGradeTab) }
-  var selectedCategory by remember { mutableStateOf(initialSectionCategory ?: CivicsSectionCategory.LESSONS) }
+  var selectedCategory by remember { mutableStateOf<CivicsSectionCategory?>(initialSectionCategory) }
   var searchQuery by remember { mutableStateOf("") }
 
   // State for MCQ interactive test
@@ -214,100 +215,165 @@ fun CivicsGrade10And11MasterHubDialog(
             .testTag("civics_search_input")
         )
 
-        // CATEGORY TABS HORIZONTAL SCROLL (Ultra-compact)
-        Row(
-          modifier = Modifier
-            .fillMaxWidth()
-            .background(Color(0xFF02201D))
-            .horizontalScroll(rememberScrollState())
-            .padding(horizontal = 8.dp, vertical = 3.dp),
-          horizontalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
-          CivicsSectionCategory.values().forEach { cat ->
-            val isSelected = selectedCategory == cat
-            Surface(
-              shape = RoundedCornerShape(12.dp),
-              color = if (isSelected) cat.themeColor else Color(0xFF134E4A).copy(alpha = 0.5f),
-              border = BorderStroke(
-                width = 1.dp,
-                color = if (isSelected) Color.White.copy(alpha = 0.8f) else Color(0xFF115E59)
-              ),
-              modifier = Modifier
-                .clickable { selectedCategory = cat }
-                .testTag("civics_cat_${cat.id}")
+        if (selectedCategory != null) {
+          // CATEGORY TABS & BACK TO OVERVIEW STRIP
+          Column(
+            modifier = Modifier
+              .fillMaxWidth()
+              .background(Color(0xFF02201D))
+              .padding(horizontal = 8.dp, vertical = 5.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
+          ) {
+            Row(
+              modifier = Modifier.fillMaxWidth(),
+              horizontalArrangement = Arrangement.SpaceBetween,
+              verticalAlignment = Alignment.CenterVertically
             ) {
-              Row(
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
-                verticalAlignment = Alignment.CenterVertically
+              Surface(
+                onClick = { selectedCategory = null },
+                shape = RoundedCornerShape(8.dp),
+                color = Color(0xFF0F766E),
+                border = BorderStroke(1.dp, Color(0xFF2DD4BF))
               ) {
-                Text(cat.emoji, fontSize = 11.sp)
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                  text = cat.titleSinhala,
-                  fontSize = 10.5.sp,
-                  fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                  color = if (isSelected) Color.White else Color(0xFFCCFBF1)
-                )
+                Row(
+                  modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                  verticalAlignment = Alignment.CenterVertically
+                ) {
+                  Text("◀ සියලු අනු කොටස් 10 බලන්න", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                }
+              }
+
+              Text(
+                text = "${selectedCategory?.emoji} ${selectedCategory?.shortTitleSinhala}",
+                color = Color(0xFF5EEAD4),
+                fontSize = 11.5.sp,
+                fontWeight = FontWeight.Bold
+              )
+            }
+
+            val categoriesChunked = remember { CivicsSectionCategory.values().toList().chunked(4) }
+            categoriesChunked.forEach { rowItems ->
+              Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+              ) {
+                rowItems.forEach { cat ->
+                  val isSelected = selectedCategory == cat
+                  Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = if (isSelected) cat.themeColor else Color(0xFF134E4A).copy(alpha = 0.5f),
+                    border = BorderStroke(
+                      width = 1.dp,
+                      color = if (isSelected) Color.White else Color(0xFF115E59)
+                    ),
+                    modifier = Modifier
+                      .weight(1f)
+                      .clickable { selectedCategory = cat }
+                      .testTag("civics_cat_${cat.id}")
+                  ) {
+                    Column(
+                      modifier = Modifier.padding(vertical = 6.dp, horizontal = 3.dp),
+                      horizontalAlignment = Alignment.CenterHorizontally,
+                      verticalArrangement = Arrangement.Center
+                    ) {
+                      Text(cat.emoji, fontSize = 13.sp)
+                      Spacer(modifier = Modifier.height(2.dp))
+                      Text(
+                        text = cat.shortTitleSinhala,
+                        fontSize = 10.sp,
+                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                        color = if (isSelected) Color.White else Color(0xFFCCFBF1),
+                        textAlign = TextAlign.Center,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                      )
+                    }
+                  }
+                }
+                repeat(4 - rowItems.size) {
+                  Spacer(modifier = Modifier.weight(1f))
+                }
               }
             }
           }
         }
 
-        // MAIN CONTENT AREA BY CATEGORY
+        // MAIN CONTENT AREA
         Box(
           modifier = Modifier
             .weight(1f)
             .fillMaxWidth()
             .background(Color(0xFF021714))
         ) {
-          when (selectedCategory) {
-            CivicsSectionCategory.LESSONS -> {
-              CivicsLessonsSection(
-                gradeTab = selectedGradeTab,
-                searchQuery = searchQuery,
-                expandedLessonId = expandedLessonId,
-                onToggleExpand = { id ->
-                  expandedLessonId = if (expandedLessonId == id) null else id
-                }
-              )
-            }
-            CivicsSectionCategory.MCQ_BANK -> {
-              CivicsMcqSection(
-                gradeTab = selectedGradeTab,
-                searchQuery = searchQuery,
-                userSelectedOptions = userSelectedOptions,
-                onSelectOption = { qId, optIdx ->
-                  userSelectedOptions[qId] = optIdx
-                },
-                onResetQuiz = {
-                  userSelectedOptions.clear()
-                }
-              )
-            }
-            CivicsSectionCategory.STRUCTURED_ESSAY -> {
-              CivicsStructuredEssaySection(
-                gradeTab = selectedGradeTab,
-                searchQuery = searchQuery,
-                expandedEssayId = expandedEssayId,
-                onToggleExpand = { id ->
-                  expandedEssayId = if (expandedEssayId == id) null else id
-                }
-              )
-            }
-            CivicsSectionCategory.TIMELINE -> {
-              CivicsTimelineSection(searchQuery = searchQuery)
-            }
-            CivicsSectionCategory.CASE_STUDIES -> {
-              CivicsCaseStudiesSection(
-                searchQuery = searchQuery,
-                expandedCaseId = expandedCaseId,
-                onToggleExpand = { id ->
-                  expandedCaseId = if (expandedCaseId == id) null else id
-                }
-              )
-            }
-            CivicsSectionCategory.FLOWCHARTS -> {
-              CivicsFlowchartsSection(searchQuery = searchQuery)
+          if (selectedCategory == null) {
+            CivicsMasterOverviewGrid(
+              selectedGradeTab = selectedGradeTab,
+              searchQuery = searchQuery,
+              onSelectCategory = { cat -> selectedCategory = cat }
+            )
+          } else {
+            when (selectedCategory) {
+              CivicsSectionCategory.LESSONS -> {
+                CivicsLessonsSection(
+                  gradeTab = selectedGradeTab,
+                  searchQuery = searchQuery,
+                  expandedLessonId = expandedLessonId,
+                  onToggleExpand = { id ->
+                    expandedLessonId = if (expandedLessonId == id) null else id
+                  }
+                )
+              }
+              CivicsSectionCategory.MCQ_BANK -> {
+                CivicsMcqSection(
+                  gradeTab = selectedGradeTab,
+                  searchQuery = searchQuery,
+                  userSelectedOptions = userSelectedOptions,
+                  onSelectOption = { qId, optIdx ->
+                    userSelectedOptions[qId] = optIdx
+                  },
+                  onResetQuiz = {
+                    userSelectedOptions.clear()
+                  }
+                )
+              }
+              CivicsSectionCategory.STRUCTURED_ESSAY -> {
+                CivicsStructuredEssaySection(
+                  gradeTab = selectedGradeTab,
+                  searchQuery = searchQuery,
+                  expandedEssayId = expandedEssayId,
+                  onToggleExpand = { id ->
+                    expandedEssayId = if (expandedEssayId == id) null else id
+                  }
+                )
+              }
+              CivicsSectionCategory.TIMELINE -> {
+                CivicsTimelineSection(searchQuery = searchQuery)
+              }
+              CivicsSectionCategory.CASE_STUDIES -> {
+                CivicsCaseStudiesSection(
+                  searchQuery = searchQuery,
+                  expandedCaseId = expandedCaseId,
+                  onToggleExpand = { id ->
+                    expandedCaseId = if (expandedCaseId == id) null else id
+                  }
+                )
+              }
+              CivicsSectionCategory.FLOWCHARTS -> {
+                CivicsFlowchartsSection(searchQuery = searchQuery)
+              }
+              CivicsSectionCategory.HUMAN_RIGHTS -> {
+                CivicsHumanRightsSection(searchQuery = searchQuery)
+              }
+              CivicsSectionCategory.LOCAL_GOVT -> {
+                CivicsLocalGovtSection(searchQuery = searchQuery)
+              }
+              CivicsSectionCategory.GOOD_GOVERNANCE -> {
+                CivicsGoodGovernanceSection(searchQuery = searchQuery)
+              }
+              CivicsSectionCategory.GLOBAL_RELATIONS -> {
+                CivicsGlobalRelationsSection(searchQuery = searchQuery)
+              }
+              null -> {}
             }
           }
         }
@@ -347,7 +413,13 @@ private fun CivicsLessonsSection(
     return
   }
 
+  val listState = androidx.compose.foundation.lazy.rememberLazyListState()
+  LaunchedEffect(gradeTab, searchQuery) {
+    listState.scrollToItem(0)
+  }
+
   LazyColumn(
+    state = listState,
     modifier = Modifier.fillMaxSize(),
     contentPadding = PaddingValues(12.dp),
     verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -550,7 +622,13 @@ private fun CivicsMcqSection(
     filteredMcqs.firstOrNull { it.id == id }?.correctOptionIndex == opt
   }
 
+  val listState = androidx.compose.foundation.lazy.rememberLazyListState()
+  LaunchedEffect(gradeTab, searchQuery) {
+    listState.scrollToItem(0)
+  }
+
   LazyColumn(
+    state = listState,
     modifier = Modifier.fillMaxSize(),
     contentPadding = PaddingValues(12.dp),
     verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -745,7 +823,13 @@ private fun CivicsStructuredEssaySection(
     }
   }
 
+  val listState = androidx.compose.foundation.lazy.rememberLazyListState()
+  LaunchedEffect(gradeTab, searchQuery) {
+    listState.scrollToItem(0)
+  }
+
   LazyColumn(
+    state = listState,
     modifier = Modifier.fillMaxSize(),
     contentPadding = PaddingValues(12.dp),
     verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -919,7 +1003,13 @@ private fun CivicsTimelineSection(searchQuery: String) {
     }
   }
 
+  val listState = androidx.compose.foundation.lazy.rememberLazyListState()
+  LaunchedEffect(searchQuery) {
+    listState.scrollToItem(0)
+  }
+
   LazyColumn(
+    state = listState,
     modifier = Modifier.fillMaxSize(),
     contentPadding = PaddingValues(12.dp),
     verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -1043,7 +1133,13 @@ private fun CivicsCaseStudiesSection(
     }
   }
 
+  val listState = androidx.compose.foundation.lazy.rememberLazyListState()
+  LaunchedEffect(searchQuery) {
+    listState.scrollToItem(0)
+  }
+
   LazyColumn(
+    state = listState,
     modifier = Modifier.fillMaxSize(),
     contentPadding = PaddingValues(12.dp),
     verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -1188,7 +1284,13 @@ private fun CivicsFlowchartsSection(searchQuery: String) {
     }
   }
 
+  val listState = androidx.compose.foundation.lazy.rememberLazyListState()
+  LaunchedEffect(searchQuery) {
+    listState.scrollToItem(0)
+  }
+
   LazyColumn(
+    state = listState,
     modifier = Modifier.fillMaxSize(),
     contentPadding = PaddingValues(12.dp),
     verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -1318,6 +1420,686 @@ private fun EmptyResultNotice(message: String) {
         fontSize = 13.sp,
         textAlign = TextAlign.Center
       )
+    }
+  }
+}
+
+// ============================================================================
+// 7. HUMAN RIGHTS & DECLARATIONS SECTION
+// ============================================================================
+@Composable
+private fun CivicsHumanRightsSection(searchQuery: String) {
+  val items = remember(searchQuery) {
+    CivicsMasterDataProvider.humanRightsItems.filter { hr ->
+      searchQuery.isBlank() ||
+          hr.title.contains(searchQuery, ignoreCase = true) ||
+          hr.category.contains(searchQuery, ignoreCase = true) ||
+          hr.description.contains(searchQuery, ignoreCase = true) ||
+          hr.keyArticlesOrRights.any { it.contains(searchQuery, ignoreCase = true) }
+    }
+  }
+
+  val listState = rememberLazyListState()
+  LaunchedEffect(searchQuery) {
+    listState.scrollToItem(0)
+  }
+
+  LazyColumn(
+    state = listState,
+    modifier = Modifier.fillMaxSize(),
+    contentPadding = PaddingValues(12.dp),
+    verticalArrangement = Arrangement.spacedBy(10.dp)
+  ) {
+    item {
+      Card(
+        shape = RoundedCornerShape(10.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF1E3A8A).copy(alpha = 0.35f)),
+        border = BorderStroke(1.dp, Color(0xFF3B82F6))
+      ) {
+        Row(
+          modifier = Modifier.padding(10.dp),
+          verticalAlignment = Alignment.CenterVertically
+        ) {
+          Text("🤝", fontSize = 20.sp)
+          Spacer(modifier = Modifier.width(8.dp))
+          Text(
+            text = "1948 UDHR ජාත්‍යන්තර මානව හිමිකම්, ළමා & කාන්තා අයිතිවාසිකම් සහ ශ්‍රී ලංකා මානව හිමිකම් කොමිෂන් සභාව.",
+            fontSize = 11.5.sp,
+            color = Color(0xFFBFDBFE),
+            lineHeight = 16.sp
+          )
+        }
+      }
+    }
+
+    items(items, key = { it.id }) { item ->
+      Card(
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF0F172A)),
+        border = BorderStroke(1.dp, Color(0xFF1E3A8A)),
+        modifier = Modifier.fillMaxWidth()
+      ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+          Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+          ) {
+            Surface(
+              color = Color(0xFF2563EB),
+              shape = RoundedCornerShape(4.dp)
+            ) {
+              Text(
+                text = item.category,
+                color = Color.White,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+              )
+            }
+            Text(
+              text = item.yearOrOrigin,
+              fontSize = 10.5.sp,
+              color = Color(0xFF93C5FD),
+              fontWeight = FontWeight.SemiBold
+            )
+          }
+
+          Spacer(modifier = Modifier.height(6.dp))
+          Text(
+            text = item.title,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.White
+          )
+          Spacer(modifier = Modifier.height(4.dp))
+          Text(
+            text = item.description,
+            fontSize = 11.5.sp,
+            color = Color(0xFFE2E8F0),
+            lineHeight = 16.sp
+          )
+
+          Spacer(modifier = Modifier.height(8.dp))
+          Text(
+            text = "📌 ප්‍රධාන වගන්ති & අයිතිවාසිකම්:",
+            fontSize = 11.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFFFDE047)
+          )
+          item.keyArticlesOrRights.forEach { art ->
+            Row(modifier = Modifier.padding(vertical = 1.5.dp)) {
+              Text("•", color = Color(0xFF60A5FA), fontSize = 11.sp, fontWeight = FontWeight.Bold)
+              Spacer(modifier = Modifier.width(5.dp))
+              Text(text = art, fontSize = 11.sp, color = Color.White, lineHeight = 15.sp)
+            }
+          }
+
+          Spacer(modifier = Modifier.height(8.dp))
+          Surface(
+            color = Color(0xFF1E293B),
+            shape = RoundedCornerShape(6.dp),
+            modifier = Modifier.fillMaxWidth()
+          ) {
+            Column(modifier = Modifier.padding(8.dp)) {
+              Text(
+                text = "🇱🇰 ශ්‍රී ලංකාවේ ක්‍රියාත්මක වීම: ${item.sriLankanContext}",
+                fontSize = 10.5.sp,
+                color = Color(0xFF93C5FD),
+                lineHeight = 15.sp
+              )
+              Spacer(modifier = Modifier.height(4.dp))
+              Text(
+                text = "🎯 විභාග ඉඟිය: ${item.examTip}",
+                fontSize = 10.5.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF34D399)
+              )
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// ============================================================================
+// 8. LOCAL GOVERNMENT SECTION
+// ============================================================================
+@Composable
+private fun CivicsLocalGovtSection(searchQuery: String) {
+  val items = remember(searchQuery) {
+    CivicsMasterDataProvider.localGovtItems.filter { lg ->
+      searchQuery.isBlank() ||
+          lg.councilType.contains(searchQuery, ignoreCase = true) ||
+          lg.keyFunctions.any { it.contains(searchQuery, ignoreCase = true) } ||
+          lg.citizenServices.contains(searchQuery, ignoreCase = true)
+    }
+  }
+
+  val listState = rememberLazyListState()
+  LaunchedEffect(searchQuery) {
+    listState.scrollToItem(0)
+  }
+
+  LazyColumn(
+    state = listState,
+    modifier = Modifier.fillMaxSize(),
+    contentPadding = PaddingValues(12.dp),
+    verticalArrangement = Arrangement.spacedBy(10.dp)
+  ) {
+    item {
+      Card(
+        shape = RoundedCornerShape(10.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF9A3412).copy(alpha = 0.35f)),
+        border = BorderStroke(1.dp, Color(0xFFEA580C))
+      ) {
+        Row(
+          modifier = Modifier.padding(10.dp),
+          verticalAlignment = Alignment.CenterVertically
+        ) {
+          Text("🏢", fontSize = 20.sp)
+          Spacer(modifier = Modifier.width(8.dp))
+          Text(
+            text = "මහනගර, නගර, ප්‍රාදේශීය සභා සහ 13 වන ව්‍යවස්ථා සංශෝධනයේ පළාත් සභා පාලන ව්‍යුහය, ආදායම් මාර්ග සහ සේවාවන්.",
+            fontSize = 11.5.sp,
+            color = Color(0xFFFFEDD5),
+            lineHeight = 16.sp
+          )
+        }
+      }
+    }
+
+    items(items, key = { it.id }) { item ->
+      Card(
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF291105)),
+        border = BorderStroke(1.dp, Color(0xFF7C2D12)),
+        modifier = Modifier.fillMaxWidth()
+      ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+          Text(
+            text = item.councilType,
+            fontSize = 14.5.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.White
+          )
+
+          Spacer(modifier = Modifier.height(6.dp))
+          Text(
+            text = "👔 නායකත්වය & ව්‍යුහය: ${item.leadershipAndStructure}",
+            fontSize = 11.5.sp,
+            color = Color(0xFFFED7AA),
+            lineHeight = 16.sp
+          )
+
+          Spacer(modifier = Modifier.height(8.dp))
+          Text(
+            text = "🛠️ ප්‍රධාන කාර්යයන් සහ වගකීම්:",
+            fontSize = 11.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFFFDE047)
+          )
+          item.keyFunctions.forEach { fn ->
+            Row(modifier = Modifier.padding(vertical = 1.5.dp)) {
+              Text("•", color = Color(0xFFF97316), fontSize = 11.sp, fontWeight = FontWeight.Bold)
+              Spacer(modifier = Modifier.width(5.dp))
+              Text(text = fn, fontSize = 11.sp, color = Color.White, lineHeight = 15.sp)
+            }
+          }
+
+          Spacer(modifier = Modifier.height(6.dp))
+          Text(
+            text = "💰 ප්‍රධාන ආදායම් මාර්ග:",
+            fontSize = 11.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF86EFAC)
+          )
+          item.revenueSources.forEach { rev ->
+            Row(modifier = Modifier.padding(vertical = 1.dp)) {
+              Text("✓", color = Color(0xFF22C55E), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+              Spacer(modifier = Modifier.width(5.dp))
+              Text(text = rev, fontSize = 10.5.sp, color = Color(0xFFDCFCE7))
+            }
+          }
+
+          Spacer(modifier = Modifier.height(8.dp))
+          Surface(
+            color = Color(0xFF431407),
+            shape = RoundedCornerShape(6.dp),
+            modifier = Modifier.fillMaxWidth()
+          ) {
+            Column(modifier = Modifier.padding(8.dp)) {
+              Text(
+                text = "🏠 පුරවැසියන්ට ලැබෙන සේවාවන්: ${item.citizenServices}",
+                fontSize = 10.5.sp,
+                color = Color(0xFFFFEDD5),
+                lineHeight = 15.sp
+              )
+              Spacer(modifier = Modifier.height(3.dp))
+              Text(
+                text = "🎯 විභාග ඉඟිය: ${item.examTip}",
+                fontSize = 10.5.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFFFDBA74)
+              )
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// ============================================================================
+// 9. GOOD GOVERNANCE & RTI SECTION
+// ============================================================================
+@Composable
+private fun CivicsGoodGovernanceSection(searchQuery: String) {
+  val items = remember(searchQuery) {
+    CivicsMasterDataProvider.goodGovernanceItems.filter { gg ->
+      searchQuery.isBlank() ||
+          gg.conceptTitle.contains(searchQuery, ignoreCase = true) ||
+          gg.keyPrinciples.any { it.contains(searchQuery, ignoreCase = true) } ||
+          gg.practicalApplication.contains(searchQuery, ignoreCase = true)
+    }
+  }
+
+  val listState = rememberLazyListState()
+  LaunchedEffect(searchQuery) {
+    listState.scrollToItem(0)
+  }
+
+  LazyColumn(
+    state = listState,
+    modifier = Modifier.fillMaxSize(),
+    contentPadding = PaddingValues(12.dp),
+    verticalArrangement = Arrangement.spacedBy(10.dp)
+  ) {
+    item {
+      Card(
+        shape = RoundedCornerShape(10.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF065F46).copy(alpha = 0.35f)),
+        border = BorderStroke(1.dp, Color(0xFF10B981))
+      ) {
+        Row(
+          modifier = Modifier.padding(10.dp),
+          verticalAlignment = Alignment.CenterVertically
+        ) {
+          Text("🛡️", fontSize = 20.sp)
+          Spacer(modifier = Modifier.width(8.dp))
+          Text(
+            text = "තොරතුරු දැනගැනීමේ අයිතිවාසිකම් පනත (RTI 2016), පාරදෘශ්‍යතාව, වගවීම, COPE කාරක සභාව සහ අල්ලස් නිවාරණය.",
+            fontSize = 11.5.sp,
+            color = Color(0xFFD1FAE5),
+            lineHeight = 16.sp
+          )
+        }
+      }
+    }
+
+    items(items, key = { it.id }) { item ->
+      Card(
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF022C22)),
+        border = BorderStroke(1.dp, Color(0xFF047857)),
+        modifier = Modifier.fillMaxWidth()
+      ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+          Text(
+            text = item.conceptTitle,
+            fontSize = 14.5.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.White
+          )
+
+          Spacer(modifier = Modifier.height(4.dp))
+          Surface(
+            color = Color(0xFF059669),
+            shape = RoundedCornerShape(4.dp)
+          ) {
+            Text(
+              text = item.legalProvisions,
+              color = Color.White,
+              fontSize = 10.sp,
+              fontWeight = FontWeight.Bold,
+              modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+            )
+          }
+
+          Spacer(modifier = Modifier.height(8.dp))
+          Text(
+            text = "📌 ප්‍රධාන මූලධර්ම සහ ලක්ෂණ:",
+            fontSize = 11.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFFFDE047)
+          )
+          item.keyPrinciples.forEach { p ->
+            Row(modifier = Modifier.padding(vertical = 1.5.dp)) {
+              Text("•", color = Color(0xFF34D399), fontSize = 11.sp, fontWeight = FontWeight.Bold)
+              Spacer(modifier = Modifier.width(5.dp))
+              Text(text = p, fontSize = 11.sp, color = Color.White, lineHeight = 15.sp)
+            }
+          }
+
+          Spacer(modifier = Modifier.height(6.dp))
+          Text(
+            text = "💡 ප්‍රායෝගික භාවිතය: ${item.practicalApplication}",
+            fontSize = 11.sp,
+            color = Color(0xFFA7F3D0),
+            lineHeight = 15.sp
+          )
+
+          Spacer(modifier = Modifier.height(8.dp))
+          Surface(
+            color = Color(0xFF064E3B),
+            shape = RoundedCornerShape(6.dp),
+            modifier = Modifier.fillMaxWidth()
+          ) {
+            Column(modifier = Modifier.padding(8.dp)) {
+              Text(
+                text = "👤 පුරවැසියාගේ කාර්යභාරය: ${item.citizenRole}",
+                fontSize = 10.5.sp,
+                color = Color(0xFFE2E8F0),
+                lineHeight = 15.sp
+              )
+              Spacer(modifier = Modifier.height(3.dp))
+              Text(
+                text = "🎯 විභාග ඉඟිය: ${item.examTip}",
+                fontSize = 10.5.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF6EE7B7)
+              )
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// ============================================================================
+// 10. GLOBAL RELATIONS SECTION
+// ============================================================================
+@Composable
+private fun CivicsGlobalRelationsSection(searchQuery: String) {
+  val items = remember(searchQuery) {
+    CivicsMasterDataProvider.globalRelationsItems.filter { gr ->
+      searchQuery.isBlank() ||
+          gr.organizationOrPolicy.contains(searchQuery, ignoreCase = true) ||
+          gr.keyObjectives.any { it.contains(searchQuery, ignoreCase = true) } ||
+          gr.sriLankaRoleAndBenefits.contains(searchQuery, ignoreCase = true)
+    }
+  }
+
+  val listState = rememberLazyListState()
+  LaunchedEffect(searchQuery) {
+    listState.scrollToItem(0)
+  }
+
+  LazyColumn(
+    state = listState,
+    modifier = Modifier.fillMaxSize(),
+    contentPadding = PaddingValues(12.dp),
+    verticalArrangement = Arrangement.spacedBy(10.dp)
+  ) {
+    item {
+      Card(
+        shape = RoundedCornerShape(10.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF581C87).copy(alpha = 0.35f)),
+        border = BorderStroke(1.dp, Color(0xFF9333EA))
+      ) {
+        Row(
+          modifier = Modifier.padding(10.dp),
+          verticalAlignment = Alignment.CenterVertically
+        ) {
+          Text("🌐", fontSize = 20.sp)
+          Spacer(modifier = Modifier.width(8.dp))
+          Text(
+            text = "එක්සත් ජාතීන්ගේ සංවිධානය (UN 1945), නොබැඳි විදේශ ප්‍රතිපත්තිය (NAM 1961), සාර්ක් (SAARC 1985) සහ ගෝලීය පුරවැසිභාවය.",
+            fontSize = 11.5.sp,
+            color = Color(0xFFE9D5FF),
+            lineHeight = 16.sp
+          )
+        }
+      }
+    }
+
+    items(items, key = { it.id }) { item ->
+      Card(
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF1E102E)),
+        border = BorderStroke(1.dp, Color(0xFF6B21A8)),
+        modifier = Modifier.fillMaxWidth()
+      ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+          Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+          ) {
+            Text(
+              text = item.organizationOrPolicy,
+              fontSize = 14.5.sp,
+              fontWeight = FontWeight.Bold,
+              color = Color.White
+            )
+            Surface(
+              color = Color(0xFF7C3AED),
+              shape = RoundedCornerShape(4.dp)
+            ) {
+              Text(
+                text = item.foundedYearAndHQ,
+                color = Color.White,
+                fontSize = 9.5.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+              )
+            }
+          }
+
+          Spacer(modifier = Modifier.height(8.dp))
+          Text(
+            text = "📌 ප්‍රධාන අරමුණු සහ කර්තව්‍යයන්:",
+            fontSize = 11.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFFFDE047)
+          )
+          item.keyObjectives.forEach { obj ->
+            Row(modifier = Modifier.padding(vertical = 1.5.dp)) {
+              Text("•", color = Color(0xFFA855F7), fontSize = 11.sp, fontWeight = FontWeight.Bold)
+              Spacer(modifier = Modifier.width(5.dp))
+              Text(text = obj, fontSize = 11.sp, color = Color.White, lineHeight = 15.sp)
+            }
+          }
+
+          Spacer(modifier = Modifier.height(6.dp))
+          Text(
+            text = "🇱🇰 ශ්‍රී ලංකාවේ දායකත්වය & ප්‍රතිලාභ: ${item.sriLankaRoleAndBenefits}",
+            fontSize = 11.sp,
+            color = Color(0xFFE9D5FF),
+            lineHeight = 15.sp
+          )
+
+          Spacer(modifier = Modifier.height(8.dp))
+          Surface(
+            color = Color(0xFF3B0764),
+            shape = RoundedCornerShape(6.dp),
+            modifier = Modifier.fillMaxWidth()
+          ) {
+            Column(modifier = Modifier.padding(8.dp)) {
+              Text(
+                text = "🌍 ගෝලීය පුරවැසිභාවය: ${item.globalCitizenshipAspects}",
+                fontSize = 10.5.sp,
+                color = Color(0xFFDDD6FE),
+                lineHeight = 15.sp
+              )
+              Spacer(modifier = Modifier.height(3.dp))
+              Text(
+                text = "🎯 විභාග ඉඟිය: ${item.examTip}",
+                fontSize = 10.5.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFFC084FC)
+              )
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// ============================================================================
+// MASTER OVERVIEW GRID VIEW (ALL 10 SUB-SECTIONS COLLECTION)
+// ============================================================================
+@Composable
+private fun CivicsMasterOverviewGrid(
+  selectedGradeTab: CivicsGradeTab,
+  searchQuery: String,
+  onSelectCategory: (CivicsSectionCategory) -> Unit
+) {
+  val listState = rememberLazyListState()
+  val categories = remember(searchQuery) {
+    CivicsSectionCategory.values().filter { cat ->
+      searchQuery.isBlank() ||
+          cat.titleSinhala.contains(searchQuery, ignoreCase = true) ||
+          cat.subtitle.contains(searchQuery, ignoreCase = true)
+    }
+  }
+
+  LazyColumn(
+    state = listState,
+    modifier = Modifier
+      .fillMaxSize()
+      .padding(horizontal = 12.dp, vertical = 10.dp),
+    verticalArrangement = Arrangement.spacedBy(12.dp)
+  ) {
+    // Header Hero Banner
+    item {
+      Card(
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF0F766E).copy(alpha = 0.35f)),
+        border = BorderStroke(1.dp, Color(0xFF2DD4BF))
+      ) {
+        Row(
+          modifier = Modifier.padding(12.dp),
+          verticalAlignment = Alignment.CenterVertically
+        ) {
+          Text("🏛️", fontSize = 28.sp)
+          Spacer(modifier = Modifier.width(10.dp))
+          Column {
+            Text(
+              text = "10 & 11 ශ්‍රේණි පුරවැසි අධ්‍යාපනය Master Hub",
+              fontSize = 15.sp,
+              fontWeight = FontWeight.Bold,
+              color = Color.White
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+              text = "පහත දැක්වෙන්නේ පුරවැසි විෂය නිර්දේශයේ සියලුම අනු කොටස් 10 හි එකතුවයි. ඕනෑම අනු කොටසක් ක්ලික් කර එහි අන්තර්ගතය අධ්‍යයනය කරන්න.",
+              fontSize = 11.5.sp,
+              color = Color(0xFFCCFBF1),
+              lineHeight = 16.sp
+            )
+          }
+        }
+      }
+    }
+
+    // Grid of all 10 categories (2 columns of cards going down)
+    items(categories.chunked(2)) { rowItems ->
+      Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+      ) {
+        rowItems.forEach { cat ->
+          Card(
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF0F172A)),
+            border = BorderStroke(1.dp, cat.themeColor.copy(alpha = 0.8f)),
+            modifier = Modifier
+              .weight(1f)
+              .clickable { onSelectCategory(cat) }
+          ) {
+            Column(
+              modifier = Modifier.padding(12.dp),
+              verticalArrangement = Arrangement.SpaceBetween
+            ) {
+              Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+              ) {
+                Surface(
+                  shape = CircleShape,
+                  color = cat.themeColor.copy(alpha = 0.25f),
+                  modifier = Modifier.size(36.dp)
+                ) {
+                  Box(contentAlignment = Alignment.Center) {
+                    Text(cat.emoji, fontSize = 18.sp)
+                  }
+                }
+                Surface(
+                  color = cat.themeColor,
+                  shape = RoundedCornerShape(4.dp)
+                ) {
+                  Text(
+                    text = "අනු කොටස",
+                    color = Color.White,
+                    fontSize = 9.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                  )
+                }
+              }
+
+              Spacer(modifier = Modifier.height(8.dp))
+              Text(
+                text = cat.titleSinhala,
+                fontSize = 13.5.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+              )
+              Spacer(modifier = Modifier.height(2.dp))
+              Text(
+                text = cat.subtitle,
+                fontSize = 10.5.sp,
+                color = Color(0xFF94A3B8),
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                lineHeight = 14.sp
+              )
+
+              Spacer(modifier = Modifier.height(10.dp))
+              Surface(
+                color = cat.themeColor.copy(alpha = 0.15f),
+                border = BorderStroke(0.8.dp, cat.themeColor),
+                shape = RoundedCornerShape(6.dp),
+                modifier = Modifier.fillMaxWidth()
+              ) {
+                Row(
+                  modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
+                  horizontalArrangement = Arrangement.SpaceBetween,
+                  verticalAlignment = Alignment.CenterVertically
+                ) {
+                  Text(
+                    text = "අන්තර්ගතය බලන්න",
+                    fontSize = 10.5.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                  )
+                  Text("➔", fontSize = 11.sp, color = cat.themeColor)
+                }
+              }
+            }
+          }
+        }
+        if (rowItems.size < 2) {
+          Spacer(modifier = Modifier.weight(1f))
+        }
+      }
     }
   }
 }

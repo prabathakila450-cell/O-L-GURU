@@ -12,6 +12,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
@@ -59,7 +60,7 @@ fun HealthGrade10And11MasterHubDialog(
   onDismiss: () -> Unit
 ) {
   var selectedGradeTab by remember { mutableStateOf(initialGradeTab) }
-  var selectedCategory by remember { mutableStateOf(initialSectionCategory ?: HealthSectionCategory.LESSONS) }
+  var selectedCategory by remember { mutableStateOf<HealthSectionCategory?>(initialSectionCategory) }
   var searchQuery by remember { mutableStateOf("") }
 
   // State for MCQ interactive test
@@ -69,6 +70,13 @@ fun HealthGrade10And11MasterHubDialog(
   var expandedLessonId by remember { mutableStateOf<String?>(null) }
   var expandedEssayId by remember { mutableStateOf<String?>(null) }
   var expandedFirstAidId by remember { mutableStateOf<String?>(null) }
+
+  // Reset expanded items when category or grade tab changes
+  LaunchedEffect(selectedCategory, selectedGradeTab) {
+    expandedLessonId = null
+    expandedEssayId = null
+    expandedFirstAidId = null
+  }
 
   Dialog(
     onDismissRequest = onDismiss,
@@ -213,40 +221,84 @@ fun HealthGrade10And11MasterHubDialog(
             .testTag("health_search_input")
         )
 
-        // CATEGORY TABS HORIZONTAL SCROLL
-        Row(
-          modifier = Modifier
-            .fillMaxWidth()
-            .background(Color(0xFF1E050E))
-            .horizontalScroll(rememberScrollState())
-            .padding(horizontal = 12.dp, vertical = 6.dp),
-          horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-          HealthSectionCategory.values().forEach { cat ->
-            val isSelected = selectedCategory == cat
-            Surface(
-              shape = RoundedCornerShape(16.dp),
-              color = if (isSelected) cat.themeColor else Color(0xFF3B0B1D).copy(alpha = 0.6f),
-              border = BorderStroke(
-                width = 1.dp,
-                color = if (isSelected) Color.White.copy(alpha = 0.8f) else Color(0xFF881337)
-              ),
-              modifier = Modifier
-                .clickable { selectedCategory = cat }
-                .testTag("health_cat_${cat.id}")
+        if (selectedCategory != null) {
+          // CATEGORY TABS & BACK TO OVERVIEW STRIP
+          Column(
+            modifier = Modifier
+              .fillMaxWidth()
+              .background(Color(0xFF1E050E))
+              .padding(horizontal = 8.dp, vertical = 6.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
+          ) {
+            Row(
+              modifier = Modifier.fillMaxWidth(),
+              horizontalArrangement = Arrangement.SpaceBetween,
+              verticalAlignment = Alignment.CenterVertically
             ) {
-              Row(
-                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                verticalAlignment = Alignment.CenterVertically
+              Surface(
+                onClick = { selectedCategory = null },
+                shape = RoundedCornerShape(8.dp),
+                color = Color(0xFFE11D48),
+                border = BorderStroke(1.dp, Color(0xFFFB7185))
               ) {
-                Text(cat.emoji, fontSize = 13.sp)
-                Spacer(modifier = Modifier.width(5.dp))
-                Text(
-                  text = cat.titleSinhala,
-                  fontSize = 11.sp,
-                  fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                  color = if (isSelected) Color.White else Color(0xFFFFE4E6)
-                )
+                Row(
+                  modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                  verticalAlignment = Alignment.CenterVertically
+                ) {
+                  Text("◀ සියලු අනු කොටස් 10 බලන්න", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                }
+              }
+
+              Text(
+                text = "${selectedCategory?.emoji} ${selectedCategory?.shortTitleSinhala}",
+                color = Color(0xFFFDA4AF),
+                fontSize = 11.5.sp,
+                fontWeight = FontWeight.Bold
+              )
+            }
+
+            val categoriesChunked = remember { HealthSectionCategory.values().toList().chunked(4) }
+            categoriesChunked.forEach { rowItems ->
+              Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+              ) {
+                rowItems.forEach { cat ->
+                  val isSelected = selectedCategory == cat
+                  Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = if (isSelected) cat.themeColor else Color(0xFF3B0B1D).copy(alpha = 0.7f),
+                    border = BorderStroke(
+                      width = 1.dp,
+                      color = if (isSelected) Color.White else Color(0xFF881337)
+                    ),
+                    modifier = Modifier
+                      .weight(1f)
+                      .clickable { selectedCategory = cat }
+                      .testTag("health_cat_${cat.id}")
+                  ) {
+                    Column(
+                      modifier = Modifier.padding(vertical = 6.dp, horizontal = 3.dp),
+                      horizontalAlignment = Alignment.CenterHorizontally,
+                      verticalArrangement = Arrangement.Center
+                    ) {
+                      Text(cat.emoji, fontSize = 13.sp)
+                      Spacer(modifier = Modifier.height(2.dp))
+                      Text(
+                        text = cat.shortTitleSinhala,
+                        fontSize = 10.sp,
+                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                        color = if (isSelected) Color.White else Color(0xFFFFE4E6),
+                        textAlign = TextAlign.Center,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                      )
+                    }
+                  }
+                }
+                repeat(4 - rowItems.size) {
+                  Spacer(modifier = Modifier.weight(1f))
+                }
               }
             }
           }
@@ -259,54 +311,75 @@ fun HealthGrade10And11MasterHubDialog(
             .fillMaxWidth()
             .background(Color(0xFF14030A))
         ) {
-          when (selectedCategory) {
-            HealthSectionCategory.LESSONS -> {
-              HealthLessonsSection(
-                gradeTab = selectedGradeTab,
-                searchQuery = searchQuery,
-                expandedLessonId = expandedLessonId,
-                onToggleExpand = { id ->
-                  expandedLessonId = if (expandedLessonId == id) null else id
-                }
-              )
-            }
-            HealthSectionCategory.MCQ_BANK -> {
-              HealthMcqSection(
-                gradeTab = selectedGradeTab,
-                searchQuery = searchQuery,
-                userSelectedOptions = userSelectedOptions,
-                onSelectOption = { qId, optIdx ->
-                  userSelectedOptions[qId] = optIdx
-                },
-                onResetQuiz = {
-                  userSelectedOptions.clear()
-                }
-              )
-            }
-            HealthSectionCategory.STRUCTURED_ESSAY -> {
-              HealthStructuredEssaySection(
-                gradeTab = selectedGradeTab,
-                searchQuery = searchQuery,
-                expandedEssayId = expandedEssayId,
-                onToggleExpand = { id ->
-                  expandedEssayId = if (expandedEssayId == id) null else id
-                }
-              )
-            }
-            HealthSectionCategory.CALCULATORS -> {
-              HealthCalculatorsSection()
-            }
-            HealthSectionCategory.FIRST_AID -> {
-              HealthFirstAidSection(
-                searchQuery = searchQuery,
-                expandedFirstAidId = expandedFirstAidId,
-                onToggleExpand = { id ->
-                  expandedFirstAidId = if (expandedFirstAidId == id) null else id
-                }
-              )
-            }
-            HealthSectionCategory.LIFE_SKILLS -> {
-              HealthLifeSkillsSection(searchQuery = searchQuery)
+          if (selectedCategory == null) {
+            HealthMasterOverviewGrid(
+              selectedGradeTab = selectedGradeTab,
+              searchQuery = searchQuery,
+              onSelectCategory = { cat -> selectedCategory = cat }
+            )
+          } else {
+            when (selectedCategory) {
+              HealthSectionCategory.LESSONS -> {
+                HealthLessonsSection(
+                  gradeTab = selectedGradeTab,
+                  searchQuery = searchQuery,
+                  expandedLessonId = expandedLessonId,
+                  onToggleExpand = { id ->
+                    expandedLessonId = if (expandedLessonId == id) null else id
+                  }
+                )
+              }
+              HealthSectionCategory.MCQ_BANK -> {
+                HealthMcqSection(
+                  gradeTab = selectedGradeTab,
+                  searchQuery = searchQuery,
+                  userSelectedOptions = userSelectedOptions,
+                  onSelectOption = { qId, optIdx ->
+                    userSelectedOptions[qId] = optIdx
+                  },
+                  onResetQuiz = {
+                    userSelectedOptions.clear()
+                  }
+                )
+              }
+              HealthSectionCategory.STRUCTURED_ESSAY -> {
+                HealthStructuredEssaySection(
+                  gradeTab = selectedGradeTab,
+                  searchQuery = searchQuery,
+                  expandedEssayId = expandedEssayId,
+                  onToggleExpand = { id ->
+                    expandedEssayId = if (expandedEssayId == id) null else id
+                  }
+                )
+              }
+              HealthSectionCategory.CALCULATORS -> {
+                HealthCalculatorsSection()
+              }
+              HealthSectionCategory.FIRST_AID -> {
+                HealthFirstAidSection(
+                  searchQuery = searchQuery,
+                  expandedFirstAidId = expandedFirstAidId,
+                  onToggleExpand = { id ->
+                    expandedFirstAidId = if (expandedFirstAidId == id) null else id
+                  }
+                )
+              }
+              HealthSectionCategory.LIFE_SKILLS -> {
+                HealthLifeSkillsSection(searchQuery = searchQuery)
+              }
+              HealthSectionCategory.SHORT_NOTES -> {
+                HealthShortNotesSection(gradeTab = selectedGradeTab, searchQuery = searchQuery)
+              }
+              HealthSectionCategory.SPORTS_RULES -> {
+                HealthSportsRulesSection(searchQuery = searchQuery)
+              }
+              HealthSectionCategory.PRACTICAL_EXAMS -> {
+                HealthPracticalExamsSection(searchQuery = searchQuery)
+              }
+              HealthSectionCategory.AYURVEDA_WELLNESS -> {
+                HealthAyurvedaSection(searchQuery = searchQuery)
+              }
+              null -> {}
             }
           }
         }
@@ -341,7 +414,13 @@ private fun HealthLessonsSection(
     }
   }
 
+  val listState = androidx.compose.foundation.lazy.rememberLazyListState()
+  LaunchedEffect(gradeTab, searchQuery) {
+    listState.scrollToItem(0)
+  }
+
   LazyColumn(
+    state = listState,
     modifier = Modifier.fillMaxSize(),
     contentPadding = PaddingValues(12.dp),
     verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -543,7 +622,13 @@ private fun HealthMcqSection(
     filteredMcqs.firstOrNull { it.id == id }?.correctOptionIndex == opt
   }
 
+  val listState = androidx.compose.foundation.lazy.rememberLazyListState()
+  LaunchedEffect(gradeTab, searchQuery) {
+    listState.scrollToItem(0)
+  }
+
   LazyColumn(
+    state = listState,
     modifier = Modifier.fillMaxSize(),
     contentPadding = PaddingValues(12.dp),
     verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -736,7 +821,13 @@ private fun HealthStructuredEssaySection(
     }
   }
 
+  val listState = androidx.compose.foundation.lazy.rememberLazyListState()
+  LaunchedEffect(gradeTab, searchQuery) {
+    listState.scrollToItem(0)
+  }
+
   LazyColumn(
+    state = listState,
     modifier = Modifier.fillMaxSize(),
     contentPadding = PaddingValues(12.dp),
     verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -905,7 +996,13 @@ private fun HealthCalculatorsSection() {
 
   var tournamentTeamsInput by remember { mutableStateOf("11") }
 
+  val listState = androidx.compose.foundation.lazy.rememberLazyListState()
+  LaunchedEffect(Unit) {
+    listState.scrollToItem(0)
+  }
+
   LazyColumn(
+    state = listState,
     modifier = Modifier.fillMaxSize(),
     contentPadding = PaddingValues(12.dp),
     verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -1168,7 +1265,13 @@ private fun HealthFirstAidSection(
     }
   }
 
+  val listState = androidx.compose.foundation.lazy.rememberLazyListState()
+  LaunchedEffect(searchQuery) {
+    listState.scrollToItem(0)
+  }
+
   LazyColumn(
+    state = listState,
     modifier = Modifier.fillMaxSize(),
     contentPadding = PaddingValues(12.dp),
     verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -1320,7 +1423,13 @@ private fun HealthLifeSkillsSection(searchQuery: String) {
     }
   }
 
+  val listState = androidx.compose.foundation.lazy.rememberLazyListState()
+  LaunchedEffect(searchQuery) {
+    listState.scrollToItem(0)
+  }
+
   LazyColumn(
+    state = listState,
     modifier = Modifier.fillMaxSize(),
     contentPadding = PaddingValues(12.dp),
     verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -1422,3 +1531,734 @@ private fun HealthLifeSkillsSection(searchQuery: String) {
     }
   }
 }
+
+// ============================================================================
+// 7. SHORT NOTES & FLASHCARDS SECTION
+// ============================================================================
+@Composable
+private fun HealthShortNotesSection(gradeTab: HealthGradeTab, searchQuery: String) {
+  val filteredNotes = remember(gradeTab, searchQuery) {
+    HealthMasterDataProvider.shortNoteCards.filter { note ->
+      val matchesGrade = when (gradeTab) {
+        HealthGradeTab.ALL -> true
+        HealthGradeTab.GRADE_10 -> note.grade == "10"
+        HealthGradeTab.GRADE_11 -> note.grade == "11"
+      }
+      val matchesSearch = searchQuery.isBlank() ||
+          note.topic.contains(searchQuery, ignoreCase = true) ||
+          note.questionPrompt.contains(searchQuery, ignoreCase = true) ||
+          note.answerText.contains(searchQuery, ignoreCase = true) ||
+          note.keyFact.contains(searchQuery, ignoreCase = true)
+      matchesGrade && matchesSearch
+    }
+  }
+
+  val listState = androidx.compose.foundation.lazy.rememberLazyListState()
+  LaunchedEffect(gradeTab, searchQuery) {
+    listState.scrollToItem(0)
+  }
+
+  LazyColumn(
+    state = listState,
+    modifier = Modifier.fillMaxSize(),
+    contentPadding = PaddingValues(12.dp),
+    verticalArrangement = Arrangement.spacedBy(10.dp)
+  ) {
+    item {
+      Card(
+        shape = RoundedCornerShape(10.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF78350F).copy(alpha = 0.35f)),
+        border = BorderStroke(1.dp, Color(0xFFF59E0B))
+      ) {
+        Row(
+          modifier = Modifier.padding(10.dp),
+          verticalAlignment = Alignment.CenterVertically
+        ) {
+          Text("⚡", fontSize = 20.sp)
+          Spacer(modifier = Modifier.width(8.dp))
+          Text(
+            text = "O/L විභාගයේදී අනිවාර්යයෙන්ම පරීක්ෂා කරන ප්‍රධාන විෂය කරුණු සහ ක්ෂණික මතක පද පහතින් අධ්‍යයනය කරන්න.",
+            fontSize = 11.5.sp,
+            color = Color(0xFFFEF3C7),
+            lineHeight = 16.sp
+          )
+        }
+      }
+    }
+
+    items(filteredNotes, key = { it.id }) { note ->
+      var isRevealed by remember { mutableStateOf(false) }
+
+      Card(
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF2C1802)),
+        border = BorderStroke(1.dp, if (isRevealed) Color(0xFFF59E0B) else Color(0xFF78350F)),
+        modifier = Modifier
+          .fillMaxWidth()
+          .clickable { isRevealed = !isRevealed }
+      ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+          Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+          ) {
+            Surface(
+              color = Color(0xFFD97706),
+              shape = RoundedCornerShape(4.dp)
+            ) {
+              Text(
+                text = "${note.grade} ශ්‍රේණිය • ${note.topic}",
+                color = Color.White,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+              )
+            }
+            Text(
+              text = if (isRevealed) "💡 සඟවන්න" else "👉 පිළිතුර බලන්න",
+              color = Color(0xFFFBBF24),
+              fontSize = 10.5.sp,
+              fontWeight = FontWeight.Bold
+            )
+          }
+
+          Spacer(modifier = Modifier.height(8.dp))
+          Text(
+            text = "❓ ${note.questionPrompt}",
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.White,
+            lineHeight = 17.sp
+          )
+
+          if (isRevealed) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Surface(
+              shape = RoundedCornerShape(8.dp),
+              color = Color(0xFF451A03),
+              border = BorderStroke(1.dp, Color(0xFFF59E0B)),
+              modifier = Modifier.fillMaxWidth()
+            ) {
+              Column(modifier = Modifier.padding(10.dp)) {
+                Text(
+                  text = "✅ පිළිතුර: ${note.answerText}",
+                  fontSize = 11.5.sp,
+                  color = Color(0xFFFEF3C7),
+                  fontWeight = FontWeight.SemiBold,
+                  lineHeight = 16.sp
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                  text = "📌 අනිවාර්ය විභාග කරුණ: ${note.keyFact}",
+                  fontSize = 11.sp,
+                  color = Color(0xFF4ADE80),
+                  fontWeight = FontWeight.Bold
+                )
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// ============================================================================
+// 8. SPORTS RULES SECTION
+// ============================================================================
+@Composable
+private fun HealthSportsRulesSection(searchQuery: String) {
+  val rules = remember(searchQuery) {
+    HealthMasterDataProvider.sportsRules.filter { s ->
+      searchQuery.isBlank() ||
+          s.sportName.contains(searchQuery, ignoreCase = true) ||
+          s.keyRules.any { it.contains(searchQuery, ignoreCase = true) } ||
+          s.foulsAndViolations.any { it.contains(searchQuery, ignoreCase = true) }
+    }
+  }
+
+  val listState = androidx.compose.foundation.lazy.rememberLazyListState()
+  LaunchedEffect(searchQuery) {
+    listState.scrollToItem(0)
+  }
+
+  LazyColumn(
+    state = listState,
+    modifier = Modifier.fillMaxSize(),
+    contentPadding = PaddingValues(12.dp),
+    verticalArrangement = Arrangement.spacedBy(10.dp)
+  ) {
+    item {
+      Card(
+        shape = RoundedCornerShape(10.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF14532D).copy(alpha = 0.35f)),
+        border = BorderStroke(1.dp, Color(0xFF22C55E))
+      ) {
+        Row(
+          modifier = Modifier.padding(10.dp),
+          verticalAlignment = Alignment.CenterVertically
+        ) {
+          Text("🏆", fontSize = 20.sp)
+          Spacer(modifier = Modifier.width(8.dp))
+          Text(
+            text = "ශ්‍රී ලංකා ජාතික සහ පාසල් මට්ටමේ නිල ක්‍රීඩා නීතිරීති, පිටි මිනුම් සහ දඬුවම් පිළිබඳ සම්පූර්ණ විස්තරය.",
+            fontSize = 11.5.sp,
+            color = Color(0xFFDCFCE7),
+            lineHeight = 16.sp
+          )
+        }
+      }
+    }
+
+    items(rules, key = { it.id }) { item ->
+      Card(
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF052E16)),
+        border = BorderStroke(1.dp, Color(0xFF15803D)),
+        modifier = Modifier.fillMaxWidth()
+      ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+          Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(item.iconEmoji, fontSize = 20.sp)
+            Spacer(modifier = Modifier.width(8.dp))
+            Column {
+              Text(
+                text = item.sportName,
+                fontSize = 14.5.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+              )
+              Text(
+                text = "📏 ${item.courtDimensions}",
+                fontSize = 10.5.sp,
+                color = Color(0xFF86EFAC)
+              )
+            }
+          }
+
+          Spacer(modifier = Modifier.height(8.dp))
+          Surface(
+            color = Color(0xFF14532D),
+            shape = RoundedCornerShape(6.dp)
+          ) {
+            Text(
+              text = "👥 සාමාජිකයින්: ${item.teamMembers}",
+              fontSize = 10.5.sp,
+              color = Color.White,
+              fontWeight = FontWeight.SemiBold,
+              modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+            )
+          }
+
+          Spacer(modifier = Modifier.height(8.dp))
+          Text(
+            text = "📌 ප්‍රධාන නීතිරීති (Key Rules):",
+            fontSize = 11.5.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFFFDE047)
+          )
+          item.keyRules.forEach { r ->
+            Row(modifier = Modifier.padding(vertical = 1.5.dp)) {
+              Text("•", color = Color(0xFF22C55E), fontSize = 11.sp, fontWeight = FontWeight.Bold)
+              Spacer(modifier = Modifier.width(5.dp))
+              Text(text = r, fontSize = 11.sp, color = Color.White, lineHeight = 15.sp)
+            }
+          }
+
+          Spacer(modifier = Modifier.height(6.dp))
+          Text(
+            text = "⚠️ වැරදි සහ දඬුවම් (Fouls & Violations):",
+            fontSize = 11.5.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFFF87171)
+          )
+          item.foulsAndViolations.forEach { f ->
+            Row(modifier = Modifier.padding(vertical = 1.5.dp)) {
+              Text("x", color = Color(0xFFEF4444), fontSize = 11.sp, fontWeight = FontWeight.Bold)
+              Spacer(modifier = Modifier.width(5.dp))
+              Text(text = f, fontSize = 11.sp, color = Color(0xFFFFD1DC), lineHeight = 15.sp)
+            }
+          }
+
+          Spacer(modifier = Modifier.height(8.dp))
+          Surface(
+            color = Color(0xFF166534),
+            shape = RoundedCornerShape(6.dp),
+            modifier = Modifier.fillMaxWidth()
+          ) {
+            Text(
+              text = "🎯 විභාග ඉඟිය: ${item.examTip}",
+              fontSize = 10.5.sp,
+              color = Color(0xFFBBF7D0),
+              fontWeight = FontWeight.Bold,
+              modifier = Modifier.padding(8.dp)
+            )
+          }
+        }
+      }
+    }
+  }
+}
+
+// ============================================================================
+// 9. PRACTICAL EXAMS SECTION
+// ============================================================================
+@Composable
+private fun HealthPracticalExamsSection(searchQuery: String) {
+  val practicals = remember(searchQuery) {
+    HealthMasterDataProvider.practicalExams.filter { p ->
+      searchQuery.isBlank() ||
+          p.testName.contains(searchQuery, ignoreCase = true) ||
+          p.componentTested.contains(searchQuery, ignoreCase = true) ||
+          p.procedureSteps.any { it.contains(searchQuery, ignoreCase = true) }
+    }
+  }
+
+  val listState = androidx.compose.foundation.lazy.rememberLazyListState()
+  LaunchedEffect(searchQuery) {
+    listState.scrollToItem(0)
+  }
+
+  LazyColumn(
+    state = listState,
+    modifier = Modifier.fillMaxSize(),
+    contentPadding = PaddingValues(12.dp),
+    verticalArrangement = Arrangement.spacedBy(10.dp)
+  ) {
+    item {
+      Card(
+        shape = RoundedCornerShape(10.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF0369A1).copy(alpha = 0.35f)),
+        border = BorderStroke(1.dp, Color(0xFF0284C7))
+      ) {
+        Row(
+          modifier = Modifier.padding(10.dp),
+          verticalAlignment = Alignment.CenterVertically
+        ) {
+          Text("📋", fontSize = 20.sp)
+          Spacer(modifier = Modifier.width(8.dp))
+          Text(
+            text = "O/L සෞඛ්‍ය හා ශාරීරික අධ්‍යාපන ප්‍රායෝගික පරීක්ෂණ, Harvard Step Test, YOYO Test සහ මිනුම් පටිපාටි.",
+            fontSize = 11.5.sp,
+            color = Color(0xFFE0F2FE),
+            lineHeight = 16.sp
+          )
+        }
+      }
+    }
+
+    items(practicals, key = { it.id }) { prac ->
+      Card(
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF0C4A6E)),
+        border = BorderStroke(1.dp, Color(0xFF0369A1)),
+        modifier = Modifier.fillMaxWidth()
+      ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+          Text(
+            text = prac.testName,
+            fontSize = 14.5.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.White
+          )
+          Spacer(modifier = Modifier.height(4.dp))
+          Surface(
+            color = Color(0xFF0284C7),
+            shape = RoundedCornerShape(4.dp)
+          ) {
+            Text(
+              text = "මැනෙන සංරචකය: ${prac.componentTested}",
+              color = Color.White,
+              fontSize = 10.sp,
+              fontWeight = FontWeight.Bold,
+              modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+            )
+          }
+
+          Spacer(modifier = Modifier.height(8.dp))
+          Text(
+            text = "🛠️ අවශ්‍ය උපකරණ: ${prac.equipmentNeeded}",
+            fontSize = 11.sp,
+            color = Color(0xFFBAE6FD)
+          )
+
+          Spacer(modifier = Modifier.height(8.dp))
+          Text(
+            text = "📝 පරීක්ෂණ පියවර (Procedure):",
+            fontSize = 11.5.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFFFDE047)
+          )
+          prac.procedureSteps.forEach { step ->
+            Row(modifier = Modifier.padding(vertical = 1.5.dp)) {
+              Text("•", color = Color(0xFF38BDF8), fontSize = 11.sp, fontWeight = FontWeight.Bold)
+              Spacer(modifier = Modifier.width(5.dp))
+              Text(text = step, fontSize = 11.sp, color = Color.White, lineHeight = 15.sp)
+            }
+          }
+
+          Spacer(modifier = Modifier.height(8.dp))
+          Surface(
+            color = Color(0xFF075985),
+            shape = RoundedCornerShape(6.dp),
+            modifier = Modifier.fillMaxWidth()
+          ) {
+            Column(modifier = Modifier.padding(8.dp)) {
+              Text(
+                text = "🧮 ලකුණු/දර්ශක සූත්‍රය: ${prac.scoringFormula}",
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF7DD3FC)
+              )
+              Spacer(modifier = Modifier.height(2.dp))
+              Text(
+                text = "📊 මට්ටම් ප්‍රමිතිය: ${prac.gradeStandards}",
+                fontSize = 10.5.sp,
+                color = Color.White
+              )
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// ============================================================================
+// 10. AYURVEDA & WELLNESS SECTION
+// ============================================================================
+@Composable
+private fun HealthAyurvedaSection(searchQuery: String) {
+  val cards = remember(searchQuery) {
+    HealthMasterDataProvider.ayurvedaCards.filter { a ->
+      searchQuery.isBlank() ||
+          a.plantOrConceptName.contains(searchQuery, ignoreCase = true) ||
+          a.category.contains(searchQuery, ignoreCase = true) ||
+          a.healthBenefits.any { it.contains(searchQuery, ignoreCase = true) }
+    }
+  }
+
+  val listState = androidx.compose.foundation.lazy.rememberLazyListState()
+  LaunchedEffect(searchQuery) {
+    listState.scrollToItem(0)
+  }
+
+  LazyColumn(
+    state = listState,
+    modifier = Modifier.fillMaxSize(),
+    contentPadding = PaddingValues(12.dp),
+    verticalArrangement = Arrangement.spacedBy(10.dp)
+  ) {
+    item {
+      Card(
+        shape = RoundedCornerShape(10.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF065F46).copy(alpha = 0.35f)),
+        border = BorderStroke(1.dp, Color(0xFF10B981))
+      ) {
+        Row(
+          modifier = Modifier.padding(10.dp),
+          verticalAlignment = Alignment.CenterVertically
+        ) {
+          Text("🌿", fontSize = 20.sp)
+          Spacer(modifier = Modifier.width(8.dp))
+          Text(
+            text = "ශ්‍රී ලංකාවේ දේශීය හෙළ වෙදකම, ආයුර්වේද ත්‍රිදෝෂ න්‍යාය, ඔසු පැළෑටි සහ දේශීය සෞඛ්‍යාරක්ෂිත ආහාර පුරුදු.",
+            fontSize = 11.5.sp,
+            color = Color(0xFFD1FAE5),
+            lineHeight = 16.sp
+          )
+        }
+      }
+    }
+
+    items(cards, key = { it.id }) { item ->
+      Card(
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF022C22)),
+        border = BorderStroke(1.dp, Color(0xFF047857)),
+        modifier = Modifier.fillMaxWidth()
+      ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+          Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+          ) {
+            Text(
+              text = item.plantOrConceptName,
+              fontSize = 14.5.sp,
+              fontWeight = FontWeight.Bold,
+              color = Color.White
+            )
+            Surface(
+              color = Color(0xFF059669),
+              shape = RoundedCornerShape(4.dp)
+            ) {
+              Text(
+                text = item.category,
+                color = Color.White,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+              )
+            }
+          }
+
+          Spacer(modifier = Modifier.height(6.dp))
+          Text(
+            text = "💡 ඖෂධීය අගය: ${item.medicinalValue}",
+            fontSize = 11.5.sp,
+            color = Color(0xFFA7F3D0),
+            lineHeight = 16.sp
+          )
+
+          Spacer(modifier = Modifier.height(4.dp))
+          Text(
+            text = "🌱 භාවිත වන කොටස: ${item.usedPart}",
+            fontSize = 11.sp,
+            color = Color(0xFF6EE7B7)
+          )
+
+          Spacer(modifier = Modifier.height(8.dp))
+          Text(
+            text = "✨ සෞඛ්‍යමය වාසි (Health Benefits):",
+            fontSize = 11.5.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFFFDE047)
+          )
+          item.healthBenefits.forEach { b ->
+            Row(modifier = Modifier.padding(vertical = 1.5.dp)) {
+              Text("•", color = Color(0xFF34D399), fontSize = 11.sp, fontWeight = FontWeight.Bold)
+              Spacer(modifier = Modifier.width(5.dp))
+              Text(text = b, fontSize = 11.sp, color = Color.White, lineHeight = 15.sp)
+            }
+          }
+
+          Spacer(modifier = Modifier.height(8.dp))
+          Surface(
+            color = Color(0xFF064E3B),
+            shape = RoundedCornerShape(6.dp),
+            modifier = Modifier.fillMaxWidth()
+          ) {
+            Text(
+              text = "🎯 විභාග ඉඟිය: ${item.examTip}",
+              fontSize = 10.5.sp,
+              color = Color(0xFF6EE7B7),
+              fontWeight = FontWeight.Bold,
+            )
+          }
+        }
+      }
+    }
+  }
+}
+
+// ============================================================================
+// HEALTH MASTER OVERVIEW GRID VIEW (ALL 10 SUB-SECTIONS COLLECTION)
+// ============================================================================
+@Composable
+private fun HealthMasterOverviewGrid(
+  selectedGradeTab: HealthGradeTab,
+  searchQuery: String,
+  onSelectCategory: (HealthSectionCategory) -> Unit
+) {
+  val listState = rememberLazyListState()
+  val categories = remember(searchQuery) {
+    HealthSectionCategory.values().filter { cat ->
+      searchQuery.isBlank() ||
+          cat.titleSinhala.contains(searchQuery, ignoreCase = true) ||
+          cat.subtitle.contains(searchQuery, ignoreCase = true)
+    }
+  }
+
+  LazyColumn(
+    state = listState,
+    modifier = Modifier
+      .fillMaxSize()
+      .padding(horizontal = 12.dp, vertical = 10.dp),
+    verticalArrangement = Arrangement.spacedBy(12.dp)
+  ) {
+    // Header Hero Banner matching Science Master Hub (image_975c63c8.png)
+    item {
+      Card(
+        shape = RoundedCornerShape(14.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF3B0B1D)),
+        border = BorderStroke(1.5.dp, Color(0xFFE11D48)),
+        modifier = Modifier.fillMaxWidth()
+      ) {
+        Column(modifier = Modifier.padding(14.dp)) {
+          Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+          ) {
+            Row(
+              verticalAlignment = Alignment.CenterVertically,
+              modifier = Modifier.weight(1f)
+            ) {
+              Surface(
+                shape = CircleShape,
+                color = Color(0xFFE11D48).copy(alpha = 0.25f),
+                modifier = Modifier.size(40.dp)
+              ) {
+                Box(contentAlignment = Alignment.Center) {
+                  Text("🏃‍♂️", fontSize = 22.sp)
+                }
+              }
+              Spacer(modifier = Modifier.width(10.dp))
+              Column {
+                Text(
+                  text = "10 & 11 සෞඛ්‍ය හා ශාරීරික අධ්‍යාපනය",
+                  fontSize = 15.sp,
+                  fontWeight = FontWeight.ExtraBold,
+                  color = Color.White
+                )
+                Text(
+                  text = "Health & Physical Education • Master Hub",
+                  fontSize = 11.sp,
+                  color = Color(0xFFFDA4AF)
+                )
+              }
+            }
+
+            Surface(
+              shape = RoundedCornerShape(20.dp),
+              color = Color(0xFF10B981)
+            ) {
+              Text(
+                text = "100% ආවරණය",
+                color = Color.White,
+                fontSize = 10.5.sp,
+                fontWeight = FontWeight.ExtraBold,
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+              )
+            }
+          }
+
+          Spacer(modifier = Modifier.height(10.dp))
+          HorizontalDivider(color = Color(0xFF881337).copy(alpha = 0.6f), thickness = 1.dp)
+          Spacer(modifier = Modifier.height(8.dp))
+
+          Text(
+            text = "පාඩම් • MCQs • රචනා • BMI ගණක • RICE ප්‍රථමාධාර • WHO ජීවන කුසලතා • ක්‍රීඩා නීති • ප්‍රායෝගික • හෙළ වෙද",
+            fontSize = 11.sp,
+            color = Color(0xFFFFE4E6),
+            lineHeight = 15.sp
+          )
+        }
+      }
+    }
+
+    // Grid of all 10 sub-section categories (2 columns of cards side-by-side going down)
+    items(categories.chunked(2)) { rowItems ->
+      Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+      ) {
+        rowItems.forEach { cat ->
+          Card(
+            shape = RoundedCornerShape(14.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF2C0A16)),
+            border = BorderStroke(1.2.dp, cat.themeColor.copy(alpha = 0.85f)),
+            modifier = Modifier
+              .weight(1f)
+              .clickable { onSelectCategory(cat) }
+              .testTag("health_overview_card_${cat.id}")
+          ) {
+            Column(
+              modifier = Modifier.padding(12.dp),
+              verticalArrangement = Arrangement.SpaceBetween
+            ) {
+              // Top row: Emoji Icon & Badge
+              Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+              ) {
+                Surface(
+                  shape = CircleShape,
+                  color = cat.themeColor.copy(alpha = 0.25f),
+                  modifier = Modifier.size(38.dp)
+                ) {
+                  Box(contentAlignment = Alignment.Center) {
+                    Text(cat.emoji, fontSize = 20.sp)
+                  }
+                }
+                Surface(
+                  color = cat.themeColor,
+                  shape = RoundedCornerShape(6.dp)
+                ) {
+                  Text(
+                    text = when (cat) {
+                      HealthSectionCategory.LESSONS -> "10 & 11 ඒකක"
+                      HealthSectionCategory.MCQ_BANK -> "O/L I MCQ"
+                      HealthSectionCategory.STRUCTURED_ESSAY -> "O/L II රචනා"
+                      HealthSectionCategory.CALCULATORS -> "සූත්‍ර & ගණනය"
+                      HealthSectionCategory.FIRST_AID -> "RICE පියවර"
+                      HealthSectionCategory.LIFE_SKILLS -> "WHO 10"
+                      HealthSectionCategory.SHORT_NOTES -> "කරුණු 200"
+                      HealthSectionCategory.SPORTS_RULES -> "නීතිරීති 15"
+                      HealthSectionCategory.PRACTICAL_EXAMS -> "Fitness Test"
+                      HealthSectionCategory.AYURVEDA_WELLNESS -> "හෙළ ඔසු පැළ"
+                    },
+                    color = Color.White,
+                    fontSize = 9.5.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.5.dp)
+                  )
+                }
+              }
+
+              Spacer(modifier = Modifier.height(10.dp))
+              Text(
+                text = cat.titleSinhala,
+                fontSize = 13.5.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                lineHeight = 17.sp
+              )
+              Spacer(modifier = Modifier.height(3.dp))
+              Text(
+                text = cat.subtitle,
+                fontSize = 10.5.sp,
+                color = Color(0xFFFDA4AF),
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                lineHeight = 14.sp
+              )
+
+              Spacer(modifier = Modifier.height(12.dp))
+              Surface(
+                color = cat.themeColor.copy(alpha = 0.18f),
+                border = BorderStroke(0.8.dp, cat.themeColor.copy(alpha = 0.8f)),
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.fillMaxWidth()
+              ) {
+                Row(
+                  modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
+                  horizontalArrangement = Arrangement.SpaceBetween,
+                  verticalAlignment = Alignment.CenterVertically
+                ) {
+                  Text(
+                    text = "අන්තර්ගතය බලන්න",
+                    fontSize = 10.5.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                  )
+                  Text("➔", fontSize = 11.sp, color = cat.themeColor, fontWeight = FontWeight.Bold)
+                }
+              }
+            }
+          }
+        }
+        if (rowItems.size < 2) {
+          Spacer(modifier = Modifier.weight(1f))
+        }
+      }
+    }
+  }
+}
+

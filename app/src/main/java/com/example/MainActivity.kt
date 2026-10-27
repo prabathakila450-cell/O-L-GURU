@@ -420,6 +420,17 @@ fun isAdminSessionActive(context: Context): Boolean {
   return prefs.getBoolean("is_admin_session_active", false)
 }
 
+fun saveGitHubShareUrl(context: Context, url: String) {
+  val prefs = context.getSharedPreferences("app_user_auth_store", Context.MODE_PRIVATE)
+  prefs.edit().putString("github_apk_share_url", url).apply()
+}
+
+fun getSavedGitHubShareUrl(context: Context): String {
+  val prefs = context.getSharedPreferences("app_user_auth_store", Context.MODE_PRIVATE)
+  return prefs.getString("github_apk_share_url", null)
+    ?: "https://github.com/prabathakila450/OLGuruApp/releases/latest/download/OL_Study_Portal.apk"
+}
+
 data class SubjectItem(
   val id: String,
   val name: String,
@@ -5043,6 +5054,72 @@ fun TopHeaderSection(
               isApproved -> Color(0xFF137333)
               else -> Color(0xFFE65100)
             }
+          )
+        }
+      }
+
+      // App Share Button with GitHub Release Direct Download Link
+      val shareContext = LocalContext.current
+      Surface(
+        onClick = {
+          val activeGithubUrl = getSavedGitHubShareUrl(shareContext)
+          val shareText = """
+අ.පො.ස. සාමාන්‍ය පෙළ (10 සහ 11 වසර) හදාරන දූදරුවන්ටම විශේෂයි! 📚✨
+
+ඔන්න ඔබේ විභාග සාර්ථක කරගන්න අවශ්‍ය සියලුම පහසුකම් දැන් එකම ඇප් එකකින්!
+
+පහත විශේෂාංග රැසක් මෙහි අන්තර්ගත වේ:
+
+10 සහ 11 ශ්‍රේණි සඳහා අදාළ සියලුම විෂයන්ගේ කෙටි සටහන් කට්ටල 📖
+
+සියලුම විෂයන්ගේ වාර විභාග ප්‍රශ්න පත්‍ර සහ වාර විභාග අනුමාන ප්‍රශ්න පත්‍ර 500ක් (සජීවීව උත්තර දී ප්‍රතිඵල බලාගත හැක) 📝
+
+සා/පෙළ පසුගිය ප්‍රශ්න පත්‍ර හා අනුමාන ප්‍රශ්න පත්‍ර 🎯
+
+සෑම විෂයකම පාඩමින් පාඩමට ප්‍රශ්න කාණ්ඩ සහ ක්විස් (Quizzes) ආකාරයේ ප්‍රශ්න 20,000ක් ❓
+
+කෙටි ප්‍රශ්න හා සත්‍ය/අසත්‍ය ප්‍රකාශන ප්‍රශ්න 30,000ක් 💡
+
+සවන් දිය හැකි ආකාරයේ වොයිස් (Voice) ආශ්‍රිත පාඩම් 300ක් 🎧
+
+සෑම විෂයකටම විශේෂාංග කොටසක් සහ විද්‍යාව, ඉතිහාසය විෂයන් සඳහා විශේෂ පාඩම් මාලා, මතක තබා ගැනීමේ ක්‍රමවේද හා සිතියම් 🗺️
+
+ගණිතය කෙටි ප්‍රශ්න 4,000ක්
+
+ඉංග්‍රීසි භාෂාව මුල සිටම උගන්වන විශේෂ පංති විශේෂාංග 🇬🇧
+
+මේ සියල්ල දැන්ම ලබාගෙන ඔබේ විභාග ජයග්‍රහණය තහවුරු කරගන්න!
+🎁👇
+$activeGithubUrl
+""".trimIndent()
+          val shareIntent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_SUBJECT, "O/L Study Portal App")
+            putExtra(Intent.EXTRA_TEXT, shareText)
+          }
+          try {
+            shareContext.startActivity(Intent.createChooser(shareIntent, "Share App Link"))
+          } catch (_: Exception) {
+            Toast.makeText(shareContext, "Sharing feature initialized", Toast.LENGTH_SHORT).show()
+          }
+        },
+        shape = CircleShape,
+        color = Color(0xFFEFF6FF),
+        border = BorderStroke(1.dp, Color(0xFF3B82F6)),
+        modifier = Modifier
+          .padding(end = 6.dp)
+          .size(32.dp)
+          .testTag("app_share_header_button")
+      ) {
+        Box(
+          modifier = Modifier.fillMaxSize(),
+          contentAlignment = Alignment.Center
+        ) {
+          Icon(
+            imageVector = Icons.Default.Share,
+            contentDescription = "Share App",
+            tint = Color(0xFF1D4ED8),
+            modifier = Modifier.size(16.dp)
           )
         }
       }

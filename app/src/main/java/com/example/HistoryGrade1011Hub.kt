@@ -625,7 +625,7 @@ fun HistoryGrade10And11MasterHubDialog(
                 when (currentModule) {
                   HistoryModuleType.KINGDOMS_RULERS -> {
                     val items = HistoryAdvancedSyllabusRepository.rulersList.filter {
-                      it.grade == activeGrade && (searchQuery.isBlank() || it.rulerName.contains(searchQuery, true) || it.kingdom.contains(searchQuery, true) || it.epithet.contains(searchQuery, true))
+                      (it.grade == activeGrade || it.grade.contains(activeGrade) || it.grade == "10 & 11" || it.grade.isEmpty()) && (searchQuery.isBlank() || it.rulerName.contains(searchQuery, true) || it.kingdom.contains(searchQuery, true) || it.epithet.contains(searchQuery, true))
                     }
                     if (items.isEmpty()) {
                       item { EmptySearchResultNotice() }
@@ -638,7 +638,7 @@ fun HistoryGrade10And11MasterHubDialog(
 
                   HistoryModuleType.IRRIGATION_CIVILIZATION -> {
                     val items = HistoryAdvancedSyllabusRepository.irrigationList.filter {
-                      it.grade == activeGrade && (searchQuery.isBlank() || it.name.contains(searchQuery, true) || it.builtBy.contains(searchQuery, true) || it.technologyComponent.contains(searchQuery, true))
+                      (it.grade == activeGrade || it.grade.contains(activeGrade) || it.grade == "10 & 11" || it.grade.isEmpty()) && (searchQuery.isBlank() || it.name.contains(searchQuery, true) || it.builtBy.contains(searchQuery, true) || it.technologyComponent.contains(searchQuery, true))
                     }
                     if (items.isEmpty()) {
                       item { EmptySearchResultNotice() }
@@ -651,7 +651,7 @@ fun HistoryGrade10And11MasterHubDialog(
 
                   HistoryModuleType.HISTORICAL_SOURCES -> {
                     val items = HistoryAdvancedSyllabusRepository.sourcesList.filter {
-                      it.grade == activeGrade && (searchQuery.isBlank() || it.sourceName.contains(searchQuery, true) || it.category.contains(searchQuery, true) || it.authorOrOrigin.contains(searchQuery, true))
+                      (it.grade == activeGrade || it.grade.contains(activeGrade) || it.grade == "10 & 11" || it.grade.isEmpty()) && (searchQuery.isBlank() || it.sourceName.contains(searchQuery, true) || it.category.contains(searchQuery, true) || it.authorOrOrigin.contains(searchQuery, true))
                     }
                     if (items.isEmpty()) {
                       item { EmptySearchResultNotice() }
@@ -664,7 +664,7 @@ fun HistoryGrade10And11MasterHubDialog(
 
                   HistoryModuleType.FOREIGN_RULE_STRUGGLES -> {
                   val items = HistoryAdvancedSyllabusRepository.colonialUprisingsList.filter {
-                    it.grade == activeGrade && (searchQuery.isBlank() || it.title.contains(searchQuery, true) || it.leaders.any { l -> l.contains(searchQuery, true) })
+                    (it.grade == activeGrade || it.grade.contains(activeGrade) || it.grade == "10 & 11" || it.grade.isEmpty()) && (searchQuery.isBlank() || it.title.contains(searchQuery, true) || it.leaders.any { l -> l.contains(searchQuery, true) })
                   }
                   if (items.isEmpty()) {
                     item { EmptySearchResultNotice() }
@@ -677,7 +677,7 @@ fun HistoryGrade10And11MasterHubDialog(
 
                 HistoryModuleType.CONSTITUTIONS -> {
                   val items = HistoryAdvancedSyllabusRepository.constitutionsList.filter {
-                    it.grade == activeGrade && (searchQuery.isBlank() || it.name.contains(searchQuery, true) || it.year.contains(searchQuery) || it.governorOrCommission.contains(searchQuery, true))
+                    (it.grade == activeGrade || it.grade.contains(activeGrade) || it.grade == "10 & 11" || it.grade.isEmpty()) && (searchQuery.isBlank() || it.name.contains(searchQuery, true) || it.year.contains(searchQuery) || it.governorOrCommission.contains(searchQuery, true))
                   }
                   if (items.isEmpty()) {
                     item { EmptySearchResultNotice() }
@@ -690,7 +690,7 @@ fun HistoryGrade10And11MasterHubDialog(
 
                 HistoryModuleType.MAP_LOCATIONS -> {
                   val items = HistoryAdvancedSyllabusRepository.mapLocationsList.filter {
-                    it.grade == activeGrade && (searchQuery.isBlank() || it.locationName.contains(searchQuery, true) || it.provinceOrDistrict.contains(searchQuery, true) || it.category.contains(searchQuery, true))
+                    (it.grade == activeGrade || it.grade.contains(activeGrade) || it.grade == "10 & 11" || it.grade.isEmpty()) && (searchQuery.isBlank() || it.locationName.contains(searchQuery, true) || it.provinceOrDistrict.contains(searchQuery, true) || it.category.contains(searchQuery, true))
                   }
                   if (items.isEmpty()) {
                     item { EmptySearchResultNotice() }
@@ -703,7 +703,7 @@ fun HistoryGrade10And11MasterHubDialog(
 
                 HistoryModuleType.WORLD_HISTORY -> {
                   val items = HistoryAdvancedSyllabusRepository.worldHistoryList.filter {
-                    it.grade == activeGrade && (searchQuery.isBlank() || it.eventTitle.contains(searchQuery, true) || it.region.contains(searchQuery, true))
+                    (it.grade == activeGrade || it.grade.contains(activeGrade) || it.grade == "10 & 11" || it.grade.isEmpty()) && (searchQuery.isBlank() || it.eventTitle.contains(searchQuery, true) || it.region.contains(searchQuery, true))
                   }
                   if (items.isEmpty()) {
                     item { EmptySearchResultNotice() }
@@ -716,7 +716,7 @@ fun HistoryGrade10And11MasterHubDialog(
 
                 HistoryModuleType.ART_SCULPTURE -> {
                   val items = HistoryExpandedRepository.artSculpturesList.filter {
-                    it.grade == activeGrade && (searchQuery.isBlank() || it.title.contains(searchQuery, true) || it.category.contains(searchQuery, true))
+                    (it.grade == activeGrade || it.grade.contains(activeGrade) || it.grade == "10 & 11" || it.grade.isEmpty()) && (searchQuery.isBlank() || it.title.contains(searchQuery, true) || it.category.contains(searchQuery, true))
                   }
                   if (items.isEmpty()) {
                     item { EmptySearchResultNotice() }
@@ -727,7 +727,7 @@ fun HistoryGrade10And11MasterHubDialog(
 
                 HistoryModuleType.HISTORICAL_TREATIES -> {
                   val items = HistoryExpandedRepository.treatiesList.filter {
-                    it.grade == activeGrade && (searchQuery.isBlank() || it.treatyName.contains(searchQuery, true) || it.signatoryParties.contains(searchQuery, true))
+                    (it.grade == activeGrade || it.grade.contains(activeGrade) || it.grade == "10 & 11" || it.grade.isEmpty()) && (searchQuery.isBlank() || it.treatyName.contains(searchQuery, true) || it.signatoryParties.contains(searchQuery, true))
                   }
                   if (items.isEmpty()) {
                     item { EmptySearchResultNotice() }
@@ -738,7 +738,7 @@ fun HistoryGrade10And11MasterHubDialog(
 
                 HistoryModuleType.REVOLUTIONS_WORLD_WARS -> {
                   val items = HistoryExpandedRepository.worldErasList.filter {
-                    it.grade == activeGrade && (searchQuery.isBlank() || it.eraTitle.contains(searchQuery, true))
+                    (it.grade == activeGrade || it.grade.contains(activeGrade) || it.grade == "10 & 11" || it.grade.isEmpty()) && (searchQuery.isBlank() || it.eraTitle.contains(searchQuery, true))
                   }
                   if (items.isEmpty()) {
                     item { EmptySearchResultNotice() }
@@ -749,7 +749,7 @@ fun HistoryGrade10And11MasterHubDialog(
 
                 HistoryModuleType.EXAM_SECRETS -> {
                   val items = HistoryAdvancedSyllabusRepository.examTipsList.filter {
-                    it.grade == activeGrade && (searchQuery.isBlank() || it.questionTopic.contains(searchQuery, true))
+                    (it.grade == activeGrade || it.grade.contains(activeGrade) || it.grade == "10 & 11" || it.grade.isEmpty()) && (searchQuery.isBlank() || it.questionTopic.contains(searchQuery, true))
                   }
                   if (items.isEmpty()) {
                     item { EmptySearchResultNotice() }
@@ -762,7 +762,7 @@ fun HistoryGrade10And11MasterHubDialog(
 
                 HistoryModuleType.RAPID_MCQS -> {
                   val items = HistoryAdvancedSyllabusRepository.rapidMcqsList.filter {
-                    it.grade == activeGrade && (searchQuery.isBlank() || it.question.contains(searchQuery, true))
+                    (it.grade == activeGrade || it.grade.contains(activeGrade) || it.grade == "10 & 11" || it.grade.isEmpty()) && (searchQuery.isBlank() || it.question.contains(searchQuery, true))
                   }
                   if (items.isEmpty()) {
                     item { EmptySearchResultNotice() }
@@ -775,7 +775,7 @@ fun HistoryGrade10And11MasterHubDialog(
 
                 HistoryModuleType.CASCADE_TANKS -> {
                   val items = HistoryExpandedRepository.cascadeTanksList.filter {
-                    it.grade == activeGrade && (searchQuery.isBlank() || it.componentName.contains(searchQuery, true) || it.mainFunction.contains(searchQuery, true))
+                    (it.grade == activeGrade || it.grade.contains(activeGrade) || it.grade == "10 & 11" || it.grade.isEmpty()) && (searchQuery.isBlank() || it.componentName.contains(searchQuery, true) || it.mainFunction.contains(searchQuery, true))
                   }
                   if (items.isEmpty()) {
                     item { EmptySearchResultNotice() }
@@ -786,7 +786,7 @@ fun HistoryGrade10And11MasterHubDialog(
 
                 HistoryModuleType.NATIONAL_REVIVAL -> {
                   val items = HistoryExpandedRepository.revivalList.filter {
-                    it.grade == activeGrade && (searchQuery.isBlank() || it.leaderOrMovement.contains(searchQuery, true))
+                    (it.grade == activeGrade || it.grade.contains(activeGrade) || it.grade == "10 & 11" || it.grade.isEmpty()) && (searchQuery.isBlank() || it.leaderOrMovement.contains(searchQuery, true))
                   }
                   if (items.isEmpty()) {
                     item { EmptySearchResultNotice() }
@@ -797,7 +797,7 @@ fun HistoryGrade10And11MasterHubDialog(
 
                 HistoryModuleType.TIMELINE_CHALLENGE -> {
                   val items = HistoryExpandedRepository.timelineChallengesList.filter {
-                    it.grade == activeGrade && (searchQuery.isBlank() || it.challengeTitle.contains(searchQuery, true))
+                    (it.grade == activeGrade || it.grade.contains(activeGrade) || it.grade == "10 & 11" || it.grade.isEmpty()) && (searchQuery.isBlank() || it.challengeTitle.contains(searchQuery, true))
                   }
                   if (items.isEmpty()) {
                     item { EmptySearchResultNotice() }
@@ -808,7 +808,7 @@ fun HistoryGrade10And11MasterHubDialog(
 
                 HistoryModuleType.ARTIFACT_IDENTIFIER -> {
                   val items = HistoryExpandedRepository.artifactsList.filter {
-                    it.grade == activeGrade && (searchQuery.isBlank() || it.artifactName.contains(searchQuery, true) || it.location.contains(searchQuery, true))
+                    (it.grade == activeGrade || it.grade.contains(activeGrade) || it.grade == "10 & 11" || it.grade.isEmpty()) && (searchQuery.isBlank() || it.artifactName.contains(searchQuery, true) || it.location.contains(searchQuery, true))
                   }
                   if (items.isEmpty()) {
                     item { EmptySearchResultNotice() }
@@ -1998,55 +1998,278 @@ fun HistoryEssayGuideSubSection(grade: String) {
 
 @Composable
 private fun HistoryMapQuizSection(onClose: () -> Unit) {
-  Column(modifier = Modifier.padding(8.dp).fillMaxWidth().background(Color(0xFF0F172A), RoundedCornerShape(8.dp)).padding(8.dp)) {
-    Text("🗺️ සිතියම් පුහුණුව", color = Color.White, fontWeight = FontWeight.Bold)
-    Text("විභාගයට අනිවාර්යයෙන්ම ලැබෙන සිතියම් ලකුණු 10ක කොටස සඳහා පුහුණුව මෙහි ඇතුළත් වේ.", color = Color(0xFF94A3B8), fontSize = 11.sp)
-    Button(onClick = onClose, modifier = Modifier.padding(top = 8.dp), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD97706))) {
-      Text("වසන්න (Close)", fontSize = 11.sp)
+  val mapSites = listOf(
+    Triple("📍 අනුරාධපුරය (Anuradhapura)", "උතුරු මැද පළාත • ශ්‍රී ලංකාවේ ප්‍රථම සංවිධානාත්මක අගනුවර", "පණ්ඩුකාභය, දේවානම්පියතිස්ස, දුටුගැමුණු, වළගම්බා, වසභ, මහසෙන් රජවරුන්ගේ පාලන මධ්‍යස්ථානය. මහා විහාරය, ශ්‍රී මහා බෝධිය, රුවන්වැලිසෑය, ජය ගඟ."),
+    Triple("📍 පොළොන්නරුව (Polonnaruwa)", "උතුරු මැද පළාත • මධ්‍යතන යුගයේ අගනගරය", "I වන විජයබාහු, මහා පරාක්‍රමබාහු, නිශ්ශංකමල්ල රජවරුන්ගේ පාලන තැන්න. පරාක්‍රම සමුද්‍රය, ගල් විහාරය, ආලාහණ පිරිවෙන."),
+    Triple("📍 දඹදෙණිය (Dambadeniya)", "වයඹ පළාත • කුරුණෑගල දිස්ත්‍රික්කය", "III වන විජයබාහු & II වන පරාක්‍රමබාහු රජවරුන්ගේ අගනුවර. කාලිංග මාඝ ආක්‍රමණයෙන් පසු දන්තධාතුන් වහන්සේ සුරක්ෂිත කළ ස්ථානය."),
+    Triple("📍 යාපහුව (Yapahuwa)", "වයඹ පළාත • මහව ආසන්නයේ", "I වන බුවනෙකබාහු රජුගේ පර්වත රාජධානිය. විශ්මිත සිංහ කැටයම් පියගැටපෙළ සහ දළදා මාලිගාව."),
+    Triple("📍 කෝට්ටේ (Kotte - ජයවර්ධනපුර)", "බස්නාහිර පළාත • කොළඹ අසල", "VI වන පරාක්‍රමබාහු රජු මුළු ලංකාවම එක්සේසත් කර පාලනය කළ රාජධානිය. සංදේශ කාව්‍ය යුගයේ ස්වර්ණමය මධ්‍යස්ථානය."),
+    Triple("📍 සීතාවක (Sitawaka - අවිස්සාවේල්ල)", "බස්නාහිර පළාත • කෑගල්ල/කොළඹ මායිම", "මායාදුන්නේ සහ I වන රාජසිංහ රජවරුන්ගේ පාලන පීඨය. 1562 මුල්ලේරියා සටනින් පෘතුගීසීන් පරාජය කළ යුධ මධ්‍යස්ථානය."),
+    Triple("📍 මහනුවර (Kandy - සෙන්කඩගල)", "මධ්‍යම පළාත • අන්තිම සිංහල රාජධානිය", "I වන විමලධර්මසූරිය, II වන රාජසිංහ, කීර්ති ශ්‍රී රාජසිංහ, ශ්‍රී වික්‍රම රාජසිංහ. ශ්‍රී දළදා මාළිගාව සහ 1815 උඩරට ගිවිසුම."),
+    Triple("📍 මාන්තොට / මහාතිත්ථ (Mantai)", "මන්නාරම දිස්ත්‍රික්කය • වයඹ/උතුරු වෙරළ", "අතීත ලංකාවේ ප්‍රධානතම ජාත්‍යන්තර සමුද්‍රීය වෙළඳ වරාය. රෝමය, පර්සියාව, චීනය සහ ඉන්දියාව සමඟ වෙළඳ සබඳතා පැවැත්වීය."),
+    Triple("📍 ගෝකණ්ණ වරාය (Trincomalee)", "ත්‍රිකුණාමලය දිස්ත්‍රික්කය • නැගෙනහිර වෙරළ", "ලෝක ප්‍රකට ස්වාභාවික වරාය. මහසෙන් රජුගේ කාලයේ සිට නැගෙනහිර නාවික හා වෙළඳ හදවත විය."),
+    Triple("📍 මාගම / තිස්සමහාරාමය (Magama)", "හම්බන්තොට දිස්ත්‍රික්කය • දකුණු පළාත", "රුහුණු රාජධානියේ මුල් අගනුවර. මහානාග, කාවන්තිස්ස, දුටුගැමුණු සහ සද්ධාතිස්ස කුමාරවරුන්ගේ ජන්ම භූමිය."),
+    Triple("📍 මුල්ලේරියාව (Mulleriyawa)", "බස්නාහිර පළාත • කොළඹ දිස්ත්‍රික්කය", "1562 දී I වන රාජසිංහ රජු (ටිකිරි කුමාරු) පෘතුගීසි බලඇණි සහමුලින්ම පරාජය කළ ආසියානු ඉතිහාසයේ විශාලතම සටන් බිම."),
+    Triple("📍 ඉබ්බන්කටුව (Ibbankatuwa)", "මාතලේ දිස්ත්‍රික්කය • දඹුල්ල අසල", "පූර්ව ඓතිහාසික මෙගලිතික (Megalithic Burial) සුසාන භූමිය. ක්‍රි.පූ. 800ට පෙර ලංකාවේ සිටි මානව ජනාවාසවල සාක්ෂි.")
+  )
+
+  Column(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+    Surface(
+      shape = RoundedCornerShape(10.dp),
+      color = Color(0xFF0F172A),
+      border = BorderStroke(1.dp, Color(0xFF0D9488)),
+      modifier = Modifier.fillMaxWidth()
+    ) {
+      Column(modifier = Modifier.padding(12.dp)) {
+        Row(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.SpaceBetween,
+          verticalAlignment = Alignment.CenterVertically
+        ) {
+          Text("📍 O/L ඉතිහාසය අනිවාර්ය සිතියම් ලකුණු කිරීම් (Map Pins)", color = Color(0xFF5EEAD4), fontWeight = FontWeight.Bold, fontSize = 13.5.sp)
+          Surface(onClick = onClose, color = Color(0xFF0D9488), shape = RoundedCornerShape(6.dp)) {
+            Text("ලකුණු 18 අත්කරගන්න", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp))
+          }
+        }
+        Text("O/L ප්‍රශ්න පත්‍රයේ පළමු ප්‍රශ්නයට අනිවාර්යයෙන් ලැබෙන සිතියම් ස්ථාන 12ක පූර්ණ විස්තරය මෙතැනින් අධ්‍යයනය කරන්න.", color = Color(0xFF99F6E4), fontSize = 11.sp, modifier = Modifier.padding(top = 4.dp))
+      }
+    }
+
+    Spacer(modifier = Modifier.height(10.dp))
+
+    mapSites.forEach { site ->
+      Card(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
+        shape = RoundedCornerShape(10.dp),
+        border = BorderStroke(1.dp, Color(0xFF0D9488).copy(alpha = 0.6f))
+      ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+          Text(site.first, fontWeight = FontWeight.Bold, color = Color(0xFF5EEAD4), fontSize = 13.sp)
+          Spacer(modifier = Modifier.height(2.dp))
+          Text(site.second, fontSize = 10.5.sp, color = Color(0xFFFDE68A), fontWeight = FontWeight.SemiBold)
+          Spacer(modifier = Modifier.height(4.dp))
+          Text(site.third, fontSize = 11.sp, color = Color(0xFFE2E8F0), lineHeight = 16.sp)
+        }
+      }
     }
   }
 }
 
 @Composable
 private fun HistoryTimelineSection(onClose: () -> Unit) {
-  Column(modifier = Modifier.padding(8.dp).fillMaxWidth().background(Color(0xFF0F172A), RoundedCornerShape(8.dp)).padding(8.dp)) {
-    Text("⏳ කාලරේඛාව", color = Color.White, fontWeight = FontWeight.Bold)
-    Text("අනුරාධපුර, පොළොන්නරු, දඹදෙණිය සිට මහනුවර දක්වා ඓතිහාසික සිදුවීම් කාලානුක්‍රමය.", color = Color(0xFF94A3B8), fontSize = 11.sp)
-    Button(onClick = onClose, modifier = Modifier.padding(top = 8.dp), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD97706))) {
-      Text("වසන්න (Close)", fontSize = 11.sp)
+  val timelineEvents = listOf(
+    Triple("1. ප්‍රාග් & පූර්ව ඓතිහාසික යුගය", "ක්‍රි.පූ. 125,000 - ක්‍රි.පූ. 500", "• හෝමෝ සේපියන්ස් බලංගොඩැන්සිස් (බලංගොඩ මානවයා)\n• පාහියන්ගල, බටදොඹලෙන, කිතුල්ගල බෙලිලෙන ජනාවාස\n• ඉබ්බන්කටුව මෙගලිතික සුසාන භූමි (ක්‍රි.පූ. 800)"),
+    Triple("2. අනුරාධපුර ආරම්භක & මුල් යුගය", "ක්‍රි.පූ. 437 - ක්‍රි.පූ. 250", "• පණ්ඩුකාභය රජු (නගර සැලසුම්, ග්‍රාම සීමා, නගර ගුප්තික)\n• දේවානම්පියතිස්ස රජු (මිහින්තලය, මහින්දාගමනය, ශ්‍රී මහා බෝධිය වැඩමවීම)\n• තිස්ස වැව සහ මුල්ම බුදුසමය ලංකාව පුරා ව්‍යාප්ත වීම"),
+    Triple("3. අනුරාධපුර එක්සේසත් & ශ්‍රේෂ්ඨ යුගය", "ක්‍රි.පූ. 161 - ක්‍රි.ව. 301", "• දුටුගැමුණු රජු (එළාර පරාජය, රුවන්වැලිසෑය, මිරිසවැටිය, ලෝවාමහාපාය)\n• වළගම්බා රජු (අභයගිරිය, ත්‍රිපිටකය ගන්ථාරූඪ කිරීම)\n• වසභ රජු (තුන් අඟලකට වඩා බෑවුම ඇති ඇළ මාර්ග, ලැයිස්තුගත වැව් 11ක්, ස්තූප 12ක්)\n• මහසෙන් රජු (මහවැලි ගඟ මගින් මිණේරිය වැව තැනීම)"),
+    Triple("4. පොළොන්නරු රාජධානිය", "ක්‍රි.ව. 1055 - ක්‍රි.ව. 1232", "• I වන විජයබාහු (චෝළයන් පලවාහැර රට එක්සේසත් කිරීම)\n• මහා පරාක්‍රමබාහු (පරාක්‍රම සමුද්‍රය, ආලාහණ පිරිවෙන, ගල් විහාරය, 'අහසින් වැටෙන එකදු දිය බිඳකුදු...').\n• නිශ්ශංකමල්ල රජු (හැටදාගේ, රන්කොත් වෙහෙර, නිශ්ශංක ලතා මණ්ඩපය)"),
+    Triple("5. නිරිතදිග රාජධානි යුගය", "ක්‍රි.ව. 1232 - 1597", "• III වන විජයබාහු & II වන පරාක්‍රමබාහු (දඹදෙණිය)\n• I වන බුවනෙකබාහු (යාපහුව)\n• IV වන පරාක්‍රමබාහු (කුරුණෑගල - උම්මග්ග ජාතකය)\n• VI වන පරාක්‍රමබාහු (කෝට්ටේ - මුළු ලංකාවම එක්සේසත් කළ අවසන් සිංහල රජු)\n• I වන රාජසිංහ (සීතාවක - මුල්ලේරියා සටනින් පෘතුගීසීන් පරාජය කිරීම)"),
+    Triple("6. මහනුවර රාජධානිය & විදේශ අරගල", "ක්‍රි.ව. 1592 - 1815", "• I වන විමලධර්මසූරිය රජු (දන්තධාතුන් වහන්සේ දෙල්ගමුවෙන් වැඩමවීම, දළදා මාළිගාව තැනීම)\n• II වන රාජසිංහ (දන්තනගර සටන & ලන්දේසීන් කැඳවීම)\n• කීර්ති ශ්‍රී රාජසිංහ (වැලිවිට සරණංකර සංඝරාජ හිමියන්ගේ නායකත්වයෙන් උපසම්පදාව නැවත පිහිටුවීම)\n• 1815 උඩරට ගිවිසුම (ශ්‍රී ලංකාව සම්පූර්ණයෙන්ම බ්‍රිතාන්‍ය යටත්විජිතයක් වීම)"),
+    Triple("7. බ්‍රිතාන්‍ය යටත්විජිත යුගය & නිදහස් අරගල", "1815 - 1948", "• 1818 ඌව වෙල්ලස්ස නිදහස් අරගලය (කැප්පෙටිපොළ දිසාව)\n• 1833 කෝල්බෲක්-කැමරන් ප්‍රතිසංස්කරණ\n• 1848 මාතලේ කැරැල්ල (පුරන් අප්පු, ගොංගාලේගොඩ බණ්ඩා)\n• 1910 කෲව්-මැකලම් (උගත් ලාංකික ආසනය - පොන්නම්බලම් රාමනාදන්)\n• 1931 ඩොනමෝර් (සර්වජන ඡන්ද බලය, රාජ්‍ය මන්ත්‍රණ සභාව)\n• 1948 පෙබරවාරි 04 (නිදහස ලැබීම - ඩී. එස්. සේනානායක)")
+  )
+
+  Column(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+    Surface(
+      shape = RoundedCornerShape(10.dp),
+      color = Color(0xFF0F172A),
+      border = BorderStroke(1.dp, Color(0xFFD97706)),
+      modifier = Modifier.fillMaxWidth()
+    ) {
+      Column(modifier = Modifier.padding(12.dp)) {
+        Row(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.SpaceBetween,
+          verticalAlignment = Alignment.CenterVertically
+        ) {
+          Text("⏳ O/L ඉතිහාසය නිල කාලරේඛාව (Chronological Timeline)", color = Color(0xFFFDE68A), fontWeight = FontWeight.Bold, fontSize = 13.5.sp)
+          Surface(onClick = onClose, color = Color(0xFFD97706), shape = RoundedCornerShape(6.dp)) {
+            Text("පූර්ණ කාලරේඛාව", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp))
+          }
+        }
+        Text("ප්‍රාග් ඓතිහාසික යුගයේ සිට 1948 නිදහස දක්වා සියලුම රාජධානි, ප්‍රධාන රජවරුන් සහ ඓතිහාසික සිදුවීම් අනුපිළිවෙල මෙතැනින් නිවැරදිව අධ්‍යයනය කරන්න.", color = Color(0xFFFEF3C7), fontSize = 11.sp, modifier = Modifier.padding(top = 4.dp))
+      }
+    }
+
+    Spacer(modifier = Modifier.height(10.dp))
+
+    timelineEvents.forEach { ev ->
+      Card(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
+        shape = RoundedCornerShape(10.dp),
+        border = BorderStroke(1.dp, Color(0xFFD97706).copy(alpha = 0.6f))
+      ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+          Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+          ) {
+            Text(ev.first, fontWeight = FontWeight.Bold, color = Color(0xFFFBBF24), fontSize = 13.sp, modifier = Modifier.weight(1f))
+            Surface(color = Color(0xFFD97706), shape = RoundedCornerShape(4.dp)) {
+              Text(ev.second, color = Color.White, fontSize = 9.5.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp))
+            }
+          }
+          Spacer(modifier = Modifier.height(6.dp))
+          Text(ev.third, fontSize = 11.sp, color = Color(0xFFE2E8F0), lineHeight = 16.sp)
+        }
+      }
     }
   }
 }
 
 @Composable
 private fun HistoryVisualGallerySection(onClose: () -> Unit) {
-  Column(modifier = Modifier.padding(8.dp).fillMaxWidth().background(Color(0xFF0F172A), RoundedCornerShape(8.dp)).padding(8.dp)) {
-    Text("🖼️ පුරාවස්තු ගැලරිය", color = Color.White, fontWeight = FontWeight.Bold)
-    Text("සඳකඩපහණ, මුරගල්, කොරවක්ගල් සහ ලෝහ ප්‍රතිමා විවරණය.", color = Color(0xFF94A3B8), fontSize = 11.sp)
-    Button(onClick = onClose, modifier = Modifier.padding(top = 8.dp), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD97706))) {
-      Text("වසන්න (Close)", fontSize = 11.sp)
+  val visualGallery = listOf(
+    Triple("🖼️ නාගරාජ මුරගල (Nagaraja Guardstone)", "අනුරාධපුර මහමෙව්නාව • රත්නප්‍රසාදය", "• අත් පහකින් යුත් නාග පෙණය\n• එක අතක පුංකලස (සමෘද්ධියේ සංකේතය)\n• අනෙක් අතේ මල් කළඹ\n• පාමුල පද්මනිධි & සංඛනිධි වාමනයන්\n• විහාර ද්වාරයේ සමෘද්ධිය සහ ආරක්ෂාව නිරූපණය කරයි."),
+    Triple("🖼️ සමාධි බුද්ධ ප්‍රතිමාව (Samadhi Statue)", "අනුරාධපුර මහමෙව්නාව • ක්‍රි.ව. 4 වන සියවස", "• වීරාසන සහ ධ්‍යාන මුද්‍රාව\n• නොසැලෙන මනස සහ පරම ශාන්තිය නිරූපණය කරයි\n• ජවාහර්ලාල් නේරු තුමන් සිරගෙදර සිටියදී සිතින් මවාගෙන ශක්තිය ලැබූ අසදෘශ මූර්තිය."),
+    Triple("🖼️ අවුකන බුද්ධ ප්‍රතිමාව (Avukana Statue)", "කලාවැව අසල • ධාතුසේන රජ සමය (ක්‍රි.ව. 5 වන සියවස)", "• අභය මුද්‍රාව (බිය නැති කිරීම)\n• අඩි 38.8ක උස, එකම කළු ගලින් නෙළන ලද නිර්මාණය\n• සිවුරේ රැලි ඉතා තියණුවට හා ස්වාභාවික ලෙස දක්වා ඇත."),
+    Triple("🖼️ ගල් විහාරය (Gal Vihara Polonnaruwa)", "පොළොන්නරුව • මහා පරාක්‍රමබාහු රජ සමය", "• විද්‍යාධර ගුහාව, හිඳි, සිටි, සැතපෙන බුද්ධ ප්‍රතිමා 4\n• සිටි පිළිමයේ පරදුක්ඛදුක්ඛිත මුද්‍රාව (අන් අයගේ දුකේදී කම්පා වීම)\n• ලංකාවේ ගල් කැටයම් කලා ශිල්පයේ උච්චතම අවස්ථාව."),
+    Triple("🖼️ සීගිරි බිතුසිතුවම් (Sigiriya Frescoes)", "සීගිරිය • කාශ්‍යප රජ සමය (ක්‍රි.ව. 5 වන සියවස)", "• ස්වාභාවික ගුරුලු, සාදම්, රන්වන් වර්ණ යොදාගත් අහස්ගැබ චිත්‍ර\n• මේඝලතා (වළාකුළු කන්‍යාවන්) සහ විජ්ජුලතා (විදුලි කෙළි) නිරූපණය වේ."),
+    Triple("🖼️ සඳකඩපහණ (Moonstone)", "අනුරාධපුර & පොළොන්නරු යුග", "• අර්ධ කවයාකාර කැටයම\n• සංසාර චක්‍රය නිරූපණය කරයි (ඇතු, අශ්ව, සිංහ, ගොන් - ජරා, ව්‍යාධි, මරණ, ඉපදීම)\n• පොළොන්නරු සඳකඩපහණේ ගොනා රූපය ඉවත් කර ඇත (හින්දු ආගමික බලපෑම නිසා).")
+  )
+
+  Column(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+    Surface(
+      shape = RoundedCornerShape(10.dp),
+      color = Color(0xFF0F172A),
+      border = BorderStroke(1.dp, Color(0xFF7C3AED)),
+      modifier = Modifier.fillMaxWidth()
+    ) {
+      Column(modifier = Modifier.padding(12.dp)) {
+        Row(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.SpaceBetween,
+          verticalAlignment = Alignment.CenterVertically
+        ) {
+          Text("🖼️ O/L ඉතිහාසය පුරාවස්තු සහ මූර්ති ගැලරිය", color = Color(0xFFDDD6FE), fontWeight = FontWeight.Bold, fontSize = 13.5.sp)
+          Surface(onClick = onClose, color = Color(0xFF7C3AED), shape = RoundedCornerShape(6.dp)) {
+            Text("ගැලරිය", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp))
+          }
+        }
+        Text("විභාග පත්‍රයේ රූප සටහන් ප්‍රශ්නවලට අනිවාර්යයෙන්ම ලැබෙන මුරගල්, සඳකඩපහණ, බුද්ධ ප්‍රතිමා සහ බිතුසිතුවම්වල පූර්ණ විවරණය.", color = Color(0xFFC4B5FD), fontSize = 11.sp, modifier = Modifier.padding(top = 4.dp))
+      }
+    }
+
+    Spacer(modifier = Modifier.height(10.dp))
+
+    visualGallery.forEach { art ->
+      Card(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
+        shape = RoundedCornerShape(10.dp),
+        border = BorderStroke(1.dp, Color(0xFF7C3AED).copy(alpha = 0.6f))
+      ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+          Text(art.first, fontWeight = FontWeight.Bold, color = Color(0xFFC4B5FD), fontSize = 13.sp)
+          Spacer(modifier = Modifier.height(2.dp))
+          Text(art.second, fontSize = 10.5.sp, color = Color(0xFFFDE68A), fontWeight = FontWeight.SemiBold)
+          Spacer(modifier = Modifier.height(4.dp))
+          Text(art.third, fontSize = 11.sp, color = Color(0xFFE2E8F0), lineHeight = 16.sp)
+        }
+      }
     }
   }
 }
 
 @Composable
 private fun HistoryComparisonSection(onClose: () -> Unit) {
-  Column(modifier = Modifier.padding(8.dp).fillMaxWidth().background(Color(0xFF0F172A), RoundedCornerShape(8.dp)).padding(8.dp)) {
-    Text("⚖️ සංසන්දන වගු", color = Color.White, fontWeight = FontWeight.Bold)
-    Text("1818 සහ 1848 නිදහස් අරගල, ඩොනමෝර් සහ සෝල්බරි ආණ්ඩුක්‍රම සංසන්දනය.", color = Color(0xFF94A3B8), fontSize = 11.sp)
-    Button(onClick = onClose, modifier = Modifier.padding(top = 8.dp), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD97706))) {
-      Text("වසන්න (Close)", fontSize = 11.sp)
+  val comparisons = listOf(
+    Triple("⚖️ 1818 ඌව වෙල්ලස්ස අරගලය VS 1848 මාතලේ අරගලය", "අරගල සංසන්දනය", "• 1818 අරගලය: උඩරට ගිවිසුම කඩකිරීම නිසා රදලවරුන් සහ ජනතාව කළ සන්නද්ධ සටනයි (කැප්පෙටිපොළ, මඩුගල්ලේ).\n• 1848 අරගලය: බ්‍රිතාන්‍යයන් විසින් පැනවූ නව අසාධාරණ බදු 7ට එරෙහිව පොදු ජනතාව කළ සටනයි (පුරන් අප්පු, ගොංගාලේගොඩ බණ්ඩා).\n• වෙනස: 1818 වැඩවසම් නායකත්වයක් වූ අතර 1848 සාමාන්‍ය ජනතාවගේ නායකත්වයක් විය."),
+    Triple("⚖️ 1833 කෝල්බෲක් VS 1931 ඩොනමෝර් VS 1947 සෝල්බරි", "ආණ්ඩුක්‍රම සංසන්දනය", "• කෝල්බෲක් (1833): රාජකාරි ක්‍රමය අහෝසි කිරීම, පළාත් 5ක් පිහිටුවීම, විධායක හා ව්‍යවස්ථාදායක කවුන්සිල.\n• ඩොනමෝර් (1931): අවුරුදු 21ට වැඩි සැමට 'සර්වජන ඡන්ද බලය' හිමිවීම, රාජ්‍ය මන්ත්‍රණ සභාව, කාරක සභා 7ක්.\n• සෝල්බරි (1947): ද්වි-මණ්ඩල පාර්ලිමේන්තුව, අගමැති ප්‍රමුඛ කැබිනට් මණ්ඩලය, 1948 පෙබරවාරි 4 ඩොමීනියන් නිදහස."),
+    Triple("⚖️ අනුරාධපුර වාරි සංස්කෘතිය VS පොළොන්නරු වාරි සංස්කෘතිය", "වාරි පද්ධති සංසන්දනය", "• අනුරාධපුරය: වසභ, මහසෙන්, ධාතුසේන රජවරුන් - මහවැලි, මල්වතු, කලා ඔය ඇසුරින් වැව් තැනීම (මිණේරිය, කලා වැව, පදවිය, ජය ගඟ).\n• පොළොන්නරුව: මහා පරාක්‍රමබාහු රජු - පරාක්‍රම සමුද්‍රය (වැව් 5ක් එකතු කර), අඟමැඩිල්ල අමුණ, ඇළහැර ඇළ.")
+  )
+
+  Column(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+    Surface(
+      shape = RoundedCornerShape(10.dp),
+      color = Color(0xFF0F172A),
+      border = BorderStroke(1.dp, Color(0xFFBE123C)),
+      modifier = Modifier.fillMaxWidth()
+    ) {
+      Column(modifier = Modifier.padding(12.dp)) {
+        Row(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.SpaceBetween,
+          verticalAlignment = Alignment.CenterVertically
+        ) {
+          Text("⚖️ O/L ඉතිහාසය නිල සංසන්දන වගු (Comparison Tables)", color = Color(0xFFFECDD3), fontWeight = FontWeight.Bold, fontSize = 13.5.sp)
+          Surface(onClick = onClose, color = Color(0xFFBE123C), shape = RoundedCornerShape(6.dp)) {
+            Text("සංසන්දන", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp))
+          }
+        }
+        Text("විභාගයේ II කොටසේ ලකුණු 15 ප්‍රශ්න සඳහා නිතර විමසන අරගල, ව්‍යවස්ථා සහ වාරි පද්ධති සංසන්දනාත්මක විශ්ලේෂණය.", color = Color(0xFFFFE4E6), fontSize = 11.sp, modifier = Modifier.padding(top = 4.dp))
+      }
+    }
+
+    Spacer(modifier = Modifier.height(10.dp))
+
+    comparisons.forEach { comp ->
+      Card(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
+        shape = RoundedCornerShape(10.dp),
+        border = BorderStroke(1.dp, Color(0xFFBE123C).copy(alpha = 0.6f))
+      ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+          Text(comp.first, fontWeight = FontWeight.Bold, color = Color(0xFFFB7185), fontSize = 13.sp)
+          Spacer(modifier = Modifier.height(2.dp))
+          Text(comp.second, fontSize = 10.5.sp, color = Color(0xFFFDE68A), fontWeight = FontWeight.SemiBold)
+          Spacer(modifier = Modifier.height(4.dp))
+          Text(comp.third, fontSize = 11.sp, color = Color(0xFFE2E8F0), lineHeight = 16.sp)
+        }
+      }
     }
   }
 }
 
 @Composable
 private fun HistoryEssayTemplatesSection(onClose: () -> Unit) {
-  Column(modifier = Modifier.padding(8.dp).fillMaxWidth().background(Color(0xFF0F172A), RoundedCornerShape(8.dp)).padding(8.dp)) {
-    Text("📝 රචනා සැකිලි", color = Color.White, fontWeight = FontWeight.Bold)
-    Text("විභාගයේදී උපරිම ලකුණු ලබාගැනීමට අවශ්‍ය ඡේද සැකසුම සහ කරුණු පෙළගැස්වීම.", color = Color(0xFF94A3B8), fontSize = 11.sp)
-    Button(onClick = onClose, modifier = Modifier.padding(top = 8.dp), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD97706))) {
-      Text("වසන්න (Close)", fontSize = 11.sp)
+  val essayTemplates = listOf(
+    Triple("📝 සැකිල්ල 1: අනුරාධපුර යුගයේ වාරි තාක්ෂණය හා කෘෂිකාර්මික දියුණුව", "ලකුණු 15 මඟපෙන්වීම", "• හැඳින්වීම: සිංහල ශිෂ්ටාචාරයේ පදනම වාරි සංස්කෘතිය බව දැක්වීම.\n• ප්‍රධාන කරුණු: බිසෝකොටුව (සොරොව් තාක්ෂණය), ජලවේගය පාලනය, මිණේරිය, කලා වැව, ජය ඇළ (සැතපුමකට අඟල් 6ක බෑවුම).\n• නිගමනය: ලෝකයේ ප්‍රථම ජල කළමනාකරණ රාජ්‍යය ශ්‍රී ලංකාව බව තහවුරු කිරීම."),
+    Triple("📝 සැකිල්ල 2: 1818 සහ 1848 නිදහස් අරගලයන්හි ස්වභාවය සහ වැදගත්කම", "ලකුණු 15 මඟපෙන්වීම", "• හැඳින්වීම: බ්‍රිතාන්‍ය යටත්විජිත පාලනයට එරෙහිව ලාංකිකයන් කළ සන්නද්ධ අරගල.\n• ප්‍රධාන කරුණු: කැප්පෙටිපොළ නිලමේගේ කාර්යභාරය, පුරන් අප්පුගේ හා ගොංගාලේගොඩ බණ්ඩාගේ නායකත්වය, පැනවූ අසාධාරණ බදු.\n• නිගමනය: සන්නද්ධ සටන්වලින් පසුව දේශපාලන හා ව්‍යවස්ථාමය අරගලවලට මගපෑදීම."),
+    Triple("📝 සැකිල්ල 3: 1948 නිදහස කරා ශ්‍රී ලංකාව ගමන් කළ ව්‍යවස්ථාමය මඟ", "ලකුණු 15 මඟපෙන්වීම", "• හැඳින්වීම: 1833 සිට 1948 දක්වා ආණ්ඩුක්‍රම විකාශනය.\n• ප්‍රධාන කරුණු: 1910 උගත් ලාංකික ආසනය, 1931 ඩොනමෝර් සර්වජන ඡන්ද බලය, 1947 සෝල්බරි ව්‍යවස්ථාව.\n• නිගමනය: ලේ වැගිරීමකින් තොරව සාමකාමීව නිදහස දිනාගැනීම.")
+  )
+
+  Column(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+    Surface(
+      shape = RoundedCornerShape(10.dp),
+      color = Color(0xFF0F172A),
+      border = BorderStroke(1.dp, Color(0xFF38BDF8)),
+      modifier = Modifier.fillMaxWidth()
+    ) {
+      Column(modifier = Modifier.padding(12.dp)) {
+        Row(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.SpaceBetween,
+          verticalAlignment = Alignment.CenterVertically
+        ) {
+          Text("📝 O/L ඉතිහාසය රචනා ප්‍රශ්න සැකිලි & පිළිතුරු (Essay Templates)", color = Color(0xFFBAE6FD), fontWeight = FontWeight.Bold, fontSize = 13.5.sp)
+          Surface(onClick = onClose, color = Color(0xFF0284C7), shape = RoundedCornerShape(6.dp)) {
+            Text("රචනා සැකිලි", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp))
+          }
+        }
+        Text("විභාගයේදී ලකුණු 15 රචනා ප්‍රශ්නවලට උපරිම ලකුණු ලබාගැනීම සඳහා පිළිතුර පෙළගස්වන නිවැරදි ආකෘතිය.", color = Color(0xFFE0F2FE), fontSize = 11.sp, modifier = Modifier.padding(top = 4.dp))
+      }
+    }
+
+    Spacer(modifier = Modifier.height(10.dp))
+
+    essayTemplates.forEach { essay ->
+      Card(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
+        shape = RoundedCornerShape(10.dp),
+        border = BorderStroke(1.dp, Color(0xFF38BDF8).copy(alpha = 0.6f))
+      ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+          Text(essay.first, fontWeight = FontWeight.Bold, color = Color(0xFF38BDF8), fontSize = 13.sp)
+          Spacer(modifier = Modifier.height(2.dp))
+          Text(essay.second, fontSize = 10.5.sp, color = Color(0xFFFDE68A), fontWeight = FontWeight.SemiBold)
+          Spacer(modifier = Modifier.height(4.dp))
+          Text(essay.third, fontSize = 11.sp, color = Color(0xFFE2E8F0), lineHeight = 16.sp)
+        }
+      }
     }
   }
 }

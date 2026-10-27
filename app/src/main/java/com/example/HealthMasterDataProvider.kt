@@ -15,16 +15,21 @@ enum class HealthGradeTab(val labelSinhala: String, val badge: String) {
 enum class HealthSectionCategory(
   val id: String,
   val titleSinhala: String,
+  val shortTitleSinhala: String,
   val subtitle: String,
   val emoji: String,
   val themeColor: Color
 ) {
-  LESSONS("lessons", "පාඩම් මාලාව & කෙටි සටහන්", "10 & 11 සම්පූර්ණ ඒකක 12", "📚", Color(0xFFE11D48)),
-  MCQ_BANK("mcq", "O/L I පත්‍රය - විවරණ සහිත MCQs", "ප්‍රශ්න සහ පූර්ණ විවරණ", "🎯", Color(0xFF2563EB)),
-  STRUCTURED_ESSAY("structured", "O/L II පත්‍රය - ව්‍යුහගත & රචනා", "ලකුණු දීමේ පටිපාටි සමඟ", "📝", Color(0xFF0D9488)),
-  CALCULATORS("calculators", "BMI & තරගාවලි ගණක මෙවලම්", "BMI සහ Knockout/League සූත්‍ර", "🧮", Color(0xFFD97706)),
-  FIRST_AID("first_aid", "ක්‍රීඩා ආපදා & RICE ප්‍රථමාධාර", "හදිසි අනතුරු පියවර", "🩹", Color(0xFFDC2626)),
-  LIFE_SKILLS("life_skills", "WHO ජීවන කුසලතා & මානසික සුවය", "ආතති කළමනාකරණය", "🧠", Color(0xFF7C3AED))
+  LESSONS("lessons", "පාඩම් මාලාව & කෙටි සටහන්", "පාඩම්", "10 & 11 සම්පූර්ණ ඒකක 12", "📚", Color(0xFFE11D48)),
+  MCQ_BANK("mcq", "O/L I පත්‍රය - විවරණ සහිත MCQs", "MCQ පත්‍ර", "ප්‍රශ්න සහ පූර්ණ විවරණ", "🎯", Color(0xFF2563EB)),
+  STRUCTURED_ESSAY("structured", "O/L II පත්‍රය - ව්‍යුහගත & රචනා", "රචනා", "ලකුණු දීමේ පටිපාටි සමඟ", "📝", Color(0xFF0D9488)),
+  CALCULATORS("calculators", "BMI & තරගාවලි ගණක මෙවලම්", "ගණක", "BMI සහ Knockout/League සූත්‍ර", "🧮", Color(0xFFD97706)),
+  FIRST_AID("first_aid", "ක්‍රීඩා ආපදා & RICE ප්‍රථමාධාර", "ප්‍රථමාධාර", "හදිසි අනතුරු පියවර", "🩹", Color(0xFFDC2626)),
+  LIFE_SKILLS("life_skills", "WHO ජීවන කුසලතා & මානසික සුවය", "ජීවන", "ආතති කළමනාකරණය", "🧠", Color(0xFF7C3AED)),
+  SHORT_NOTES("short_notes", "විභාග ඉලක්ක කෙටි සටහන් & Flashcards", "කෙටි සටහන්", "අනිවාර්ය කරුණු 200", "⚡", Color(0xFFD97706)),
+  SPORTS_RULES("sports_rules", "ක්‍රීඩා නීතිරීති & මලල ක්‍රීඩා", "ක්‍රීඩා නීති", "වොලිබෝල්, දැල්පන්දු, ධාවන පථ", "🏆", Color(0xFF16A34A)),
+  PRACTICAL_EXAMS("practicals", "ප්‍රායෝගික පරීක්ෂණ & YOYO Test", "ප්‍රායෝගික", "යෝග්‍යතා මිනුම් පරීක්ෂණ 10", "📋", Color(0xFF0284C7)),
+  AYURVEDA_WELLNESS("ayurveda", "දේශීය වෙදකම & හෙළ සෞඛ්‍යය", "හෙළ වෙද", "හෙළ වෙදකම හා ඔසු පැළෑටි", "🌿", Color(0xFF059669))
 }
 
 data class HealthLesson(
@@ -83,6 +88,46 @@ data class HealthLifeSkillCard(
   val category: String,
   val description: String,
   val practicalApplication: String
+)
+
+data class HealthShortNoteCard(
+  val id: String,
+  val grade: String,
+  val topic: String,
+  val questionPrompt: String,
+  val answerText: String,
+  val keyFact: String
+)
+
+data class HealthSportsRuleCard(
+  val id: String,
+  val sportName: String,
+  val iconEmoji: String,
+  val courtDimensions: String,
+  val teamMembers: String,
+  val keyRules: List<String>,
+  val foulsAndViolations: List<String>,
+  val examTip: String
+)
+
+data class HealthPracticalExamCard(
+  val id: String,
+  val testName: String,
+  val componentTested: String,
+  val equipmentNeeded: String,
+  val procedureSteps: List<String>,
+  val scoringFormula: String,
+  val gradeStandards: String
+)
+
+data class HealthAyurvedaCard(
+  val id: String,
+  val plantOrConceptName: String,
+  val category: String,
+  val medicinalValue: String,
+  val usedPart: String,
+  val healthBenefits: List<String>,
+  val examTip: String
 )
 
 // ============================================================================
@@ -1048,6 +1093,206 @@ object HealthMasterDataProvider {
       category = "චිත්තවේග කුසලතා",
       description = "ජීවිතයේ පීඩාකාරී අවස්ථාවන්හිදී මනස සැහැල්ලු කරගනිමින් සමබරව ක්‍රියාකිරීමේ ශක්තියයි.",
       practicalApplication = "විභාග හෝ තරග ආතතිය පාලනයට භාවනාව, යෝග, ව්‍යායාම සහ ප්‍රියතම සංගීතයට සවන්දීම."
+    )
+  )
+
+  // --------------------------------------------------------------------------
+  // 7. HIGH-YIELD SHORT NOTES & FLASHCARDS (EXAM ESSENTIALS)
+  // --------------------------------------------------------------------------
+  val shortNoteCards: List<HealthShortNoteCard> = listOf(
+    HealthShortNoteCard(
+      id = "sn_1",
+      grade = "10",
+      topic = "පෝෂණය & BMI",
+      questionPrompt = "BMI ගණනය කිරීමේ නිවැරදි සූත්‍රය සහ නිරෝගී පරාසය කුමක්ද?",
+      answerText = "BMI = ශරීර බර (kg) / [උස (m) × උස (m)]. නිරෝගී ප්‍රශස්ත පරාසය 18.5 - 24.9 kg/m² වේ.",
+      keyFact = "18.5ට අඩු නම් අඩු බර, 25-29.9 අතර අධිබර, 30ට වැඩි නම් ස්ථුලතාව වේ."
+    ),
+    HealthShortNoteCard(
+      id = "sn_2",
+      grade = "10",
+      topic = "පෝෂණ ඌනතා",
+      questionPrompt = "ප්‍රෝටීන ඌනතාවය නිසා කුඩා දරුවන්ට ඇතිවන ප්‍රධාන රෝගය කුමක්ද?",
+      answerText = "ක්වාෂියෝකෝර් (Kwashiorkor) රෝගයයි. ප්‍රෝටීන මෙන්ම ශක්තිය (කැලරි) යන දෙකම ඌන වූ විට 'මැරස්මස්' හටගනී.",
+      keyFact = "ක්වාෂියෝකෝර් හිදී පාද ඉදිමීම සහ උදරය ඉදිරියට නෙරා ඒම සිදුවේ."
+    ),
+    HealthShortNoteCard(
+      id = "sn_3",
+      grade = "10",
+      topic = "දේහ පද්ධති",
+      questionPrompt = "රුධිර සංසරණ පද්ධතියේ ප්‍රධානතම පොම්පය වන හෘදයේ කුටීර 4 මොනවාද?",
+      answerText = "වම් කර්ණිකාව, වම් කෝෂිකාව, දකුණු කර්ණිකාව සහ දකුණු කෝෂිකාවයි.",
+      keyFact = "වම් කෝෂිකාවේ බිත්තිය වඩාත්ම ඝනකම් වන්නේ මුළු ශරීරයටම රුධිරය පොම්ප කරන බැවිනි."
+    ),
+    HealthShortNoteCard(
+      id = "sn_4",
+      grade = "10",
+      topic = "ශාරීරික යෝග්‍යතාව",
+      questionPrompt = "FITT පුහුණු මූලධර්මයේ අකුරු 4න් නිරූපණය වන සංකල්ප මොනවාද?",
+      answerText = "F - Frequency (වාර ගණන), I - Intensity (තීව්‍රතාව), T - Time (කාලසීමාව), T - Type (ව්‍යායාම වර්ගය).",
+      keyFact = "යෝග්‍යතාව වැඩිදියුණු කිරීමට FITT අනුව අධිභාර (Overload) මූලධර්මය යොදාගනී."
+    ),
+    HealthShortNoteCard(
+      id = "sn_5",
+      grade = "11",
+      topic = "බෝනොවන රෝග (NCDs)",
+      questionPrompt = "ශ්‍රී ලංකාවේ බෝනොවන රෝග (NCDs) සඳහා බලපාන ප්‍රධාන හැසිරීම් අවදානම් සාධක 4 මොනවාද?",
+      answerText = "1. දුම්කොළ භාවිතය 2. මත්පැන් පානය 3. අහිතකර ආහාර (ලුණු, සීනි, තෙල් බහුල) 4. ශාරීරික අක්‍රියතාව.",
+      keyFact = "වයස 35ට වැඩි අයට සුවදිවි මධ්‍යස්ථානවලින් (HLC) නිදහස් පරීක්ෂණ සිදුකරයි."
+    ),
+    HealthShortNoteCard(
+      id = "sn_6",
+      grade = "11",
+      topic = "තරගාවලි සූත්‍ර",
+      questionPrompt = "පිළිමලුන් පිටුදැකීමේ (Knockout) තරගාවලියක Byes (වරප්‍රසාද) සෙවීමේ සූත්‍රය කුමක්ද?",
+      answerText = "Byes සංඛ්‍යාව = 2ⁿ - N (මෙහි N යනු කණ්ඩායම් ගණනයි; 2ⁿ යනු N ට වැඩි ළඟම ඇති 2 හි බලයයි).",
+      keyFact = "උදා: කණ්ඩායම් 11ක් සඳහා Byes = 16 - 11 = 5 Byes වේ."
+    )
+  )
+
+  // --------------------------------------------------------------------------
+  // 8. SPORTS RULES & ATHLETICS
+  // --------------------------------------------------------------------------
+  val sportsRules: List<HealthSportsRuleCard> = listOf(
+    HealthSportsRuleCard(
+      id = "sr_1",
+      sportName = "වොලිබෝල් (Volleyball)",
+      iconEmoji = "🏐",
+      courtDimensions = "දිග මීටර් 18m × පළල මීටර් 9m | දැල උස: පිරිමි 2.43m / කාන්තා 2.24m",
+      teamMembers = "පිටියේ ක්‍රීඩකයින් 6යි (ආදේශක 6යි - මුළු කණ්ඩායම 12යි)",
+      keyRules = listOf(
+        "පන්දුව ප්‍රතිවාදී පිලට යැවීමට උපරිම පහරවල් 3ක් (Contacts) හිමිවේ.",
+        "සර්විස් පහර එල්ල කළ පසු ක්‍රීඩකයින් ඔරලෝසු අතට (Clockwise) කැරකෙමින් ඉරියව් මාරු කරයි.",
+        "සෙට් 5න් තරගයක් ජයගැනීමට මුල් සෙට් 4 ලකුණු 25 බැගින්ද, 5 වන සෙට් එක ලකුණු 15 බැගින්ද ලබාගත යුතුය."
+      ),
+      foulsAndViolations = listOf(
+        "දැලේ ඇඟ ගෑවීම (Net touch foul)",
+        "මධ්‍ය රේඛාව පැනීම (Center line crossing)",
+        "පන්දුව රඳවා තබා ගැනීම හෝ එසවීම (Carrying / Lift)"
+      ),
+      examTip = "වොලිබෝල් ක්‍රීඩාවේ භ්‍රමණය (Rotation) සිදුවන්නේ ඔරලෝසු අතට බව O/L MCQs සඳහා මතක තබාගන්න."
+    ),
+    HealthSportsRuleCard(
+      id = "sr_2",
+      sportName = "දැල්පන්දු (Netball)",
+      iconEmoji = "🏀",
+      courtDimensions = "දිග මීටර් 30.5m × පළල මීටර් 15.25m (කලාප 3කට බෙදා ඇත)",
+      teamMembers = "පිටියේ ක්‍රීඩකයින් 7යි (GS, GA, WA, C, WD, GD, GK)",
+      keyRules = listOf(
+        "පන්දුව අතැතිව තබාගත හැක්කේ උපරිම තත්පර 3ක් පමණි.",
+        "පන්දුව අතැති ක්‍රීඩකයාගෙන් මීටර් 0.9 (අඩි 3) ක පරතරයක් ආරක්ෂක ක්‍රීඩකයා පවත්වා ගත යුතුය.",
+        "ලකුණු ලබාගත හැක්කේ GS සහ GA ක්‍රීඩිකාවන්ට පමණක් දැල්පන්දු වළල්ල තුළ සිටය."
+      ),
+      foulsAndViolations = listOf(
+        "අඩිය තැබීමේ නීතිය කැඩීම (Footwork / Dragging foot)",
+        "පිටිය පැනීම (Offside - තම කලාපයෙන් පිටතට යාම)",
+        "බාධා කිරීම (Obstruction - අඩි 3කට වඩා ළඟින් සිටීම)"
+      ),
+      examTip = "දැල්පන්දු ක්‍රීඩාවේ කලාප 3 සහ C (Center) ක්‍රීඩිකාවට යා හැකි කලාප O/L විභාගයේදී නිතර අසනු ලැබේ."
+    ),
+    HealthSportsRuleCard(
+      id = "sr_3",
+      sportName = "මලල ක්‍රීඩා සහ සහය දිවීම (Track & Field Relay)",
+      iconEmoji = "🏃‍♂️",
+      courtDimensions = "මීටර් 400 සම්මත ධාවන පථය (Standard 400m Oval Track)",
+      teamMembers = "කණ්ඩායමකට ධාවකයින් 4දෙනෙකි",
+      keyRules = listOf(
+        "මීටර් 4x100m සහය දිවීමේදී 'අදෘශ්‍ය යෂ්ටි හුවමාරුව' (Non-visual baton exchange) යොදාගනී.",
+        "මීටර් 4x400m සහය දිවීමේදී 'දෘශ්‍ය යෂ්ටි හුවමාරුව' (Visual baton exchange) යොදාගනී.",
+        "යෂ්ටි හුවමාරු කලාපය (Baton Exchange Zone) මීටර් 30ක සීමාවක් ඇතුළත සිදුවිය යුතුය."
+      ),
+      foulsAndViolations = listOf(
+        "හුවමාරු කලාපයෙන් පිටතදී යෂ්ටිය මාරු කිරීම",
+        "යෂ්ටිය බිම වැටීම සහ වෙනත් ධාවකයෙකුට බාධා කිරීම",
+        "තම ධාවන තීරුවෙන් (Lane) පිටතට යාම"
+      ),
+      examTip = "4x100m සඳහා අදෘශ්‍ය හුවමාරුවත්, 4x400m සඳහා දෘශ්‍ය හුවමාරුවත් භාවිත කරන බව නිවැරදිව ලියන්න."
+    )
+  )
+
+  // --------------------------------------------------------------------------
+  // 9. PRACTICAL EXAMS & YOYO FITNESS TESTS
+  // --------------------------------------------------------------------------
+  val practicalExams: List<HealthPracticalExamCard> = listOf(
+    HealthPracticalExamCard(
+      id = "pe_1",
+      testName = "Harvard Step Test (හාර්වඩ් පියගැට පරීක්ෂණය)",
+      componentTested = "හෘද ස්වසන නොනැවතී පැවතීම (Cardiovascular Endurance)",
+      equipmentNeeded = "සෙන්ටිමීටර් 50 උස පෙට්ටියක් / පියගැටයක්, නැවතුම් ගණකය (Stopwatch), මෙට්‍රොනෝමයක්",
+      procedureSteps = listOf(
+        "විනාඩියකට පියවර 30ක සීඝ්‍රතාවයෙන් විනාඩි 5ක් නොනැවතී පෙට්ටිය මතට නැග බැසීම.",
+        "පරීක්ෂණය නිමවූ පසු විනාඩි 1 - 1.5, 2 - 2.5 සහ 3 - 3.5 අතර කාල පරාසවලදී නාඩි වැටීමේ වාර ගණන මැනීම."
+      ),
+      scoringFormula = "යෝග්‍යතා දර්ශකය = (තත්පරවලින් මුළු කාලය × 100) / (2 × නාඩි ස්පන්දන එකතුව)",
+      gradeStandards = "90ට වැඩි = විශිෂ්ටයි, 80-89 = යහපත්යි, 65-79 = මධ්‍යමයි, 55ට අඩු = දුර්වලයි."
+    ),
+    HealthPracticalExamCard(
+      id = "pe_2",
+      testName = "YOYO Intermittent Recovery Test (යෝයෝ යෝග්‍යතා පරීක්ෂණය)",
+      componentTested = "ක්‍රීඩකයින්ගේ අධි තීව්‍රතා යථා තත්ත්වයට පත්වීමේ හැකියාව (Aerobic High-Intensity Recovery)",
+      equipmentNeeded = "මීටර් 20 සලකුණු කළ කේතු, ශ්‍රව්‍ය බීප් හඬ පටය (Audio Beep), නැවතුම් ගණකය",
+      procedureSteps = listOf(
+        "ශ්‍රව්‍ය බීප් හඬට අනුව මීටර් 20ක දුරක් ඉදිරියට ගොස් ආපසු ධාවනය කිරීම.",
+        "සෑම ශටලයකින් පසුවම තත්පර 10ක සක්‍රීය විවේක කාලයක් (මීටර් 5ක් පයින් යාම) හිමිවේ.",
+        "බීප් හඬට පෙර මීටර් 20 සීමාවට ළඟා වීමට දෙවරක් අපොහොසත් වුවහොත් පරීක්ෂණය නිමවේ."
+      ),
+      scoringFormula = "අවසානයට සම්පූර්ණ කළ Level සහ Shuttle ප්‍රමාණය අනුව මුළු ධාවන දුර (මීටර්) ගණනය කෙරේ.",
+      gradeStandards = "මීටර් 1000ට වැඩි දුරක් ධාවනය කිරීම උසස් ජාතික මට්ටමේ ශාරීරික යෝග්‍යතාවයකි."
+    ),
+    HealthPracticalExamCard(
+      id = "pe_3",
+      testName = "Sit and Reach Test (වාඩිවී ඉදිරියට නැමීමේ පරීක්ෂණය)",
+      componentTested = "කොන්දේ පහළ කොටස සහ කලවා පසුපස පේශිවල නම්‍යශීලීතාව (Flexibility)",
+      equipmentNeeded = "සෙන්ටිමීටර් මිනුම් ලෑල්ල සහිත Sit & Reach පෙට්ටිය",
+      procedureSteps = listOf(
+        "දෙපා දිගහැර පෙට්ටියට පාද තබා සෘජුව වාඩිවීම.",
+        "දෙඅත් ඉදිරියට දිගු කර දූල අත්ල පෙට්ටිය මත තබා දණහිස් නොනමා හැකි තරම් ඉදිරියට නැමීම."
+      ),
+      scoringFormula = "ලෑල්ල මත අත් ඇඟිලි ස්පර්ශ වන උපරිම සෙන්ටිමීටර් අගය සටහන් කරගනු ලැබේ.",
+      gradeStandards = "සෙ.මී. 15ට වැඩි නම් නම්‍යශීලීතාව ඉතා යහපත් මට්ටමක පවතී."
+    )
+  )
+
+  // --------------------------------------------------------------------------
+  // 10. AYURVEDA & INDIGENOUS SRI LANKAN WELLNESS
+  // --------------------------------------------------------------------------
+  val ayurvedaCards: List<HealthAyurvedaCard> = listOf(
+    HealthAyurvedaCard(
+      id = "ay_1",
+      plantOrConceptName = "ත්‍රිදෝෂ න්‍යාය (වාත, පිත්ත, කප)",
+      category = "දේශීය වෙදකම & ආයුර්වේදය",
+      medicinalValue = "මිනිස් සිරුරේ ක්‍රියාකාරිත්වය පාලනය වන ප්‍රධාන ශක්ති ප්‍රභවයන් 3කි.",
+      usedPart = "සමස්ත ශරීර පද්ධතියම",
+      healthBenefits = listOf(
+        "වාත දෝෂය: චලනය හා ස්වසනය පාලනය කරයි.",
+        "පිත්ත දෝෂය: ආහාර ජීර්ණය හා ශරීර උෂ්ණත්වය පාලනය කරයි.",
+        "කප දෝෂය: ශරීර ව්‍යුහය හා ස්ථායීතාව පාලනය කරයි."
+      ),
+      examTip = "ත්‍රිදෝෂ සමබරව පැවතීම සෞඛ්‍ය සම්පන්න බවත්, දෝෂ කෝප වීම රෝගී තත්ත්වයට හේතු වන බවත් මතක තබාගන්න."
+    ),
+    HealthAyurvedaCard(
+      id = "ay_2",
+      plantOrConceptName = "කොතලහිඹුටු (Kotalahimbutu)",
+      category = "දේශීය ඔසු පැළෑටි",
+      medicinalValue = "රුධිරයේ ග්ලූකෝස් මට්ටම පාලනය කරන ප්‍රබල දේශීය ඖෂධීය ශාකයකි.",
+      usedPart = "කඳ සහ මුල් (Stems & Roots)",
+      healthBenefits = listOf(
+        "දියවැඩියා (Type 2 Diabetes) රෝගීන්ගේ රුධිර සීනි මට්ටම පාලනය කරයි.",
+        "ශරීරයේ අධික ස්ථුලතාව පාලනය කිරීමට උපකාරී වේ."
+      ),
+      examTip = "දියවැඩියාව පාලනයට භාවිත වන දේශීය ඔසු ශාකයක් ලෙස කොතලහිඹුටු O/L සෞඛ්‍ය විභාගයේදී අසනු ලැබේ."
+    ),
+    HealthAyurvedaCard(
+      id = "ay_3",
+      plantOrConceptName = "දේශීය ඖෂධීය කැඳ (Herb Porridges)",
+      category = "දේශීය සෞඛ්‍ය ආහාර",
+      medicinalValue = "හතවැලිය, කරපිංචා, මොනරකුඩුම්බිය, ගොටුකොළ, ඉරමුසු කැඳ උදෑසන පානයක් ලෙස භාවිත වේ.",
+      usedPart = "කොළ සහ පස්ගොඩ (Leaves & Roots)",
+      healthBenefits = listOf(
+        "ශරීරයේ විෂ නසයි (Detoxification) සහ ප්‍රතිශක්තිය වර්ධනය කරයි.",
+        "ආහාර ජීර්ණය පහසු කර අක්මාවේ නීරෝගීබව සුරකියි."
+      ),
+      examTip = "දේශීය වෙදකමේ එන පෝෂණීය පාන ලෙස ඖෂධීය කැඳ වර්ග O/L II පත්‍රයේ කොටස්වලට පැමිණේ."
     )
   )
 }

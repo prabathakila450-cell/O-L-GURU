@@ -53,7 +53,14 @@ fun SubjectMaster20CategoriesDetailView(
     }
   }
 
+  val listState = androidx.compose.foundation.lazy.rememberLazyListState()
+
+  LaunchedEffect(selectedCategoryNumber) {
+    listState.scrollToItem(0)
+  }
+
   LazyColumn(
+    state = listState,
     modifier = modifier
       .fillMaxSize()
       .padding(horizontal = 12.dp, vertical = 6.dp),

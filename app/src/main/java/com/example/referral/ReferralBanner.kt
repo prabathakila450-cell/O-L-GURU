@@ -54,8 +54,10 @@ fun ReferralBanner(modifier: Modifier = Modifier) {
             ඉංග්‍රීසි භාෂාව මුල සිටම උගන්වන විශේෂ පංති විශේෂාංග 🇬🇧
 
             මේ සියල්ල දැන්ම ලබාගෙන ඔබේ විභාග ජයග්‍රහණය තහවුරු කරගන්න!
-            🎁👇
-            https://github.com/prabathakila450/OL-Guru/releases/latest
+            🎁👇 කෙලින්ම ඇප් එක ඩවුන්ලෝඩ් කර ඉන්ස්ටෝල් කරගන්න:
+            https://github.com/prabathakila450/OL-Guru/releases/latest/download/app-release.apk
+            
+            වැඩි විස්තර සඳහා: https://github.com/prabathakila450/OL-Guru
         """.trimIndent()
         
         try {
