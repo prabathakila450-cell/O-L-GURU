@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
+import com.example.getSavedGitHubShareUrl
 
 @Composable
 fun ReferralBanner(modifier: Modifier = Modifier) {
@@ -30,6 +31,7 @@ fun ReferralBanner(modifier: Modifier = Modifier) {
     }
     
     fun shareToApp(packageName: String, appName: String, isGroup: Boolean) {
+        val downloadUrl = getSavedGitHubShareUrl(context)
         val shareText = """
             අ.පො.ස. සාමාන්‍ය පෙළ (10 සහ 11 වසර) හදාරන දූදරුවන්ටම විශේෂයි! 📚✨
 
@@ -55,9 +57,9 @@ fun ReferralBanner(modifier: Modifier = Modifier) {
 
             මේ සියල්ල දැන්ම ලබාගෙන ඔබේ විභාග ජයග්‍රහණය තහවුරු කරගන්න!
             🎁👇 කෙලින්ම ඇප් එක ඩවුන්ලෝඩ් කර ඉන්ස්ටෝල් කරගන්න:
-            https://github.com/prabathakila450/OL-Guru/releases/latest/download/app-release.apk
+            $downloadUrl
             
-            වැඩි විස්තර සඳහා: https://github.com/prabathakila450/OL-Guru
+            වැඩි විස්තර සඳහා: https://github.com/prabathakila450-cell/O-L-Guru
         """.trimIndent()
         
         try {

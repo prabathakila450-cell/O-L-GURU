@@ -428,7 +428,7 @@ fun saveGitHubShareUrl(context: Context, url: String) {
 fun getSavedGitHubShareUrl(context: Context): String {
   val prefs = context.getSharedPreferences("app_user_auth_store", Context.MODE_PRIVATE)
   return prefs.getString("github_apk_share_url", null)
-    ?: "https://github.com/prabathakila450-cell/O-L-GURU/releases/latest/download/app-debug.apk"
+    ?: "https://github.com/prabathakila450-cell/O-L-Guru/releases/download/latest/app-debug.apk"
 }
 
 data class SubjectItem(
