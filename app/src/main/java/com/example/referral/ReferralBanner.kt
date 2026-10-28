@@ -59,7 +59,7 @@ fun ReferralBanner(modifier: Modifier = Modifier) {
             🎁👇 කෙලින්ම ඇප් එක ඩවුන්ලෝඩ් කර ඉන්ස්ටෝල් කරගන්න:
             $downloadUrl
             
-            වැඩි විස්තර සඳහා: https://github.com/prabathakila450-cell/O-L-Guru
+            වැඩි විස්තර සඳහා: https://github.com/prabathakila450/OL-Guru
         """.trimIndent()
         
         try {
