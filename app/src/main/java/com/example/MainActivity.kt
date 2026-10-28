@@ -428,7 +428,7 @@ fun saveGitHubShareUrl(context: Context, url: String) {
 fun getSavedGitHubShareUrl(context: Context): String {
   val prefs = context.getSharedPreferences("app_user_auth_store", Context.MODE_PRIVATE)
   return prefs.getString("github_apk_share_url", null)
-    ?: "https://github.com/prabathakila450/OLGuruApp/releases/latest/download/OL_Study_Portal.apk"
+    ?: "https://github.com/prabathakila450-cell/O-L-GURU/releases/latest/download/app-debug.apk"
 }
 
 data class SubjectItem(
@@ -1260,6 +1260,25 @@ fun StudentPortalApp() {
         currentScreen = "HOME"
         selectedTabNav = 0
       }
+      currentScreen == "GEOGRAPHY_AUTO_CHECKER" -> {
+        currentScreen = if (selectedSubjectItem != null) "CONTENT" else "HOME"
+        selectedTabNav = 0
+      }
+      currentScreen == "OL_SPECIAL_FEATURES" -> {
+        currentScreen = if (selectedSubjectItem != null) "CONTENT" else "HOME"
+        selectedTabNav = 0
+      }
+      currentScreen == "OL_SUBJECT_TOOLS" -> {
+        currentScreen = "OL_SPECIAL_FEATURES"
+      }
+      currentScreen == "GRADE_10_11_COMMERCE_SHORT_NOTES" -> {
+        currentScreen = if (selectedSubjectItem != null) "CONTENT" else "HOME"
+        selectedTabNav = 0
+      }
+      currentScreen == "GRADE_10_11_MATH_SHORT_NOTES" -> {
+        currentScreen = if (selectedSubjectItem != null) "CONTENT" else "HOME"
+        selectedTabNav = 0
+      }
       else -> {
         (context as? android.app.Activity)?.finish()
       }
@@ -1905,10 +1924,14 @@ fun StudentPortalApp() {
           }
         )
       } else {
+        val mainScrollState = rememberScrollState()
+        LaunchedEffect(effectiveScreen, selectedGrade, selectedSubjectItem) {
+          mainScrollState.scrollTo(0)
+        }
         Column(
           modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
+            .verticalScroll(mainScrollState)
             .padding(bottom = 24.dp)
         ) {
           // Top Header

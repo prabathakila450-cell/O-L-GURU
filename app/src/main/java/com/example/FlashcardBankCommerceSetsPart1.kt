@@ -10,10 +10,10 @@ object FlashcardBankCommerceSetsPart1 {
   fun getCard(setNum: Int, cardNum: Int, grade: String): CardContentTuple? {
     val c = cardNum.coerceIn(1, 20)
     return when (setNum) {
-      1 -> if (grade == "11") grade11_set1[(c - 1) % grade11_set1.size] else set1[(c - 1) % set1.size]
-      2 -> if (grade == "11") grade11_set2[(c - 1) % grade11_set2.size] else set2[(c - 1) % set2.size]
-      3 -> if (grade == "11") grade11_set3[(c - 1) % grade11_set3.size] else set3[(c - 1) % set3.size]
-      4 -> if (grade == "11") grade11_set4[(c - 1) % grade11_set4.size] else set4[(c - 1) % set4.size]
+      1 -> if (grade.contains("11")) grade11_set1[(c - 1) % grade11_set1.size] else set1[(c - 1) % set1.size]
+      2 -> if (grade.contains("11")) grade11_set2[(c - 1) % grade11_set2.size] else set2[(c - 1) % set2.size]
+      3 -> if (grade.contains("11")) grade11_set3[(c - 1) % grade11_set3.size] else set3[(c - 1) % set3.size]
+      4 -> if (grade.contains("11")) grade11_set4[(c - 1) % grade11_set4.size] else set4[(c - 1) % set4.size]
       5 -> set5[(c - 1) % set5.size]
       6 -> set6[(c - 1) % set6.size]
       7 -> set7[(c - 1) % set7.size]

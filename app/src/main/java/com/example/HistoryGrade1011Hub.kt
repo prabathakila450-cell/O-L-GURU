@@ -56,6 +56,17 @@ fun HistoryGrade10And11MasterHub(
   var showFullScreenModal by remember { mutableStateOf(false) }
 
   val categories = remember { SubjectMasterHistory20x20.getCategories() }
+  val filteredCategories = remember(activeGrade) {
+    if (activeGrade == "10") {
+      categories.filter { it.categoryNumber <= 10 }
+    } else {
+      categories.filter { it.categoryNumber > 10 }
+    }
+  }
+
+  LaunchedEffect(activeGrade) {
+    selectedCategoryIndex = -1
+  }
 
   // Main Card Container with rich gradients to match Master Hub standard
   Card(
@@ -155,11 +166,12 @@ fun HistoryGrade10And11MasterHub(
         horizontalArrangement = Arrangement.spacedBy(6.dp),
         modifier = Modifier.fillMaxWidth()
       ) {
-        itemsIndexed(categories) { index, cat ->
-          val isSelected = selectedCategoryIndex == index
+        itemsIndexed(filteredCategories) { _, cat ->
+          val originalIndex = categories.indexOf(cat)
+          val isSelected = selectedCategoryIndex == originalIndex
           Surface(
             onClick = {
-              selectedCategoryIndex = if (isSelected) -1 else index
+              selectedCategoryIndex = if (isSelected) -1 else originalIndex
             },
             shape = RoundedCornerShape(8.dp),
             color = if (isSelected) cat.color else Color(0xFF1E293B),
@@ -190,8 +202,10 @@ fun HistoryGrade10And11MasterHub(
       // Content Display Area depending on Selected Module
       if (selectedCategoryIndex == -1) {
         HistoryQuickOverviewGrid(
-          categories = categories,
-          onSelectModule = { selectedCategoryIndex = it }
+          categories = filteredCategories,
+          onSelectModule = { cat -> 
+            selectedCategoryIndex = categories.indexOf(cat)
+          }
         )
       } else {
         HistoryInlineModuleContent(
@@ -376,6 +390,18 @@ fun HistoryGrade10And11MasterHubDialog(
   var searchQuery by remember { mutableStateOf("") }
   var isSearchExpanded by remember { mutableStateOf(false) }
 
+  val filteredCategories = remember(activeGrade) {
+    if (activeGrade == "10") {
+      categories.filter { it.categoryNumber <= 10 }
+    } else {
+      categories.filter { it.categoryNumber > 10 }
+    }
+  }
+
+  LaunchedEffect(activeGrade) {
+    selectedCategoryIndex = -1
+  }
+
   BackHandler {
     if (selectedCategoryIndex != -1) {
       selectedCategoryIndex = -1
@@ -511,13 +537,15 @@ fun HistoryGrade10And11MasterHubDialog(
             // Category Detail View: Full-screen scrollable 20 facts
             SubjectMaster20CategoriesDetailView(
               subjectName = "ඉතිහාසය",
-              categories = categories,
+              categories = filteredCategories,
               selectedCategoryNumber = categories[selectedCategoryIndex].categoryNumber,
               onSelectCategory = { num ->
                 if (num == 0) selectedCategoryIndex = -1
                 else {
-                  val newIdx = categories.indexOfFirst { it.categoryNumber == num }
-                  if (newIdx != -1) selectedCategoryIndex = newIdx
+                  val targetCat = categories.find { it.categoryNumber == num }
+                  if (targetCat != null) {
+                     selectedCategoryIndex = categories.indexOf(targetCat)
+                  }
                 }
               },
               modifier = Modifier.fillMaxSize()
@@ -578,8 +606,10 @@ fun HistoryGrade10And11MasterHubDialog(
                 // 20 Categories Quick Overview Grid
                 item(key = "overview_grid") {
                   HistoryQuickOverviewGrid(
-                    categories = categories,
-                    onSelectModule = { selectedCategoryIndex = it }
+                    categories = filteredCategories,
+                    onSelectModule = { cat -> 
+                      selectedCategoryIndex = categories.indexOf(cat)
+                    }
                   )
                 }
               } else {
@@ -875,7 +905,7 @@ fun HistoryFullScreenModal(
 @Composable
 fun HistoryQuickOverviewGrid(
   categories: List<SubjectMasterCategory>,
-  onSelectModule: (Int) -> Unit
+  onSelectModule: (SubjectMasterCategory) -> Unit
 ) {
   Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
     // 2-column layout to match Sinhala Master Hub
@@ -887,13 +917,13 @@ fun HistoryQuickOverviewGrid(
         HistoryFeatureButton(
           category = categories[i],
           modifier = Modifier.weight(1f),
-          onClick = { onSelectModule(i) }
+          onClick = { onSelectModule(categories[i]) }
         )
         if (i + 1 < categories.size) {
           HistoryFeatureButton(
             category = categories[i + 1],
             modifier = Modifier.weight(1f),
-            onClick = { onSelectModule(i + 1) }
+            onClick = { onSelectModule(categories[i + 1]) }
           )
         } else {
           HistoryFeatureButton(

@@ -10,15 +10,15 @@ object FlashcardSetsScienceMaths {
 
   fun getScienceCard(setNum: Int, cardNum: Int, grade: String, theme: String): CardContentTuple {
     val c = cardNum.coerceIn(1, 20)
-    return when (grade) {
-      "11" -> when (setNum) {
+    return when {
+      grade.contains("11") -> when (setNum) {
         1 -> getGrade11ScienceSet1(c) // ප්‍රභාසංස්ලේෂණය & ආහාර නිෂ්පාදනය
         2 -> getGrade11ScienceSet2(c) // සෛලීය ශ්වසනය & ATP
         3 -> getGrade11ScienceSet3(c) // ප්‍රවේණිය, DNA & මෙන්ඩල් නියම
         4 -> getGrade11ScienceSet4(c) // ධාරා විද්‍යුතය & ඕම් නියමය
         else -> getScienceSet10General(setNum, c, theme)
       }
-      "9" -> when (setNum) {
+      grade.contains("9") -> when (setNum) {
         1 -> getGrade9ScienceSet1(c) // ජීවීන්ගේ විවිධත්වය & සෛලය
         2 -> getGrade9ScienceSet2(c) // පදාර්ථයේ ව්‍යුහය & මූලද්‍රව්‍ය
         3 -> getGrade9ScienceSet3(c) // ශක්ති ප්‍රභව & තාපය
@@ -37,15 +37,15 @@ object FlashcardSetsScienceMaths {
 
   fun getMathCard(setNum: Int, cardNum: Int, grade: String, theme: String): CardContentTuple {
     val c = cardNum.coerceIn(1, 20)
-    return when (grade) {
-      "11" -> when (setNum) {
+    return when {
+      grade.contains("11") -> when (setNum) {
         1 -> getGrade11MathSet1(c) // සැබෑ ලඝුගණක & ගණනය
         2 -> getGrade11MathSet2(c) // සරල පොලිය & අඩු වන ශේෂ ක්‍රමය
         3 -> getGrade11MathSet3(c) // වර්ගජ සමීකරණ & සූත්‍ර ක්‍රමය
         4 -> getGrade11MathSet4(c) // වෘත්ත ප්‍රමේය, චක්‍රීය චතුරස්‍ර & ජ්‍යාමිතිය
         else -> getMathSetGeneral(setNum, c, theme)
       }
-      "9" -> when (setNum) {
+      grade.contains("9") -> when (setNum) {
         1 -> getGrade9MathSet1(c) // සංඛ්‍යා රටා & ගුණාකාර
         2 -> getGrade9MathSet2(c) // භාග & දශම එකතු කිරීම
         3 -> getGrade9MathSet3(c) // මූලික වීජ ගණිතය & ප්‍රකාශන

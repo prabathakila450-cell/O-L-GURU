@@ -3,6 +3,7 @@ package com.example
 import android.content.Context
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
@@ -64,9 +65,15 @@ fun GeographyAutoCheckerScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(bottom = 32.dp)
+                .padding(bottom = 16.dp)
         ) {
+            BackHandler {
+                if (selectedCategoryNumber != 0) {
+                    selectedCategoryNumber = 0
+                } else {
+                    onBack()
+                }
+            }
             // Top Hero Card Banner matching Screenshot 20261027-103528
             Card(
                 shape = RoundedCornerShape(16.dp),
@@ -290,253 +297,266 @@ fun GeographyAutoCheckerScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             // Main Green/Emerald Master Hub Container Box matching Screenshot 20261027-103528
-            when (activeTab) {
-                0 -> {
-                    Surface(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 12.dp),
-                        shape = RoundedCornerShape(16.dp),
-                        color = Color(0xFF022C22), // Emerald dark green container
-                        border = BorderStroke(1.5.dp, Color(0xFF10B981))
-                    ) {
-                        Column(modifier = Modifier.padding(12.dp)) {
-                            // Header of Master Hub
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
+            Box(modifier = Modifier.weight(1f)) {
+                when (activeTab) {
+                    0 -> {
+                        Surface(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 12.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            color = Color(0xFF022C22), // Emerald dark green container
+                            border = BorderStroke(1.5.dp, Color(0xFF10B981))
+                        ) {
+                            Column(modifier = Modifier.padding(12.dp)) {
+                                // Header of Master Hub
                                 Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier.weight(1f)
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text("🔬", fontSize = 18.sp)
-                                    Spacer(modifier = Modifier.width(6.dp))
-                                    Text(
-                                        text = "10 & 11 භූගෝල විද්‍යාව විෂය නිර්දේශ Master Hub",
-                                        color = Color.White,
-                                        fontSize = 13.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier.weight(1f)
+                                    ) {
+                                        Text("🔬", fontSize = 18.sp)
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                        Text(
+                                            text = "10 & 11 භූගෝල විද්‍යාව විෂය නිර්දේශ Master Hub",
+                                            color = Color.White,
+                                            fontSize = 13.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                    }
+                                    Surface(
+                                        shape = RoundedCornerShape(12.dp),
+                                        color = Color(0xFFF59E0B)
+                                    ) {
+                                        Text(
+                                            text = "100% ආවරණය",
+                                            color = Color(0xFF1E1B4B),
+                                            fontSize = 10.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
+                                        )
+                                    }
                                 }
-                                Surface(
-                                    shape = RoundedCornerShape(12.dp),
-                                    color = Color(0xFFF59E0B)
+
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Text(
+                                    text = "සිතියම් • භෞතික භූගෝල විද්‍යාව • මානසික භූගෝල විද්‍යාව • ආපදා • කරුණු 400",
+                                    color = Color(0xFF6EE7B7),
+                                    fontSize = 10.5.sp
+                                )
+
+                                Spacer(modifier = Modifier.height(10.dp))
+
+                                // Grade Selector Buttons inside Green Master Hub
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                                 ) {
-                                    Text(
-                                        text = "100% ආවරණය",
-                                        color = Color(0xFF1E1B4B),
-                                        fontSize = 10.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
-                                    )
+                                    Button(
+                                        onClick = { currentGradeTab = "10" },
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = if (currentGradeTab == "10") Color(0xFF10B981) else Color(0xFF064E3B)
+                                        ),
+                                        shape = RoundedCornerShape(8.dp),
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .height(38.dp)
+                                    ) {
+                                        Text(
+                                            text = "📖 10 ශ්‍රේණිය",
+                                            fontSize = 12.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color.White
+                                        )
+                                    }
+                                    Button(
+                                        onClick = { currentGradeTab = "11" },
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = if (currentGradeTab == "11") Color(0xFF10B981) else Color(0xFF064E3B)
+                                        ),
+                                        shape = RoundedCornerShape(8.dp),
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .height(38.dp)
+                                    ) {
+                                        Text(
+                                            text = "📙 11 ශ්‍රේණිය (O/L)",
+                                            fontSize = 12.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color.White
+                                        )
+                                    }
                                 }
-                            }
 
-                            Spacer(modifier = Modifier.height(2.dp))
-                            Text(
-                                text = "සිතියම් • භෞතික භූගෝල විද්‍යාව • මානසික භූගෝල විද්‍යාව • ආපදා • කරුණු 400",
-                                color = Color(0xFF6EE7B7),
-                                fontSize = 10.5.sp
-                            )
+                                Spacer(modifier = Modifier.height(12.dp))
 
-                            Spacer(modifier = Modifier.height(10.dp))
-
-                            // Grade Selector Buttons inside Green Master Hub
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                Button(
-                                    onClick = { currentGradeTab = "10" },
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = if (currentGradeTab == "10") Color(0xFF10B981) else Color(0xFF064E3B)
-                                    ),
-                                    shape = RoundedCornerShape(8.dp),
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .height(38.dp)
-                                ) {
-                                    Text(
-                                        text = "📖 10 ශ්‍රේණිය",
-                                        fontSize = 12.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = Color.White
-                                    )
-                                }
-                                Button(
-                                    onClick = { currentGradeTab = "11" },
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = if (currentGradeTab == "11") Color(0xFF10B981) else Color(0xFF064E3B)
-                                    ),
-                                    shape = RoundedCornerShape(8.dp),
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .height(38.dp)
-                                ) {
-                                    Text(
-                                        text = "📙 11 ශ්‍රේණිය (O/L)",
-                                        fontSize = 12.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = Color.White
-                                    )
-                                }
-                            }
-
-                            Spacer(modifier = Modifier.height(12.dp))
-
-                            // 20 Categories Grid or Category Detail View
-                            if (selectedCategoryNumber == 0) {
-                                GeographyQuickOverviewGrid(
-                                    categories = masterCategories.filter { cat ->
+                                // 20 Categories Grid or Category Detail View
+                                if (selectedCategoryNumber == 0) {
+                                    val gridScrollState = rememberScrollState()
+                                    LaunchedEffect(currentGradeTab) {
+                                        gridScrollState.scrollTo(0)
+                                    }
+                                    Box(modifier = Modifier.fillMaxSize().verticalScroll(gridScrollState)) {
+                                        GeographyQuickOverviewGrid(
+                                            categories = masterCategories.filter { cat ->
+                                                if (currentGradeTab == "10") cat.categoryNumber <= 10 else cat.categoryNumber > 10
+                                            }.ifEmpty { masterCategories },
+                                            onSelectModule = { selectedCategoryNumber = it }
+                                        )
+                                    }
+                                } else {
+                                    val filteredForGrade = masterCategories.filter { cat ->
                                         if (currentGradeTab == "10") cat.categoryNumber <= 10 else cat.categoryNumber > 10
-                                    }.ifEmpty { masterCategories },
-                                    onSelectModule = { selectedCategoryNumber = it }
-                                )
-                            } else {
-                                SubjectMaster20CategoriesDetailView(
-                                    subjectName = "භූගෝල විද්‍යාව",
-                                    categories = masterCategories,
-                                    selectedCategoryNumber = selectedCategoryNumber,
-                                    onSelectCategory = { selectedCategoryNumber = it },
-                                    modifier = Modifier.fillMaxWidth()
-                                )
+                                    }
+                                    SubjectMaster20CategoriesDetailView(
+                                        subjectName = "භූගෝල විද්‍යාව",
+                                        categories = filteredForGrade,
+                                        selectedCategoryNumber = selectedCategoryNumber,
+                                        onSelectCategory = { selectedCategoryNumber = it },
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
+                                }
                             }
                         }
                     }
-                }
-                1 -> {
-                    // Interactive Auto-Checker Workbook
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 12.dp)
-                    ) {
-                        Surface(
-                            shape = RoundedCornerShape(10.dp),
-                            color = Color(0xFF1E293B),
-                            border = BorderStroke(1.dp, Color(0xFF334155)),
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Column(modifier = Modifier.padding(12.dp)) {
-                                Text(
-                                    text = "⚡ භූගෝල විද්‍යාව ස්වයංක්‍රීය පිළිතුරු පරීක්ෂාව (Auto-Check)",
-                                    color = Color(0xFF34D399),
-                                    fontSize = 13.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Text(
-                                    text = "පිළිතුරක් තෝරාගත් වහාම 100% නිවැරදිදැයි තහවුරු කර, සවිස්තරාත්මක විවරණය සහ විභාග ඉඟි ලබා ගන්න.",
-                                    color = Color(0xFF94A3B8),
-                                    fontSize = 11.sp,
-                                    lineHeight = 15.sp
-                                )
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(10.dp))
-
+                    1 -> {
+                        // Interactive Auto-Checker Workbook
                         val filteredQuestions = autoCheckQuestions.filter { q ->
                             when (currentGradeTab) {
                                 "10" -> q.gradeLevel == GeoGradeLevel.GRADE_10 || q.gradeLevel == GeoGradeLevel.ALL
                                 else -> q.gradeLevel == GeoGradeLevel.GRADE_11 || q.gradeLevel == GeoGradeLevel.ALL
                             }
                         }
-
-                        filteredQuestions.forEach { question ->
-                            GeoAutoCheckCard(question = question)
-                            Spacer(modifier = Modifier.height(10.dp))
-                        }
-                    }
-                }
-                2 -> {
-                    // Q&A Hub & Flashcards Tab matching Screenshot 2
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 12.dp),
-                        verticalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        Surface(
-                            shape = RoundedCornerShape(12.dp),
-                            color = Color(0xFF1E293B),
-                            border = BorderStroke(1.dp, Color(0xFF7C3AED)),
-                            modifier = Modifier.fillMaxWidth()
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = 12.dp),
+                            verticalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
-                            Column(modifier = Modifier.padding(14.dp)) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Text("🎯", fontSize = 20.sp)
-                                    Spacer(modifier = Modifier.width(6.dp))
-                                    Text(
-                                        text = "භූගෝල විද්‍යාව Q&A & Flashcards Hub",
-                                        color = Color.White,
-                                        fontSize = 14.sp,
-                                        fontWeight = FontWeight.Bold
-                                    )
+                            item {
+                                Surface(
+                                    shape = RoundedCornerShape(10.dp),
+                                    color = Color(0xFF1E293B),
+                                    border = BorderStroke(1.dp, Color(0xFF334155)),
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Column(modifier = Modifier.padding(12.dp)) {
+                                        Text(
+                                            text = "⚡ භූගෝල විද්‍යාව ස්වයංක්‍රීය පිළිතුරු පරීක්ෂාව (Auto-Check)",
+                                            color = Color(0xFF34D399),
+                                            fontSize = 13.sp,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            text = "පිළිතුරක් තෝරාගත් වහාම 100% නිවැරදිදැයි තහවුරු කර, සවිස්තරාත්මක විවරණය සහ විභාග ඉඟි ලබා ගන්න.",
+                                            color = Color(0xFF94A3B8),
+                                            fontSize = 11.sp,
+                                            lineHeight = 15.sp
+                                        )
+                                    }
                                 }
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Text(
-                                    text = "10 සහ 11 ශ්‍රේණි කෙටි පිළිතුරු, රචනා ප්‍රශ්න, Daily 10 සහ මතක තබා ගැනීමේ Flashcards.",
-                                    color = Color(0xFF94A3B8),
-                                    fontSize = 11.sp
-                                )
+                            }
+                            items(filteredQuestions) { question ->
+                                GeoAutoCheckCard(question = question)
                             }
                         }
-
-                        // Geography Q&A Flashcard Cards
-                        GeoQaFlashcardSection(currentGrade = currentGradeTab)
                     }
-                }
-                3 -> {
-                    // PDF Notes & Workbook Viewer Tab matching Screenshot 2
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 12.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        Card(
-                            shape = RoundedCornerShape(12.dp),
-                            colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
-                            border = BorderStroke(1.dp, Color(0xFF059669)),
-                            modifier = Modifier.fillMaxWidth()
+                    2 -> {
+                        // Q&A Hub & Flashcards Tab matching Screenshot 2
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = 12.dp),
+                            verticalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
-                            Column(
-                                modifier = Modifier.padding(16.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Text("📄", fontSize = 32.sp)
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text(
-                                    text = "10 සහ 11 ශ්‍රේණි භූගෝල විද්‍යාව සම්පූර්ණ PDF කෙටි සටහන්",
-                                    color = Color.White,
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    textAlign = TextAlign.Center
-                                )
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Text(
-                                    text = "නිල විෂය නිර්දේශයට අදාළ සියලුම 1:50,000 සිතියම්, ප්‍රස්තාර, සටහන් සහ පින්තූර අඩංගු ගොනුව (පිටු 93).",
-                                    color = Color(0xFF94A3B8),
-                                    fontSize = 11.5.sp,
-                                    textAlign = TextAlign.Center,
-                                    lineHeight = 16.sp
-                                )
-                                Spacer(modifier = Modifier.height(12.dp))
-                                Button(
-                                    onClick = { showPdfViewerModal = true },
-                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF059669)),
-                                    shape = RoundedCornerShape(8.dp),
-                                    modifier = Modifier.fillMaxWidth().height(42.dp)
+                            item {
+                                Surface(
+                                    shape = RoundedCornerShape(12.dp),
+                                    color = Color(0xFF1E293B),
+                                    border = BorderStroke(1.dp, Color(0xFF7C3AED)),
+                                    modifier = Modifier.fillMaxWidth()
                                 ) {
-                                    Icon(Icons.Default.Visibility, contentDescription = null, tint = Color.White, modifier = Modifier.size(16.dp))
-                                    Spacer(modifier = Modifier.width(6.dp))
-                                    Text("PDF ගොනුව විවෘත කර බලන්න", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                                    Column(modifier = Modifier.padding(14.dp)) {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Text("🎯", fontSize = 20.sp)
+                                            Spacer(modifier = Modifier.width(6.dp))
+                                            Text(
+                                                text = "භූගෝල විද්‍යාව Q&A & Flashcards Hub",
+                                                color = Color.White,
+                                                fontSize = 14.sp,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                        }
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            text = "10 සහ 11 ශ්‍රේණි කෙටි පිළිතුරු, රචනා ප්‍රශ්න, Daily 10 සහ මතක තබා ගැනීමේ Flashcards.",
+                                            color = Color(0xFF94A3B8),
+                                            fontSize = 11.sp
+                                        )
+                                    }
+                                }
+                            }
+                            item {
+                                GeoQaFlashcardSection(currentGrade = currentGradeTab)
+                            }
+                        }
+                    }
+                    3 -> {
+                        // PDF Notes & Workbook Viewer Tab matching Screenshot 2
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = 12.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            item {
+                                Card(
+                                    shape = RoundedCornerShape(12.dp),
+                                    colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
+                                    border = BorderStroke(1.dp, Color(0xFF059669)),
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Column(
+                                        modifier = Modifier.padding(16.dp),
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        Text("📄", fontSize = 32.sp)
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        Text(
+                                            text = "10 සහ 11 ශ්‍රේණි භූගෝල විද්‍යාව සම්පූර්ණ PDF කෙටි සටහන්",
+                                            color = Color.White,
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            textAlign = TextAlign.Center
+                                        )
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            text = "නිල විෂය නිර්දේශයට අදාළ සියලුම 1:50,000 සිතියම්, ප්‍රස්තාර, සටහන් සහ පින්තූර අඩංගු ගොනුව (පිටු 93).",
+                                            color = Color(0xFF94A3B8),
+                                            fontSize = 11.5.sp,
+                                            textAlign = TextAlign.Center,
+                                            lineHeight = 16.sp
+                                        )
+                                        Spacer(modifier = Modifier.height(12.dp))
+                                        Button(
+                                            onClick = { showPdfViewerModal = true },
+                                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF059669)),
+                                            shape = RoundedCornerShape(8.dp),
+                                            modifier = Modifier.fillMaxWidth().height(42.dp)
+                                        ) {
+                                            Icon(Icons.Default.Visibility, contentDescription = null, tint = Color.White, modifier = Modifier.size(16.dp))
+                                            Spacer(modifier = Modifier.width(6.dp))
+                                            Text("PDF ගොනුව විවෘත කර බලන්න", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                                        }
+                                    }
                                 }
                             }
                         }

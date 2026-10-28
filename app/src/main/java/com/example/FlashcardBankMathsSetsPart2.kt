@@ -6,7 +6,7 @@ package com.example
  */
 object FlashcardBankMathsSetsPart2 {
 
-  fun getMathSet(setNum: Int, cardNum: Int): CardContentTuple? {
+  fun getMathSet(setNum: Int, cardNum: Int, grade: String): CardContentTuple? {
     val c = cardNum.coerceIn(1, 20)
     return when (setNum) {
       10 -> mathSet10[(c - 1) % mathSet10.size]

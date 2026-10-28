@@ -649,7 +649,13 @@ fun CommerceGrade10And11MasterHubDialog(
         }
 
         // SCROLLABLE CONTENT BODY (Scrollable up and down smoothly)
+        val commerceListState = androidx.compose.foundation.lazy.rememberLazyListState()
+        LaunchedEffect(selectedGradeTab, expandedSectionId) {
+          commerceListState.scrollToItem(0)
+        }
+
         LazyColumn(
+          state = commerceListState,
           modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 10.dp, vertical = 4.dp),

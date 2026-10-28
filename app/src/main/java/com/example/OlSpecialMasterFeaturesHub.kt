@@ -1,5 +1,6 @@
 package com.example
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.BorderStroke
@@ -1411,6 +1412,9 @@ fun HistoryTimelineAndMapPinningFeatureView() {
 fun GeographyTopoMapsAndRegionsFeatureView(
   onOpenCategories: (() -> Unit)? = null
 ) {
+  BackHandler {
+    // Navigate back to the previous screen or pop backstack
+  }
   val topoFeatures = remember {
     listOf(
       Triple("සමෝච්ච රේඛා (Contour Lines)", "මුහුදු මට්ටමේ සිට සමාන උසක් ඇති ස්ථාන යා කරන රේඛා වේ.", "ළඟින් ළඟින් පිහිටි විට බෑවුම අධිකයි (කඳු බෑවුම්); ඈතින් පිහිටි විට මෘදු බෑවුම්/තැනිතලා වේ."),

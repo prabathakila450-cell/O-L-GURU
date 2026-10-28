@@ -9,10 +9,10 @@ object FlashcardBankAgriSetsPart1 {
   fun getAgriSet(s: Int, c: Int, grade: String = "10"): CardContentTuple? {
     val cardNum = c.coerceIn(1, 20)
     return when (s) {
-      1 -> if (grade == "11") grade11_getSet1(cardNum) else getSet1(cardNum)
-      2 -> if (grade == "11") grade11_getSet2(cardNum) else getSet2(cardNum)
-      3 -> if (grade == "11") grade11_getSet3(cardNum) else getSet3(cardNum)
-      4 -> if (grade == "11") grade11_getSet4(cardNum) else getSet4(cardNum)
+      1 -> if (grade.contains("11")) grade11_getSet1(cardNum) else getSet1(cardNum)
+      2 -> if (grade.contains("11")) grade11_getSet2(cardNum) else getSet2(cardNum)
+      3 -> if (grade.contains("11")) grade11_getSet3(cardNum) else getSet3(cardNum)
+      4 -> if (grade.contains("11")) grade11_getSet4(cardNum) else getSet4(cardNum)
       5 -> getSet5(cardNum)
       6 -> getSet6(cardNum)
       7 -> getSet7(cardNum)

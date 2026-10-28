@@ -34,8 +34,8 @@ object FlashcardDynamicContentProvider {
     ) {
       val card = when {
         s in 1..4 -> FlashcardSetsScienceMaths.getScienceCard(s, c, grade, theme)
-        s in 5..10 -> FlashcardBankScienceSets.getScienceSet(s, c)
-        else -> FlashcardBankScienceSetsPart2.getScienceSet(s, c)
+        s in 5..10 -> FlashcardBankScienceSets.getScienceSet(s, c, grade)
+        else -> FlashcardBankScienceSetsPart2.getScienceSet(s, c, grade)
       }
       if (card != null) return card
     }
@@ -44,8 +44,8 @@ object FlashcardDynamicContentProvider {
     if (subject.contains("ගණිතය") || subject.contains("ගණිත")) {
       val card = when {
         s in 1..4 -> FlashcardSetsScienceMaths.getMathCard(s, c, grade, theme)
-        s in 5..9 -> FlashcardBankMathsSets.getMathSet(s, c)
-        else -> FlashcardBankMathsSetsPart2.getMathSet(s, c)
+        s in 5..9 -> FlashcardBankMathsSets.getMathSet(s, c, grade)
+        else -> FlashcardBankMathsSetsPart2.getMathSet(s, c, grade)
       }
       if (card != null) return card
     }
@@ -54,8 +54,8 @@ object FlashcardDynamicContentProvider {
     if (subject.contains("ඉතිහාසය") || subject.contains("ඉතිහාස")) {
       val card = when {
         s in 1..4 -> FlashcardSetsHistorySocial.getHistoryCard(s, c, grade, theme)
-        s in 5..8 -> FlashcardBankHistorySetsPart1.getHistorySet(s, c)
-        else -> FlashcardBankHistorySetsPart2.getHistorySet(s, c)
+        s in 5..8 -> FlashcardBankHistorySetsPart1.getHistorySet(s, c, grade)
+        else -> FlashcardBankHistorySetsPart2.getHistorySet(s, c, grade)
       }
       if (card != null) return card
     }

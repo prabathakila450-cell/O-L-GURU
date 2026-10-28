@@ -46,8 +46,9 @@ fun SubjectMaster20CategoriesDetailView(
 
   // Filter categories to display
   val displayedCategories = remember(selectedCategoryNumber, categories) {
-    if (selectedCategoryNumber in 1..categories.size) {
-      listOf(categories[selectedCategoryNumber - 1])
+    val specific = categories.find { it.categoryNumber == selectedCategoryNumber }
+    if (specific != null) {
+      listOf(specific)
     } else {
       categories
     }
@@ -55,7 +56,7 @@ fun SubjectMaster20CategoriesDetailView(
 
   val listState = androidx.compose.foundation.lazy.rememberLazyListState()
 
-  LaunchedEffect(selectedCategoryNumber) {
+  LaunchedEffect(selectedCategoryNumber, categories) {
     listState.scrollToItem(0)
   }
 

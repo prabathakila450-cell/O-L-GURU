@@ -6,7 +6,7 @@ package com.example
  */
 object FlashcardBankHistorySetsPart2 {
 
-  fun getHistorySet(setNum: Int, cardNum: Int): CardContentTuple? {
+  fun getHistorySet(setNum: Int, cardNum: Int, grade: String): CardContentTuple? {
     val c = cardNum.coerceIn(1, 20)
     return when (setNum) {
       9 -> historySet9[(c - 1) % historySet9.size]
