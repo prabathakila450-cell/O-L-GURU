@@ -10,17 +10,17 @@ object FlashcardSetsHistorySocial {
     val c = cardNum.coerceIn(1, 20)
     return when (grade) {
       "11" -> when (setNum) {
-        1 -> FlashcardBankHistorySetsPart2.getHistorySet(12, c) ?: getHistorySet12(c) // බ්‍රිතාන්‍ය පාලනය & 1815 උඩරට ගිවිසුම
-        2 -> FlashcardBankHistorySetsPart2.getHistorySet(13, c) ?: getHistorySet13(c) // 1818 ඌව වෙල්ලස්ස & 1848 මාතලේ නිදහස් අරගල
-        3 -> FlashcardBankHistorySetsPart2.getHistorySet(14, c) ?: getHistorySet14(c) // ආණ්ඩුක්‍රම ප්‍රතිසංස්කරණ & 1948 නිදහස
-        4 -> FlashcardBankHistorySetsPart2.getHistorySet(17, c) ?: getHistorySet15(c) // 19 වන සියවසේ ජාතික, ආගමික හා සාහිත්‍ය පුනරුදය
+        1 -> FlashcardBankHistorySetsPart2.getHistorySet(12, c, "11") ?: getHistorySet12(c) // බ්‍රිතාන්‍ය පාලනය & 1815 උඩරට ගිවිසුම
+        2 -> FlashcardBankHistorySetsPart2.getHistorySet(13, c, "11") ?: getHistorySet13(c) // 1818 ඌව වෙල්ලස්ස & 1848 මාතලේ නිදහස් අරගල
+        3 -> FlashcardBankHistorySetsPart2.getHistorySet(14, c, "11") ?: getHistorySet14(c) // ආණ්ඩුක්‍රම ප්‍රතිසංස්කරණ & 1948 නිදහස
+        4 -> FlashcardBankHistorySetsPart2.getHistorySet(17, c, "11") ?: getHistorySet15(c) // 19 වන සියවසේ ජාතික, ආගමික හා සාහිත්‍ය පුනරුදය
         else -> getHistorySet1(c)
       }
       else -> when (setNum) { // Grade 10
         1 -> getHistorySet1(c) // ඓතිහාසික මූලාශ්‍ර සහ ප්‍රාග් ඓතිහාසික යුගය
-        2 -> FlashcardBankHistorySetsPart1.getHistorySet(2, c) ?: getHistorySet2(c) // අනුරාධපුර යුගයේ ආරම්භය & පණ්ඩුකාභය රජු
-        3 -> FlashcardBankHistorySetsPart1.getHistorySet(3, c) ?: getHistorySet3(c) // මහින්දාගමනය & දේවානම්පියතිස්ස රජු
-        4 -> FlashcardBankHistorySetsPart1.getHistorySet(4, c) ?: getHistorySet4(c) // දුටුගැමුණු රජු & එක්සේසත් කිරීම
+        2 -> FlashcardBankHistorySetsPart1.getHistorySet(2, c, "10") ?: getHistorySet2(c) // අනුරාධපුර යුගයේ ආරම්භය & පණ්ඩුකාභය රජු
+        3 -> FlashcardBankHistorySetsPart1.getHistorySet(3, c, "10") ?: getHistorySet3(c) // මහින්දාගමනය & දේවානම්පියතිස්ස රජු
+        4 -> FlashcardBankHistorySetsPart1.getHistorySet(4, c, "10") ?: getHistorySet4(c) // දුටුගැමුණු රජු & එක්සේසත් කිරීම
         else -> getHistorySet1(c)
       }
     }
