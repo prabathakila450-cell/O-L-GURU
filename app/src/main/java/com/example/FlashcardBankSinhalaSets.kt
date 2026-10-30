@@ -10,56 +10,16 @@ object FlashcardBankSinhalaSets {
   fun getCard(setNum: Int, cardNum: Int, grade: String): CardContentTuple? {
     val c = cardNum.coerceIn(1, 20)
     return when (setNum) {
-      1 -> when(grade) {
-        "10" -> set1_Grade10[(c-1)%set1_Grade10.size]
-        "11" -> set1_Grade11[(c-1)%set1_Grade11.size]
-        else -> set1_Grade9[(c-1)%set1_Grade9.size]
-      }
-      2 -> when(grade) {
-        "10" -> set2_Grade10[(c-1)%set2_Grade10.size]
-        "11" -> set2_Grade11[(c-1)%set2_Grade11.size]
-        else -> set2[(c-1)%set2.size]
-      }
-      3 -> when(grade) {
-        "10" -> set3_Grade10[(c-1)%set3_Grade10.size]
-        "11" -> set3_Grade11[(c-1)%set3_Grade11.size]
-        else -> set3[(c-1)%set3.size]
-      }
-      4 -> when(grade) {
-        "10" -> set4_Grade10[(c-1)%set4_Grade10.size]
-        "11" -> set4_Grade11[(c-1)%set4_Grade11.size]
-        else -> set4[(c-1)%set4.size]
-      }
-      5 -> when(grade) {
-        "11" -> set5_Grade11[(c-1)%set5_Grade11.size]
-        "10" -> set5_Grade10[(c-1)%set5_Grade10.size]
-        else -> set5[(c-1)%set5.size]
-      }
-      6 -> when(grade) {
-        "11" -> set6_Grade11[(c-1)%set6_Grade11.size]
-        "10" -> set6_Grade10[(c-1)%set6_Grade10.size]
-        else -> set6[(c-1)%set6.size]
-      }
-      7 -> when(grade) {
-        "11" -> set7_Grade11[(c-1)%set7_Grade11.size]
-        "10" -> set7_Grade10[(c-1)%set7_Grade10.size]
-        else -> set7[(c-1)%set7.size]
-      }
-      8 -> when(grade) {
-        "11" -> set8_Grade11[(c-1)%set8_Grade11.size]
-        "10" -> set8_Grade10[(c-1)%set8_Grade10.size]
-        else -> set8[(c-1)%set8.size]
-      }
-      9 -> when(grade) {
-        "11" -> set9_Grade11[(c-1)%set9_Grade11.size]
-        "10" -> set9_Grade10[(c-1)%set9_Grade10.size]
-        else -> set9[(c-1)%set9.size]
-      }
-      10 -> when(grade) {
-        "11" -> set10_Grade11[(c-1)%set10_Grade11.size]
-        "10" -> set10_Grade10[(c-1)%set10_Grade10.size]
-        else -> set10[(c-1)%set10.size]
-      }
+      1 -> if (grade == "11") set1_Grade11[(c - 1) % set1_Grade11.size] else set1_Grade10[(c - 1) % set1_Grade10.size]
+      2 -> if (grade == "11") set2_Grade11[(c - 1) % set2_Grade11.size] else set2_Grade10[(c - 1) % set2_Grade10.size]
+      3 -> if (grade == "11") set3_Grade11[(c - 1) % set3_Grade11.size] else set3_Grade10[(c - 1) % set3_Grade10.size]
+      4 -> if (grade == "11") set4_Grade11[(c - 1) % set4_Grade11.size] else set4_Grade10[(c - 1) % set4_Grade10.size]
+      5 -> if (grade == "11") set5_Grade11[(c - 1) % set5_Grade11.size] else set5_Grade10[(c - 1) % set5_Grade10.size]
+      6 -> if (grade == "11") set6_Grade11[(c - 1) % set6_Grade11.size] else set6_Grade10[(c - 1) % set6_Grade10.size]
+      7 -> if (grade == "11") set7_Grade11[(c - 1) % set7_Grade11.size] else set7_Grade10[(c - 1) % set7_Grade10.size]
+      8 -> if (grade == "11") set8_Grade11[(c - 1) % set8_Grade11.size] else set8_Grade10[(c - 1) % set8_Grade10.size]
+      9 -> if (grade == "11") set9_Grade11[(c - 1) % set9_Grade11.size] else set9_Grade10[(c - 1) % set9_Grade10.size]
+      10 -> if (grade == "11") set10_Grade11[(c - 1) % set10_Grade11.size] else set10_Grade10[(c - 1) % set10_Grade10.size]
       else -> FlashcardBankSinhalaSetsPart2.getCard(setNum, cardNum, grade)
     }
   }

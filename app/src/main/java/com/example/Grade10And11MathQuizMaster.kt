@@ -135,11 +135,12 @@ object MathQuizEngine {
     return when (qIndex) {
       0 -> {
         // Topic 1: දර්ශක (Indices Laws)
-        val type = k % 4
+        val type = (k - 1) % 4
+        val idx = (k - 1) / 4 // 0..19
         when (type) {
           0 -> {
-            val p = 2 + (k % 7)
-            val q = 3 + ((k * 3) % 8)
+            val p = 2 + idx
+            val q = 3 + (idx % 4)
             val sum = p + q
             buildMcq(
               id = id, grade = 10, set = k, qNum = qNum,
@@ -151,8 +152,8 @@ object MathQuizEngine {
             )
           }
           1 -> {
-            val diff = 2 + (k % 6)
-            val n = 2 + ((k * 2) % 5)
+            val n = 2 + (idx % 5)
+            val diff = 2 + idx
             val m = n + diff
             buildMcq(
               id = id, grade = 10, set = k, qNum = qNum,
@@ -164,8 +165,8 @@ object MathQuizEngine {
             )
           }
           2 -> {
-            val a = 2 + (k % 5)
-            val b = 2 + ((k * 3) % 4)
+            val a = 2 + idx
+            val b = 2 + (idx % 4)
             val prod = a * b
             buildMcq(
               id = id, grade = 10, set = k, qNum = qNum,
@@ -177,20 +178,16 @@ object MathQuizEngine {
             )
           }
           else -> {
-            val baseList = listOf(4, 8, 16, 25, 27, 32, 64, 81, 100, 125)
-            val base = baseList[(k * 7) % baseList.size]
-            val (expr, ans) = when (base) {
-              4 -> "4^(1/2)" to "2"
-              8 -> "8^(1/3)" to "2"
-              16 -> "16^(1/4)" to "2"
-              25 -> "25^(1/2)" to "5"
-              27 -> "27^(1/3)" to "3"
-              32 -> "32^(1/5)" to "2"
-              64 -> "64^(1/3)" to "4"
-              81 -> "81^(1/4)" to "3"
-              100 -> "100^(1/2)" to "10"
-              else -> "125^(1/3)" to "5"
-            }
+            val baseList = listOf(
+              "4^(1/2)" to "2", "8^(1/3)" to "2", "16^(1/4)" to "2", "25^(1/2)" to "5",
+              "27^(1/3)" to "3", "32^(1/5)" to "2", "64^(1/3)" to "4", "81^(1/4)" to "3",
+              "100^(1/2)" to "10", "125^(1/3)" to "5", "16^(1/2)" to "4", "36^(1/2)" to "6",
+              "49^(1/2)" to "7", "64^(1/2)" to "8", "81^(1/2)" to "9", "121^(1/2)" to "11",
+              "144^(1/2)" to "12", "216^(1/3)" to "6", "343^(1/3)" to "7", "512^(1/3)" to "8"
+            )
+            val pair = baseList[idx.coerceIn(0, baseList.size - 1)]
+            val expr = pair.first
+            val ans = pair.second
             buildMcq(
               id = id, grade = 10, set = k, qNum = qNum,
               topic = "දර්ශක හා නීති",
@@ -204,20 +201,22 @@ object MathQuizEngine {
       }
       1 -> {
         // Topic 2: ලඝුගණක මූලික නීති (Logarithms)
-        val type = k % 4
+        val type = (k - 1) % 4
+        val idx = (k - 1) / 4 // 0..19
         when (type) {
           0 -> {
-            val powers = listOf(
-              2 to listOf(4 to 2, 8 to 3, 16 to 4, 32 to 5, 64 to 6),
-              3 to listOf(9 to 2, 27 to 3, 81 to 4, 243 to 5),
-              10 to listOf(100 to 2, 1000 to 3, 10000 to 4, 100000 to 5)
+            val list = listOf(
+              Triple("₂", 4, 2), Triple("₂", 8, 3), Triple("₂", 16, 4), Triple("₂", 32, 5),
+              Triple("₂", 64, 6), Triple("₂", 128, 7), Triple("₂", 256, 8), Triple("₂", 512, 9),
+              Triple("₃", 9, 2), Triple("₃", 27, 3), Triple("₃", 81, 4), Triple("₃", 243, 5),
+              Triple("₃", 729, 6), Triple("₅", 25, 2), Triple("₅", 125, 3), Triple("₅", 625, 4),
+              Triple("₁₀", 100, 2), Triple("₁₀", 1000, 3), Triple("₁₀", 10000, 4), Triple("₁₀", 100000, 5)
             )
-            val baseGroup = powers[k % powers.size]
-            val pair = baseGroup.second[(k / 3) % baseGroup.second.size]
-            val b = baseGroup.first
-            val v = pair.first
-            val p = pair.second
-            val baseSub = if (b == 10) "₁₀" else if (b == 2) "₂" else "₃"
+            val item = list[idx.coerceIn(0, list.size - 1)]
+            val baseSub = item.first
+            val v = item.second
+            val p = item.third
+            val b = if (baseSub == "₁₀") 10 else if (baseSub == "₂") 2 else if (baseSub == "₃") 3 else 5
             buildMcq(
               id = id, grade = 10, set = k, qNum = qNum,
               topic = "ලඝුගණක මූලික න්‍යාය",
@@ -228,8 +227,12 @@ object MathQuizEngine {
             )
           }
           1 -> {
-            val pairs = listOf(20 to 5, 25 to 4, 50 to 2, 250 to 4, 200 to 5, 125 to 8, 500 to 2)
-            val p = pairs[k % pairs.size]
+            val pairs = listOf(
+              20 to 5, 25 to 4, 50 to 2, 250 to 4, 200 to 5, 125 to 8, 500 to 2,
+              40 to 25, 80 to 125, 4 to 250, 2 to 500, 8 to 125, 5 to 200,
+              10 to 10, 50 to 20, 25 to 40, 100 to 10, 10 to 100, 2 to 50, 4 to 25
+            )
+            val p = pairs[idx.coerceIn(0, pairs.size - 1)]
             val prod = p.first * p.second
             val ans = if (prod == 100) 2 else 3
             buildMcq(
@@ -242,24 +245,35 @@ object MathQuizEngine {
             )
           }
           2 -> {
-            val pairs = listOf(48 to 3, 80 to 5, 96 to 3, 32 to 2, 112 to 7)
-            val p = pairs[k % pairs.size]
-            val div = p.first / p.second
-            val ans = when (div) { 16 -> 4; 32 -> 5; else -> 4 }
+            val pairs = listOf(
+              Triple(48, 3, 4), Triple(80, 5, 4), Triple(96, 3, 5), Triple(32, 2, 4), Triple(112, 7, 4),
+              Triple(64, 4, 4), Triple(96, 6, 4), Triple(128, 4, 5), Triple(160, 5, 5), Triple(192, 6, 5),
+              Triple(128, 2, 6), Triple(256, 4, 6), Triple(512, 8, 6), Triple(64, 2, 5), Triple(224, 7, 5),
+              Triple(256, 8, 5), Triple(384, 6, 6), Triple(512, 4, 7), Triple(1024, 8, 7), Triple(256, 2, 7)
+            )
+            val item = pairs[idx.coerceIn(0, pairs.size - 1)]
+            val div = item.first / item.second
+            val ans = item.third
             buildMcq(
               id = id, grade = 10, set = k, qNum = qNum,
               topic = "ලඝුගණක මූලික න්‍යාය",
-              question = "log₂(${p.first}) - log₂(${p.second}) හි අගය කීයද?",
+              question = "log₂(${item.first}) - log₂(${item.second}) හි අගය කීයද?",
               correctAnswer = "$ans",
-              distractors = listOf("${ans + 1}", "${ans - 1}", "${p.first - p.second}"),
-              explanation = "ලඝුගණක අඩු කිරීමේ නීතිය: log a - log b = log(a/b)\nlog₂(${p.first}) - log₂(${p.second}) = log₂(${p.first}/${p.second}) = log₂($div) = $ans වේ."
+              distractors = listOf("${ans + 1}", "${ans - 1}", "${item.first - item.second}"),
+              explanation = "ලඝුගණක අඩු කිරීමේ නීතිය: log a - log b = log(a/b)\nlog₂(${item.first}) - log₂(${item.second}) = log₂(${item.first}/${item.second}) = log₂($div) = $ans වේ."
             )
           }
           else -> {
-            val valA = 2 + (k % 4)
-            val valY = 2 + ((k * 2) % 3)
-            var pVal = 1
-            for (i in 0 until valY) pVal *= valA
+            val equations = listOf(
+              Triple(2, 2, 4), Triple(2, 3, 8), Triple(2, 4, 16), Triple(2, 5, 32), Triple(2, 6, 64),
+              Triple(2, 7, 128), Triple(2, 8, 256), Triple(3, 2, 9), Triple(3, 3, 27), Triple(3, 4, 81),
+              Triple(3, 5, 243), Triple(5, 2, 25), Triple(5, 3, 125), Triple(5, 4, 625), Triple(10, 2, 100),
+              Triple(10, 3, 1000), Triple(10, 4, 10000), Triple(4, 2, 16), Triple(4, 3, 64), Triple(6, 2, 36)
+            )
+            val item = equations[idx.coerceIn(0, equations.size - 1)]
+            val valA = item.first
+            val valY = item.second
+            val pVal = item.third
             buildMcq(
               id = id, grade = 10, set = k, qNum = qNum,
               topic = "ලඝුගණක මූලික න්‍යාය",
@@ -273,97 +287,135 @@ object MathQuizEngine {
       }
       2 -> {
         // Topic 3: භාග සුළු කිරීම (Fractions)
-        val mode = k % 3
-        if (mode == 0) {
-          val whole = 2 + (k % 7)
-          val den = 3 + ((k * 2) % 5)
-          val num = 1 + (k % (den - 1))
-          val totalNum = whole * den + num
-          buildMcq(
-            id = id, grade = 10, set = k, qNum = qNum,
-            topic = "භාග",
-            question = "$whole සහ $num/$den මිශ්‍ර භාගය විෂම භාගයක් ලෙස ලියන්න.",
-            correctAnswer = "$totalNum/$den",
-            distractors = listOf("${totalNum + 1}/$den", "${whole * num}/$den", "$totalNum/${den + 1}"),
-            explanation = "මිශ්‍ර භාගයක් විෂම භාගයක් කිරීම: ($whole × $den + $num) / $den = $totalNum/$den වේ."
-          )
-        } else if (mode == 1) {
-          val d = 4 + (k % 5)
-          val n1 = 1 + (k % 3)
-          val n2 = 1 + ((k * 2) % 2)
-          val sumN = n1 + n2
-          buildMcq(
-            id = id, grade = 10, set = k, qNum = qNum,
-            topic = "භාග",
-            question = "$n1/$d + $n2/$d හි අගය සරල කරන්න.",
-            correctAnswer = "$sumN/$d",
-            distractors = listOf("$sumN/${d * 2}", "${n1 * n2}/$d", "${sumN + 1}/$d"),
-            explanation = "හරයන් සමාන විට ලවයන් සෘජුව එකතු වේ: $n1/$d + $n2/$d = ($n1 + $n2)/$d = $sumN/$d වේ."
-          )
-        } else {
-          val a = 1 + (k % 3)
-          val b = 3 + (k % 3)
-          val c = 2 + (k % 2)
-          val d = 5 + (k % 3)
-          val top = a * c
-          val bot = b * d
-          buildMcq(
-            id = id, grade = 10, set = k, qNum = qNum,
-            topic = "භාග",
-            question = "$a/$b × $c/$d ගුණිතයේ අගය සොයන්න.",
-            correctAnswer = "$top/$bot",
-            distractors = listOf("${a + c}/${b + d}", "$top/${bot + 1}", "${top + 1}/$bot"),
-            explanation = "භාග ගුණ කිරීමේදී ලවය ලවයෙන්ද, හරය හරයෙන්ද ගුණ වේ: ($a × $c) / ($b × $d) = $top/$bot වේ."
-          )
+        val mode = (k - 1) % 4
+        val idx = (k - 1) / 4 // 0..19
+        when (mode) {
+          0 -> {
+            val whole = 1 + idx
+            val den = 3 + (idx % 5)
+            val num = 1 + (idx % (den - 1)).coerceAtLeast(1)
+            val totalNum = whole * den + num
+            buildMcq(
+              id = id, grade = 10, set = k, qNum = qNum,
+              topic = "භාග",
+              question = "$whole සහ $num/$den මිශ්‍ර භාගය විෂම භාගයක් ලෙස ලියන්න.",
+              correctAnswer = "$totalNum/$den",
+              distractors = listOf("${totalNum + 1}/$den", "${whole * num}/$den", "$totalNum/${den + 1}"),
+              explanation = "මිශ්‍ර භාගයක් විෂම භාගයක් කිරීම: ($whole × $den + $num) / $den = $totalNum/$den වේ."
+            )
+          }
+          1 -> {
+            val d = 6 + idx
+            val n1 = 1 + (idx % 3)
+            val n2 = 1 + ((idx + 1) % 2)
+            val sumN = n1 + n2
+            buildMcq(
+              id = id, grade = 10, set = k, qNum = qNum,
+              topic = "භාග",
+              question = "$n1/$d + $n2/$d හි අගය සරල කරන්න.",
+              correctAnswer = "$sumN/$d",
+              distractors = listOf("$sumN/${d * 2}", "${n1 * n2}/$d", "${sumN + 1}/$d"),
+              explanation = "හරයන් සමාන විට ලවයන් සෘජුව එකතු වේ: $n1/$d + $n2/$d = ($n1 + $n2)/$d = $sumN/$d වේ."
+            )
+          }
+          2 -> {
+            val b = 5 + idx
+            val a = 1 + (idx % 3)
+            val c = 2 + (idx % 2)
+            val d = 7 + (idx % 4)
+            val top = a * c
+            val bot = b * d
+            buildMcq(
+              id = id, grade = 10, set = k, qNum = qNum,
+              topic = "භාග",
+              question = "$a/$b × $c/$d ගුණිතයේ අගය සොයන්න.",
+              correctAnswer = "$top/$bot",
+              distractors = listOf("${a + c}/${b + d}", "$top/${bot + 1}", "${top + 1}/$bot"),
+              explanation = "භාග ගුණ කිරීමේදී ලවය ලවයෙන්ද, හරය හරයෙන්ද ගුණ වේ: ($a × $c) / ($b × $d) = $top/$bot වේ."
+            )
+          }
+          else -> {
+            val d = 7 + idx
+            val n1 = 3 + (idx % 3)
+            val n2 = 1 + (idx % 2)
+            val diffN = n1 - n2
+            buildMcq(
+              id = id, grade = 10, set = k, qNum = qNum,
+              topic = "භාග",
+              question = "$n1/$d - $n2/$d හි අගය සරල කරන්න.",
+              correctAnswer = "$diffN/$d",
+              distractors = listOf("$diffN/${d * 2}", "${n1 + n2}/$d", "${diffN + 1}/$d"),
+              explanation = "හරයන් සමාන විට ලවයන් අඩු වේ: ($n1 - $n2)/$d = $diffN/$d වේ."
+            )
+          }
         }
       }
       3 -> {
         // Topic 4: ප්‍රතිශත සහ ලාභය/අලාභය (Percentages & Profit/Loss)
-        val mode = k % 3
-        if (mode == 0) {
-          val cp = 400 + (k * 150)
-          val rate = 10 + (k % 6) * 5
-          val profit = (cp * rate) / 100
-          val sp = cp + profit
-          buildMcq(
-            id = id, grade = 10, set = k, qNum = qNum,
-            topic = "ප්‍රතිශත හා ලාභ/අලාභ",
-            question = "රු. $cp කට මිලදී ගත් භාණ්ඩයක් $rate% ක ලාභයක් සහිතව විකිණූ විට විකුණුම් මිල කීයද?",
-            correctAnswer = "රු. $sp",
-            distractors = listOf("රු. ${sp - profit / 2}", "රු. ${sp + profit}", "රු. $cp"),
-            explanation = "ලාභය = රු. $cp × $rate / 100 = රු. $profit.\nවිකුණුම් මිල = ගැනුම් මිල + ලාභය = $cp + $profit = රු. $sp වේ."
-          )
-        } else if (mode == 1) {
-          val cp = 600 + (k * 120)
-          val rate = 5 + (k % 4) * 5
-          val loss = (cp * rate) / 100
-          val sp = cp - loss
-          buildMcq(
-            id = id, grade = 10, set = k, qNum = qNum,
-            topic = "ප්‍රතිශත හා ලාභ/අලාභ",
-            question = "රු. $cp කට ගත් භාණ්ඩයක් $rate% ක අලාභයක් සහිතව විකිණූ විට ලැබෙන විකුණුම් මිල කීයද?",
-            correctAnswer = "රු. $sp",
-            distractors = listOf("රු. ${sp + loss}", "රු. ${cp + loss}", "රු. ${sp - 50}"),
-            explanation = "අලාභය = රු. $cp × $rate / 100 = රු. $loss.\nවිකුණුම් මිල = ගැනුම් මිල - අලාභය = $cp - $loss = රු. $sp වේ."
-          )
-        } else {
-          val marked = 1000 + (k * 200)
-          val discRate = 5 + (k % 5) * 5
-          val disc = (marked * discRate) / 100
-          val sp = marked - disc
-          buildMcq(
-            id = id, grade = 10, set = k, qNum = qNum,
-            topic = "ප්‍රතිශත හා ලාභ/අලාභ",
-            question = "ලකුණු කළ මිල රු. $marked වූ උපකරණයකට $discRate% ක වට්ටමක් ලබා දෙන්නේ නම්, ගෙවිය යුතු මුදල කීයද?",
-            correctAnswer = "රු. $sp",
-            distractors = listOf("රු. $disc", "රු. ${sp + disc / 2}", "රු. ${marked + disc}"),
-            explanation = "වට්ටම = රු. $marked × $discRate / 100 = රු. $disc.\nගෙවිය යුතු මිල = $marked - $disc = රු. $sp වේ."
-          )
+        val mode = (k - 1) % 4
+        val idx = (k - 1) / 4 // 0..19
+        when (mode) {
+          0 -> {
+            val cp = 400 + idx * 100
+            val rate = 10 + (idx % 5) * 5
+            val profit = (cp * rate) / 100
+            val sp = cp + profit
+            buildMcq(
+              id = id, grade = 10, set = k, qNum = qNum,
+              topic = "ප්‍රතිශත හා ලාභ/අලාභ",
+              question = "රු. $cp කට මිලදී ගත් භාණ්ඩයක් $rate% ක ලාභයක් සහිතව විකිණූ විට විකුණුම් මිල කීයද?",
+              correctAnswer = "රු. $sp",
+              distractors = listOf("රු. ${sp - profit / 2}", "රු. ${sp + profit}", "රු. $cp"),
+              explanation = "ලාභය = රු. $cp × $rate / 100 = රු. $profit.\nවිකුණුම් මිල = ගැනුම් මිල + ලාභය = $cp + $profit = රු. $sp වේ."
+            )
+          }
+          1 -> {
+            val cp = 450 + idx * 100
+            val rate = 5 + (idx % 4) * 5
+            val loss = (cp * rate) / 100
+            val sp = cp - loss
+            buildMcq(
+              id = id, grade = 10, set = k, qNum = qNum,
+              topic = "ප්‍රතිශත හා ලාභ/අලාභ",
+              question = "රු. $cp කට ගත් භාණ්ඩයක් $rate% ක අලාභයක් සහිතව විකිණූ විට ලැබෙන විකුණුම් මිල කීයද?",
+              correctAnswer = "රු. $sp",
+              distractors = listOf("රු. ${sp + loss}", "රු. ${cp + loss}", "රු. ${sp - 50}"),
+              explanation = "අලාභය = රු. $cp × $rate / 100 = රු. $loss.\nවිකුණුම් මිල = ගැනුම් මිල - අලාභය = $cp - $loss = රු. $sp වේ."
+            )
+          }
+          2 -> {
+            val marked = 1000 + idx * 200
+            val discRate = 5 + (idx % 5) * 5
+            val disc = (marked * discRate) / 100
+            val sp = marked - disc
+            buildMcq(
+              id = id, grade = 10, set = k, qNum = qNum,
+              topic = "ප්‍රතිශත හා ලාභ/අලාභ",
+              question = "ලකුණු කළ මිල රු. $marked වූ උපකරණයකට $discRate% ක වට්ටමක් ලබා දෙන්නේ නම්, ගෙවිය යුතු මුදල කීයද?",
+              correctAnswer = "රු. $sp",
+              distractors = listOf("රු. $disc", "රු. ${sp + disc / 2}", "රු. ${marked + disc}"),
+              explanation = "වට්ටම = රු. $marked × $discRate / 100 = රු. $disc.\nගෙවිය යුතු මිල = $marked - $disc = රු. $sp වේ."
+            )
+          }
+          else -> {
+            val amount = 1200 + idx * 250
+            val vatRate = 8 + (idx % 4) * 2
+            val vat = (amount * vatRate) / 100
+            val total = amount + vat
+            buildMcq(
+              id = id, grade = 10, set = k, qNum = qNum,
+              topic = "ප්‍රතිශත හා ලාභ/අලාභ",
+              question = "වටිනාකම රු. $amount වන සේවාවක් සඳහා $vatRate% ක එකතු කළ අගය මත බද්දක් (VAT) අය කරන්නේ නම්, ගෙවිය යුතු මුළු මුදල කීයද?",
+              correctAnswer = "රු. $total",
+              distractors = listOf("රු. $vat", "රු. ${total + 100}", "රු. $amount"),
+              explanation = "VAT බද්ද = රු. $amount × $vatRate / 100 = රු. $vat.\nගෙවිය යුතු මුළු මුදල = රු. $amount + රු. $vat = රු. $total වේ."
+            )
+          }
         }
       }
       4 -> {
         // Topic 5: සරල පොලිය (Simple Interest)
-        val p = 12000 + (k * 1500)
+        val p = 10000 + k * 1000
         val r = 5 + (k % 8)
         val t = 1 + (k % 3)
         val interest = (p * r * t) / 100
@@ -391,118 +443,183 @@ object MathQuizEngine {
       }
       5 -> {
         // Topic 6: වීජීය ප්‍රකාශන ප්‍රසාරණය (Expansion)
-        val mode = k % 3
-        if (mode == 0) {
-          val a = 2 + (k % 11)
-          val twoA = 2 * a
-          val aSq = a * a
-          buildMcq(
-            id = id, grade = 10, set = k, qNum = qNum,
-            topic = "වීජීය ප්‍රකාශන ප්‍රසාරණය",
-            question = "(x + $a)² ප්‍රසාරණය කළ විට ලැබෙන ප්‍රකාශනය කුමක්ද?",
-            correctAnswer = "x² + ${twoA}x + $aSq",
-            distractors = listOf("x² + ${a}x + $aSq", "x² + $aSq", "x² + ${twoA}x + $a"),
-            explanation = "(a + b)² = a² + 2ab + b² අනුව:\n(x + $a)² = x² + 2(x)($a) + $a² = x² + ${twoA}x + $aSq වේ."
-          )
-        } else if (mode == 1) {
-          val b = 2 + ((k * 2) % 9)
-          val twoB = 2 * b
-          val bSq = b * b
-          buildMcq(
-            id = id, grade = 10, set = k, qNum = qNum,
-            topic = "වීජීය ප්‍රකාශන ප්‍රසාරණය",
-            question = "(x - $b)² ප්‍රසාරණය කළ විට ලැබෙන පිළිතුර කුමක්ද?",
-            correctAnswer = "x² - ${twoB}x + $bSq",
-            distractors = listOf("x² - ${twoB}x - $bSq", "x² - ${b}x + $bSq", "x² + ${twoB}x + $bSq"),
-            explanation = "(a - b)² = a² - 2ab + b² අනුව:\n(x - $b)² = x² - 2(x)($b) + $b² = x² - ${twoB}x + $bSq වේ."
-          )
-        } else {
-          val m = 1 + (k % 5)
-          val n = 2 + ((k * 3) % 6)
-          val sum = m + n
-          val prod = m * n
-          buildMcq(
-            id = id, grade = 10, set = k, qNum = qNum,
-            topic = "වීජීය ප්‍රකාශන ප්‍රසාරණය",
-            question = "(x + $m)(x + $n) ප්‍රසාරණය කර සරල කරන්න.",
-            correctAnswer = "x² + ${sum}x + $prod",
-            distractors = listOf("x² + ${prod}x + $sum", "x² + ${sum}x - $prod", "x² + $prod"),
-            explanation = "(x + a)(x + b) = x² + (a + b)x + ab අනුව:\n(x + $m)(x + $n) = x² + ($m + $n)x + ($m × $n) = x² + ${sum}x + $prod වේ."
-          )
+        val mode = (k - 1) % 4
+        val idx = (k - 1) / 4 // 0..19
+        when (mode) {
+          0 -> {
+            val a = 2 + idx
+            val twoA = 2 * a
+            val aSq = a * a
+            buildMcq(
+              id = id, grade = 10, set = k, qNum = qNum,
+              topic = "වීජීය ප්‍රකාශන ප්‍රසාරණය",
+              question = "(x + $a)² ප්‍රසාරණය කළ විට ලැබෙන ප්‍රකාශනය කුමක්ද?",
+              correctAnswer = "x² + ${twoA}x + $aSq",
+              distractors = listOf("x² + ${a}x + $aSq", "x² + $aSq", "x² + ${twoA}x + $a"),
+              explanation = "(a + b)² = a² + 2ab + b² අනුව:\n(x + $a)² = x² + 2(x)($a) + $a² = x² + ${twoA}x + $aSq වේ."
+            )
+          }
+          1 -> {
+            val b = 2 + idx
+            val twoB = 2 * b
+            val bSq = b * b
+            buildMcq(
+              id = id, grade = 10, set = k, qNum = qNum,
+              topic = "වීජීය ප්‍රකාශන ප්‍රසාරණය",
+              question = "(x - $b)² ප්‍රසාරණය කළ විට ලැබෙන පිළිතුර කුමක්ද?",
+              correctAnswer = "x² - ${twoB}x + $bSq",
+              distractors = listOf("x² - ${twoB}x - $bSq", "x² - ${b}x + $bSq", "x² + ${twoB}x + $bSq"),
+              explanation = "(a - b)² = a² - 2ab + b² අනුව:\n(x - $b)² = x² - 2(x)($b) + $b² = x² - ${twoB}x + $bSq වේ."
+            )
+          }
+          2 -> {
+            val m = 1 + idx
+            val n = m + 2 + (idx % 3)
+            val sum = m + n
+            val prod = m * n
+            buildMcq(
+              id = id, grade = 10, set = k, qNum = qNum,
+              topic = "වීජීය ප්‍රකාශන ප්‍රසාරණය",
+              question = "(x + $m)(x + $n) ප්‍රසාරණය කර සරල කරන්න.",
+              correctAnswer = "x² + ${sum}x + $prod",
+              distractors = listOf("x² + ${prod}x + $sum", "x² + ${sum}x - $prod", "x² + $prod"),
+              explanation = "(x + a)(x + b) = x² + (a + b)x + ab අනුව:\n(x + $m)(x + $n) = x² + ($m + $n)x + ($m × $n) = x² + ${sum}x + $prod වේ."
+            )
+          }
+          else -> {
+            val m = 1 + idx
+            val n = 2 + (idx % 4)
+            val diff = m - n
+            val prod = m * n
+            val middleSign = if (diff >= 0) "+ ${diff}x" else "- ${-diff}x"
+            buildMcq(
+              id = id, grade = 10, set = k, qNum = qNum,
+              topic = "වීජීය ප්‍රකාශන ප්‍රසාරණය",
+              question = "(x + $m)(x - $n) ප්‍රසාරණය කර සරල කරන්න.",
+              correctAnswer = "x² $middleSign - $prod",
+              distractors = listOf("x² - ${m + n}x - $prod", "x² + ${prod}x - $m", "x² - $prod"),
+              explanation = "(x + a)(x - b) = x² + (a - b)x - ab අනුව:\n(x + $m)(x - $n) = x² $middleSign - $prod වේ."
+            )
+          }
         }
       }
       6 -> {
         // Topic 7: වර්ග දෙකක වෙනස සාධක (Difference of Two Squares)
-        val b = 2 + (k % 18)
+        val type = (k - 1) % 4
+        val idx = (k - 1) / 4 // 0..19
+        val b = 2 + idx
         val bSq = b * b
-        val isDouble = (k % 2 == 1)
-        if (isDouble) {
-          buildMcq(
-            id = id, grade = 10, set = k, qNum = qNum,
-            topic = "වර්ග දෙකක වෙනස සාධක",
-            question = "4x² - $bSq හි සාධක මොනවාද?",
-            correctAnswer = "(2x - $b)(2x + $b)",
-            distractors = listOf("(2x - $b)²", "(4x - $b)(x + $b)", "(2x + $b)²"),
-            explanation = "a² - b² = (a - b)(a + b) අනුව:\n(2x)² - $b² = (2x - $b)(2x + $b) වේ."
-          )
-        } else {
-          buildMcq(
-            id = id, grade = 10, set = k, qNum = qNum,
-            topic = "වර්ග දෙකක වෙනස සාධක",
-            question = "x² - $bSq හි සාධක වෙන් කරන්න.",
-            correctAnswer = "(x - $b)(x + $b)",
-            distractors = listOf("(x - $b)²", "(x + $b)²", "(x - $bSq)(x + 1)"),
-            explanation = "a² - b² = (a - b)(a + b) අනුව:\nx² - $b² = (x - $b)(x + $b) වේ."
-          )
+        when (type) {
+          0 -> {
+            buildMcq(
+              id = id, grade = 10, set = k, qNum = qNum,
+              topic = "වර්ග දෙකක වෙනස සාධක",
+              question = "x² - $bSq හි සාධක වෙන් කරන්න.",
+              correctAnswer = "(x - $b)(x + $b)",
+              distractors = listOf("(x - $b)²", "(x + $b)²", "(x - $bSq)(x + 1)"),
+              explanation = "a² - b² = (a - b)(a + b) අනුව:\nx² - $b² = (x - $b)(x + $b) වේ."
+            )
+          }
+          1 -> {
+            buildMcq(
+              id = id, grade = 10, set = k, qNum = qNum,
+              topic = "වර්ග දෙකක වෙනස සාධක",
+              question = "4x² - $bSq හි සාධක මොනවාද?",
+              correctAnswer = "(2x - $b)(2x + $b)",
+              distractors = listOf("(2x - $b)²", "(4x - $b)(x + $b)", "(2x + $b)²"),
+              explanation = "a² - b² = (a - b)(a + b) අනුව:\n(2x)² - $b² = (2x - $b)(2x + $b) වේ."
+            )
+          }
+          2 -> {
+            buildMcq(
+              id = id, grade = 10, set = k, qNum = qNum,
+              topic = "වර්ග දෙකක වෙනස සාධක",
+              question = "9x² - $bSq හි සාධක වෙන් කරන්න.",
+              correctAnswer = "(3x - $b)(3x + $b)",
+              distractors = listOf("(3x - $b)²", "(9x - $b)(x + $b)", "(3x + $b)²"),
+              explanation = "a² - b² = (a - b)(a + b) අනුව:\n(3x)² - $b² = (3x - $b)(3x + $b) වේ."
+            )
+          }
+          else -> {
+            buildMcq(
+              id = id, grade = 10, set = k, qNum = qNum,
+              topic = "වර්ග දෙකක වෙනස සාධක",
+              question = "16x² - $bSq හි සාධක මොනවාද?",
+              correctAnswer = "(4x - $b)(4x + $b)",
+              distractors = listOf("(4x - $b)²", "(16x - $b)(x + $b)", "(4x + $b)²"),
+              explanation = "a² - b² = (a - b)(a + b) අනුව:\n(4x)² - $b² = (4x - $b)(4x + $b) වේ."
+            )
+          }
         }
       }
       7 -> {
         // Topic 8: වර්ගජ ත්‍රිපද සාධක (Factorization of Trinomials)
-        val mode = k % 3
-        val m = 1 + (k % 8)
-        val n = 2 + ((k * 2) % 9)
-        if (mode == 0) {
-          val sum = m + n
-          val prod = m * n
-          buildMcq(
-            id = id, grade = 10, set = k, qNum = qNum,
-            topic = "වර්ගජ ත්‍රිපද සාධක",
-            question = "x² + ${sum}x + $prod හි සාධක වෙන් කරන්න.",
-            correctAnswer = "(x + $m)(x + $n)",
-            distractors = listOf("(x - $m)(x - $n)", "(x + $sum)(x + 1)", "(x + ${m + 1})(x + ${n - 1})"),
-            explanation = "ගුණිතය $prod ද, එකතුව $sum ද වන සංඛ්‍යා යුගලය $m සහ $n වේ.\nඑබැවින් x² + ${sum}x + $prod = (x + $m)(x + $n) වේ."
-          )
-        } else if (mode == 1) {
-          val sum = m + n
-          val prod = m * n
-          buildMcq(
-            id = id, grade = 10, set = k, qNum = qNum,
-            topic = "වර්ගජ ත්‍රිපද සාධක",
-            question = "x² - ${sum}x + $prod හි සාධක මොනවාද?",
-            correctAnswer = "(x - $m)(x - $n)",
-            distractors = listOf("(x + $m)(x + $n)", "(x - $sum)(x - 1)", "(x - $m)(x + $n)"),
-            explanation = "ගුණිතය +$prod ද, එකතුව -$sum ද වන සංඛ්‍යා යුගලය -$m සහ -$n වේ.\nඑබැවින් x² - ${sum}x + $prod = (x - $m)(x - $n) වේ."
-          )
-        } else {
-          val bigger = maxOf(m, n)
-          val smaller = minOf(m, n)
-          val diff = (bigger - smaller).coerceAtLeast(1)
-          val prod = bigger * smaller
-          buildMcq(
-            id = id, grade = 10, set = k, qNum = qNum,
-            topic = "වර්ගජ ත්‍රිපද සාධක",
-            question = "x² + ${diff}x - $prod හි සාධක මොනවාද?",
-            correctAnswer = "(x + $bigger)(x - $smaller)",
-            distractors = listOf("(x - $bigger)(x + $smaller)", "(x + $bigger)(x + $smaller)", "(x - $diff)(x + 1)"),
-            explanation = "ගුණිතය -$prod ද, එකතුව +$diff ද වන සංඛ්‍යා යුගලය +$bigger සහ -$smaller වේ.\nඑබැවින් (x + $bigger)(x - $smaller) වේ."
-          )
+        val mode = (k - 1) % 4
+        val idx = (k - 1) / 4 // 0..19
+        when (mode) {
+          0 -> {
+            val m = 1 + idx
+            val n = 2 + (idx % 5)
+            val sum = m + n
+            val prod = m * n
+            buildMcq(
+              id = id, grade = 10, set = k, qNum = qNum,
+              topic = "වර්ගජ ත්‍රිපද සාධක",
+              question = "x² + ${sum}x + $prod හි සාධක වෙන් කරන්න.",
+              correctAnswer = "(x + $m)(x + $n)",
+              distractors = listOf("(x - $m)(x - $n)", "(x + $sum)(x + 1)", "(x + ${m + 1})(x + ${n - 1})"),
+              explanation = "ගුණිතය $prod ද, එකතුව $sum ද වන සංඛ්‍යා යුගලය $m සහ $n වේ.\nඑබැවින් x² + ${sum}x + $prod = (x + $m)(x + $n) වේ."
+            )
+          }
+          1 -> {
+            val m = 1 + idx
+            val n = 2 + (idx % 5)
+            val sum = m + n
+            val prod = m * n
+            buildMcq(
+              id = id, grade = 10, set = k, qNum = qNum,
+              topic = "වර්ගජ ත්‍රිපද සාධක",
+              question = "x² - ${sum}x + $prod හි සාධක මොනවාද?",
+              correctAnswer = "(x - $m)(x - $n)",
+              distractors = listOf("(x + $m)(x + $n)", "(x - $sum)(x - 1)", "(x - $m)(x + $n)"),
+              explanation = "ගුණිතය +$prod ද, එකතුව -$sum ද වන සංඛ්‍යා යුගලය -$m සහ -$n වේ.\nඑබැවින් x² - ${sum}x + $prod = (x - $m)(x - $n) වේ."
+            )
+          }
+          2 -> {
+            val bigger = 3 + idx
+            val smaller = 1 + (idx % 3)
+            val diff = bigger - smaller
+            val prod = bigger * smaller
+            buildMcq(
+              id = id, grade = 10, set = k, qNum = qNum,
+              topic = "වර්ගජ ත්‍රිපද සාධක",
+              question = "x² + ${diff}x - $prod හි සාධක මොනවාද?",
+              correctAnswer = "(x + $bigger)(x - $smaller)",
+              distractors = listOf("(x - $bigger)(x + $smaller)", "(x + $bigger)(x + $smaller)", "(x - $diff)(x + 1)"),
+              explanation = "ගුණිතය -$prod ද, එකතුව +$diff ද වන සංඛ්‍යා යුගලය +$bigger සහ -$smaller වේ.\nඑබැවින් (x + $bigger)(x - $smaller) වේ."
+            )
+          }
+          else -> {
+            val bigger = 4 + idx
+            val smaller = 1 + (idx % 3)
+            val diff = bigger - smaller
+            val prod = bigger * smaller
+            buildMcq(
+              id = id, grade = 10, set = k, qNum = qNum,
+              topic = "වර්ගජ ත්‍රිපද සාධක",
+              question = "x² - ${diff}x - $prod හි සාධක වෙන් කරන්න.",
+              correctAnswer = "(x - $bigger)(x + $smaller)",
+              distractors = listOf("(x + $bigger)(x - $smaller)", "(x - $diff)(x - 1)", "(x - $bigger)(x - $smaller)"),
+              explanation = "ගුණිතය -$prod ද, එකතුව -$diff ද වන සංඛ්‍යා යුගලය -$bigger සහ +$smaller වේ.\nඑබැවින් (x - $bigger)(x + $smaller) වේ."
+            )
+          }
         }
       }
       8 -> {
         // Topic 9: සරල සමීකරණ (Linear Equations)
-        val a = 2 + (k % 6)
-        val ans = 2 + (k % 12)
-        val b = 1 + ((k * 3) % 14)
+        val a = 2 + (k % 5)
+        val ans = 2 + k
+        val b = 1 + (k % 7)
         val rhs = a * ans + b
         buildMcq(
           id = id, grade = 10, set = k, qNum = qNum,
@@ -515,8 +632,8 @@ object MathQuizEngine {
       }
       9 -> {
         // Topic 10: සමගාමී සමීකරණ (Simultaneous Equations)
-        val xVal = 2 + (k % 11)
-        val yVal = 1 + ((k * 2) % 9)
+        val xVal = 2 + k
+        val yVal = 1 + (k % 9)
         val eq1 = xVal + yVal
         val eq2 = xVal - yVal
         buildMcq(
@@ -531,7 +648,7 @@ object MathQuizEngine {
       10 -> {
         // Topic 11: සරල අසමානතා (Linear Inequalities)
         val a = 2 + (k % 5)
-        val limit = 3 + (k % 10)
+        val limit = 3 + k
         val rhs = a * limit
         val isLess = (k % 2 == 0)
         if (isLess) {
@@ -558,7 +675,7 @@ object MathQuizEngine {
       }
       11 -> {
         // Topic 12: පරිමිතිය - අර්ධ වෘත්තය හා චාප (Perimeter of Semicircle & Arcs)
-        val r = 7 * (1 + (k % 12))
+        val r = 7 * k
         val d = 2 * r
         val arc = (22 * r) / 7
         val perimeter = arc + d
@@ -585,9 +702,9 @@ object MathQuizEngine {
       }
       12 -> {
         // Topic 13: වර්ගඵලය - ත්‍රපීසියම (Area of Trapezium)
-        val a = 4 + (k % 14)
-        val b = a + 2 + ((k * 2) % 10)
-        val h = 2 + ((k * 3) % 7) * 2
+        val a = 3 + k
+        val b = a + 4 + (k % 6)
+        val h = 2 + (k % 5) * 2
         val area = ((a + b) * h) / 2
         buildMcq(
           id = id, grade = 10, set = k, qNum = qNum,
@@ -600,9 +717,9 @@ object MathQuizEngine {
       }
       13 -> {
         // Topic 14: ඝන වස්තු පරිමාව - ප්‍රිස්මය (Volume of Prism)
-        val l = 4 + (k % 12)
-        val w = 3 + ((k * 2) % 9)
-        val h = 2 + ((k * 3) % 8)
+        val l = 3 + k
+        val w = 2 + (k % 7)
+        val h = 2 + ((k * 2) % 6)
         val vol = l * w * h
         buildMcq(
           id = id, grade = 10, set = k, qNum = qNum,
@@ -615,8 +732,8 @@ object MathQuizEngine {
       }
       14 -> {
         // Topic 15: කෝණ හා සමාන්තර රේඛා (Angles & Parallel Lines)
-        val angleA = 30 + (k % 55)
-        val type = k % 3
+        val angleA = 20 + k
+        val type = (k - 1) % 3
         if (type == 0) {
           val supp = 180 - angleA
           buildMcq(
@@ -649,8 +766,8 @@ object MathQuizEngine {
       }
       15 -> {
         // Topic 16: ත්‍රිකෝණ අභ්‍යන්තර කෝණ (Angles in Triangles)
-        val a1 = 35 + (k % 40)
-        val a2 = 40 + ((k * 3) % 45)
+        val a1 = 15 + (k % 25)
+        val a2 = 25 + k
         val a3 = 180 - (a1 + a2)
         val ext = a1 + a2
         val isExt = (k % 2 == 1)
@@ -676,9 +793,9 @@ object MathQuizEngine {
       }
       16 -> {
         // Topic 17: සමද්වීපාද ත්‍රිකෝණ (Isosceles Triangles)
-        val isGivenVertex = (k % 2 == 0)
+        val isGivenVertex = (k % 2 == 1)
         if (isGivenVertex) {
-          val vertex = 30 + (k % 25) * 4
+          val vertex = 20 + (k / 2) * 2
           val base = (180 - vertex) / 2
           buildMcq(
             id = id, grade = 10, set = k, qNum = qNum,
@@ -689,7 +806,7 @@ object MathQuizEngine {
             explanation = "සමද්වීපාද ත්‍රිකෝණයක සමාන පාදවලට සම්මුඛ ආධාරක කෝණ සමාන වේ.\nආධාරක කෝණය = (180° - $vertex°) / 2 = $base° වේ."
           )
         } else {
-          val base = 35 + (k % 22) * 2
+          val base = 25 + (k / 2)
           val vertex = 180 - 2 * base
           buildMcq(
             id = id, grade = 10, set = k, qNum = qNum,
@@ -703,7 +820,7 @@ object MathQuizEngine {
       }
       17 -> {
         // Topic 18: සමාන්තරාස්‍ර ප්‍රමේය (Parallelograms)
-        val oppAngle = 55 + (k % 65)
+        val oppAngle = 30 + k
         val adjAngle = 180 - oppAngle
         val askOpposite = (k % 2 == 1)
         if (askOpposite) {
@@ -712,7 +829,7 @@ object MathQuizEngine {
             topic = "සමාන්තරාස්‍ර ප්‍රමේය",
             question = "සමාන්තරාස්‍රයක එක් අභ්‍යන්තර කෝණයක් $oppAngle° නම්, ඊට සම්මුඛව ඇති කෝණයේ විශාලත්වය කීයද?",
             correctAnswer = "$oppAngle°",
-            distractors = listOf("$adjAngle°", "${180 - oppAngle}°", "${90}°"),
+            distractors = listOf("$adjAngle°", "${180 - oppAngle}°", "90°"),
             explanation = "ප්‍රමේයය: සමාන්තරාස්‍රයක සම්මුඛ කෝණ එකිනෙකට විශාලත්වයෙන් සමාන වේ. එබැවින් සම්මුඛ කෝණය $oppAngle° වේ."
           )
         } else {
@@ -721,7 +838,7 @@ object MathQuizEngine {
             topic = "සමාන්තරාස්‍ර ප්‍රමේය",
             question = "සමාන්තරාස්‍රයක එක් අභ්‍යන්තර කෝණයක් $oppAngle° නම්, ඊට යාබද කෝණයේ අගය සොයන්න.",
             correctAnswer = "$adjAngle°",
-            distractors = listOf("$oppAngle°", "${adjAngle + 10}°", "${90}°"),
+            distractors = listOf("$oppAngle°", "${adjAngle + 10}°", "90°"),
             explanation = "සමාන්තරාස්‍රයක යාබද කෝණ දෙකක ඓක්‍යය 180° කි (මිත්‍ර කෝණ බැවින්).\nයාබද කෝණය = 180° - $oppAngle° = $adjAngle° වේ."
           )
         }
@@ -729,15 +846,16 @@ object MathQuizEngine {
       18 -> {
         // Topic 19: වෘත්ත ප්‍රමේය - ජ්‍යාය හා කේන්ද්‍රය (Circle: Chord & Centre)
         val triples = listOf(
-          Triple(3, 4, 5), Triple(6, 8, 10), Triple(5, 12, 13),
-          Triple(8, 15, 17), Triple(9, 12, 15), Triple(7, 24, 25)
+          Triple(3, 4, 5), Triple(6, 8, 10), Triple(5, 12, 13), Triple(8, 15, 17),
+          Triple(9, 12, 15), Triple(7, 24, 25), Triple(12, 16, 20), Triple(10, 24, 26)
         )
-        val triple = triples[k % triples.size]
-        val dist = triple.first
-        val halfChord = triple.second
-        val radius = triple.third
+        val mult = 1 + (k - 1) / 8
+        val baseTriple = triples[(k - 1) % triples.size]
+        val dist = baseTriple.first * mult
+        val halfChord = baseTriple.second * mult
+        val radius = baseTriple.third * mult
         val chord = 2 * halfChord
-        val askRadius = (k % 2 == 0)
+        val askRadius = (k % 2 == 1)
         if (askRadius) {
           buildMcq(
             id = id, grade = 10, set = k, qNum = qNum,
@@ -760,7 +878,7 @@ object MathQuizEngine {
       }
       19 -> {
         // Topic 20: වෘත්ත ප්‍රමේය - කේන්ද්‍ර කෝණය හා පරිධි කෝණය
-        val sub = 20 + (k % 50)
+        val sub = 15 + k
         val center = 2 * sub
         val askCenter = (k % 2 == 1)
         if (askCenter) {
@@ -785,13 +903,10 @@ object MathQuizEngine {
       }
       20 -> {
         // Topic 21: ත්‍රිකෝණමිතික මූලික අනුපාත (Trigonometry Ratios)
-        val triples = listOf(Triple(3, 4, 5), Triple(5, 12, 13), Triple(8, 15, 17), Triple(7, 24, 25))
-        val mult = 1 + (k % 3)
-        val baseTriple = triples[(k / 3) % triples.size]
-        val opp = baseTriple.first * mult
-        val adj = baseTriple.second * mult
-        val hyp = baseTriple.third * mult
-        val ratioType = k % 3
+        val opp = 2 + k
+        val adj = opp + 3 + (k % 5)
+        val hyp = opp + 5 + (k % 4)
+        val ratioType = (k - 1) % 3
         when (ratioType) {
           0 -> {
             buildMcq(
@@ -827,9 +942,9 @@ object MathQuizEngine {
       }
       21 -> {
         // Topic 22: සමාන්තර ශ්‍රේඪි මූලික පද (Arithmetic Progressions - Tn)
-        val a = 1 + (k % 8)
-        val d = 2 + ((k * 2) % 7)
-        val n = 8 + ((k * 3) % 15)
+        val a = 2 + (k % 7)
+        val d = 2 + (k % 5)
+        val n = 5 + k
         val tn = a + (n - 1) * d
         buildMcq(
           id = id, grade = 10, set = k, qNum = qNum,
@@ -843,9 +958,9 @@ object MathQuizEngine {
       22 -> {
         // Topic 23: සංඛ්‍යානය - මධ්‍යන්‍යය & මධ්‍යස්ථය (Mean & Median)
         val mode = k % 2
-        if (mode == 0) {
-          val base = 10 + (k % 20)
-          val d = 1 + (k % 4)
+        if (mode == 1) {
+          val base = 10 + k
+          val d = 2 + (k % 4)
           val v1 = base
           val v2 = base + d
           val v3 = base + 2 * d
@@ -862,8 +977,8 @@ object MathQuizEngine {
             explanation = "මධ්‍යන්‍යය = (සියලු අගයන්ගේ එකතුව) / අගයන් ගණන\n= ($v1 + $v2 + $v3 + $v4 + $v5) / 5 = $sum / 5 = $mean වේ."
           )
         } else {
-          val b = 5 + (k % 15)
-          val d = 2 + (k % 3)
+          val b = 5 + k
+          val d = 3 + (k % 3)
           val list = listOf(b, b + d, b + 2 * d, b + 3 * d, b + 4 * d)
           val median = list[2]
           val shuffled = listOf(list[3], list[0], list[4], list[1], list[2])
@@ -880,12 +995,21 @@ object MathQuizEngine {
       }
       23 -> {
         // Topic 24: සම්භාවිතාව (Probability)
-        val mode = k % 2
-        if (mode == 0) {
-          val red = 2 + (k % 7)
-          val blue = 3 + ((k * 2) % 6)
-          val green = 1 + ((k * 3) % 4)
-          val total = red + blue + green
+        val red = 1 + k
+        val blue = 2 + (k % 7)
+        val green = 1 + (k % 5)
+        val total = red + blue + green
+        val askRed = (k % 2 == 1)
+        if (askRed) {
+          buildMcq(
+            id = id, grade = 10, set = k, qNum = qNum,
+            topic = "සම්භාවිතාව",
+            question = "මල්ලක රතු කැට $red ක්, නිල් කැට $blue ක් සහ කොළ කැට $green ක් ඇත. අහඹු ලෙස ගන්නා කැටයක් රතු පැහැති එකක් වීමේ සම්භාවිතාව කීයද?",
+            correctAnswer = "$red/$total",
+            distractors = listOf("$blue/$total", "$green/$total", "$red/${total + 1}"),
+            explanation = "සමස්ත කැට ගණන n(S) = $red + $blue + $green = $total.\nරතු කැට ගණන n(R) = $red.\nP(R) = $red / $total වේ."
+          )
+        } else {
           buildMcq(
             id = id, grade = 10, set = k, qNum = qNum,
             topic = "සම්භාවිතාව",
@@ -894,34 +1018,13 @@ object MathQuizEngine {
             distractors = listOf("$red/$total", "$green/$total", "$blue/${total - 1}"),
             explanation = "සමස්ත කැට ගණන n(S) = $red + $blue + $green = $total.\nනිල් කැට ගණන n(B) = $blue.\nP(B) = $blue / $total වේ."
           )
-        } else {
-          val isPrime = (k % 4 == 1)
-          if (isPrime) {
-            buildMcq(
-              id = id, grade = 10, set = k, qNum = qNum,
-              topic = "සම්භාවිතාව",
-              question = "සාධාරණ දාදු කැටයක් එක්වරක් උඩ දැමූ විට ප්‍රථමක සංඛ්‍යාවක් ලැබීමේ සම්භාවිතාව කීයද?",
-              correctAnswer = "1/2",
-              distractors = listOf("1/3", "1/6", "2/3"),
-              explanation = "දාදු කැටයක මුළු පැති n(S) = 6. ප්‍රථමක සංඛ්‍යා වන්නේ {2, 3, 5} (අගයන් 3 කි).\nසම්භාවිතාව = 3/6 = 1/2 වේ."
-            )
-          } else {
-            buildMcq(
-              id = id, grade = 10, set = k, qNum = qNum,
-              topic = "සම්භාවිතාව",
-              question = "සාධාරණ දාදු කැටයක් එක්වරක් පෙරළූ විට 4 ට වඩා වැඩි අගයක් ලැබීමේ සම්භාවිතාව කීයද?",
-              correctAnswer = "1/3",
-              distractors = listOf("1/2", "1/6", "2/3"),
-              explanation = "දාදු කැටයක 4 ට වැඩි අගයන් වන්නේ 5 සහ 6 (අගයන් 2 කි).\nසම්භාවිතාව = 2/6 = 1/3 වේ."
-            )
-          }
         }
       }
       24 -> {
         // Topic 25: කුලක (Sets & Venn Diagrams)
-        val nA = 12 + (k % 18)
-        val nB = 10 + ((k * 2) % 15)
-        val nInter = 2 + (k % 8)
+        val nA = 10 + k
+        val nB = 8 + (k % 12)
+        val nInter = 2 + (k % 6)
         val nUnion = nA + nB - nInter
         val askInter = (k % 2 == 1)
         if (askInter) {

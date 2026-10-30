@@ -19,7 +19,7 @@ object SciencePastPaper60QuestionsProvider {
     subjectTitle: String
   ): PastPaperQuestion {
     val q = qNum.coerceIn(1, 60)
-    val v = (year + q) % 3 // Year variation index
+    val v = 0 // Fixed to 0 to ensure 100% exact alignment between question, options, answer key, and explanation
 
     val (topic, text, options, correctIdx, exp) = when (q) {
       // =========================================================================

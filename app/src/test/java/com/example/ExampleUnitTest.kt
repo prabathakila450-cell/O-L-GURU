@@ -28,4 +28,18 @@ class ExampleUnitTest {
     println(">>> Done checking all cards! Total empty cards: $emptyCount")
     assertEquals(0, emptyCount)
   }
+
+  @Test
+  fun testGrade10MathQuizDistinctness() {
+    val allQuestions = mutableListOf<MathQuizQuestion>()
+    for (set in 1..80) {
+      val questions = MathQuizEngine.getSetQuestions(10, set)
+      allQuestions.addAll(questions)
+    }
+    val duplicates = allQuestions.groupBy { it.questionText }.filter { it.value.size > 1 }
+    val uniqueCount = allQuestions.map { it.questionText }.toSet().size
+    val firstDup = duplicates.entries.firstOrNull()
+    val msg = "Total duplicates: ${duplicates.size}. Unique: $uniqueCount/2000. Example: ${firstDup?.key} in sets ${firstDup?.value?.map { it.setNumber }}"
+    assertEquals(msg, 2000, uniqueCount)
+  }
 }

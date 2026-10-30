@@ -8790,7 +8790,7 @@ fun UnlimitedAccessPaymentDialog(
 
                 // Step B: Format pre-filled WhatsApp message for Admin
                 val nowTimeFormatted = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date())
-                val (_, devName) = getDeviceIdentifier(context)
+                val (devId, devName) = getDeviceIdentifier(context)
                 val slipNote = if (selectedSlipUri != null) "රිසිට්පත තෝරා ඇත (ස්ලිප් පත මෙයට අමුණා ඇත)" else "WhatsApp හරහා රිසිට්පත එවනු ලැබේ"
                 val wpMessage = """
 🌟 *O/L Study Portal - ඇඩ්මින් අනුමැති ඉල්ලීම* 🌟
@@ -8801,7 +8801,8 @@ fun UnlimitedAccessPaymentDialog(
 💰 *ගෙවීම් මුදල:* රු. 1,000 (මාස 6ක් සඳහා)
 🏦 *තැන්පත් කළ ගිණුම:* ලංකා බැංකුව 90313771
 📅 *දිනය:* $nowTimeFormatted
-📱 *දුරකථනය:* $devName
+📱 *උපාංගය:* $devName
+🆔 *Hardware ID:* $devId
 -----------------------------------------
 මම ලංකා බැංකුවේ 90313771 ගිණුමට රු. 1,000 තැන්පත් කළ අතර, ඇප් එක තුළද අනුමැති ඉල්ලීම ස්වයංක්‍රීයව සටහන් විය. කරුණාකර මගේ ගිණුම අනුමත කර දෙන්න. ($slipNote)
 """.trimIndent()

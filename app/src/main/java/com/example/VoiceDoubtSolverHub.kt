@@ -1,13 +1,20 @@
 package com.example
 
+import android.app.Activity
+import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import android.speech.tts.TextToSpeech
+import android.speech.tts.UtteranceProgressListener
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
@@ -187,7 +194,7 @@ object VoiceDoubtSolverRepository {
     // ICT DOUBTS
     DoubtItem(
       id = "ict_doubt_logic_gates",
-      subject = "තොරතුරු හා සන්නිවේදන තාක්ෂණය",
+      subject = "ICT / තොරතුරු තාක්ෂණය",
       grade = "11",
       questionSinhala = "AND, OR, NOT සහ NAND තර්ක ද්වාරවල (Logic Gates) සත්‍යතා වගු මතක තබාගන්නේ කෙසේද?",
       shortSummary = "AND ද්වාරයේ සියලු ආදාන 1 නම් පමණක් ප්‍රතිදානය 1 වේ. OR ද්වාරයේ අවම එක් ආදානයක් හෝ 1 නම් ප්‍රතිදානය 1 වේ.",
@@ -419,8 +426,65 @@ object VoiceDoubtSolverRepository {
       examTip = "සිතියම් ලකුණු කිරීමේදී මිලිමීටර් 2000 සමවෘෂ්ටි රේඛාව නිවැරදිව සලකුණු කිරීමට පුරුදු වන්න.",
       coreFormulaOrRule = "කලාප: තෙත් (>2000mm) | අතරමැදි (1250-2000mm) | වියළි (<1250mm)",
       relatedTopic = "ශ්‍රී ලංකාවේ භෞතික පරිසරය සහ දේශගුණය"
+    ),
+
+    // CIVICS DOUBTS
+    DoubtItem(
+      id = "civics_doubt_constitution",
+      subject = "පුරවැසි අධ්‍යාපනය",
+      grade = "11",
+      questionSinhala = "ශ්‍රී ලංකා ප්‍රජාතන්ත්‍රවාදී සමාජවාදී ජනරජයේ ආණ්ඩුවේ ප්‍රධාන අංශ 3 (ව්‍යවස්ථාදායකය, විධායකය, අධිකරණය) සහ ඒවායේ බලතල මොනවාද?",
+      shortSummary = "ව්‍යවස්ථාදායකය නීති පනවයි (පාර්ලිමේන්තුව), විධායකය නීති ක්‍රියාත්මක කරයි (ජනාධිපති හා අමාත්‍ය මණ්ඩලය), අධිකරණය නීතිය අර්ථනිරූපණය කර සාධාරණය ඉටු කරයි.",
+      detailedVoiceExplanation = "ප්‍රජාතන්ත්‍රවාදී රටක ආණ්ඩුව ප්‍රධාන අංශ තුනකින් සමන්විත වන අතර මෙය බලතල බෙදීමේ මූලධර්මය මත පදනම් වේ. පළමුවැන්න ව්‍යවස්ථාදායකයයි. ශ්‍රී ලංකාවේ ව්‍යවස්ථාදායක බලය හිමි වන්නේ පාර්ලිමේන්තුවටයි. ජනතාව ඡන්දයෙන් පත්කරන මන්ත්‍රීවරුන් 225 දෙනෙකුගෙන් යුත් පාර්ලිමේන්තුව රටට අවශ්‍ය නීති සම්පාදනය කරයි. දෙවැන්න විධායකයයි. රටේ පාලන බලතල සහ ආරක්ෂාව මෙහෙයවීමේ බලය විධායක ජනාධිපතිවරයා ප්‍රමුඛ අමාත්‍ය මණ්ඩලයට හිමිවේ. තෙවැන්න අධිකරණයයි. නීතියේ ආධිපත්‍යය සුරකිමින් සාධාරණත්වය ඉටු කිරීම, ආණ්ඩුක්‍රම ව්‍යවස්ථාව අර්ථනිරූපණය කිරීම සහ මූලික අයිතිවාසිකම් සුරැකීම ශ්‍රේෂ්ඨාධිකරණය ඇතුළු අධිකරණ පද්ධතිය මගින් සිදුකරයි. මෙම අංශ තුන එකිනෙක මත තුලන හා සංවරණ පද්ධතියක් ලෙස ක්‍රියාත්මක වීම ප්‍රජාතන්ත්‍රවාදයේ හරයයි.",
+      stepByStepSolution = listOf(
+        "1. ව්‍යවස්ථාදායකය (Legislature): පාර්ලිමේන්තුව (මන්ත්‍රීවරු 225) - රටේ නීති සම්පාදනය, අයවැය සම්මත කිරීම.",
+        "2. විධායකය (Executive): ජනාධිපති සහ කැබිනට් මණ්ඩලය - රාජ්‍ය ප්‍රතිපත්ති ක්‍රියාත්මක කිරීම, ආරක්ෂාව සහ විදේශ සබඳතා.",
+        "3. අධිකරණය (Judiciary): ශ්‍රේෂ්ඨාධිකරණය, අභියාචනාධිකරණය සහ දිසා අධිකරණ - නීතිය ක්‍රියාත්මක කිරීම සහ අර්ථකථනය.",
+        "4. මූලික අයිතිවාසිකම්: 1978 ආණ්ඩුක්‍රම ව්‍යවස්ථාවේ 3 වන පරිච්ඡේදය මගින් පුරවැසියන්ගේ මූලික අයිතීන් තහවුරු කර ඇත.",
+        "5. පරමාධිපත්‍ය බලය: බලය ඇත්තේ ජනතාව සතුව වන අතර එය ඡන්ද බලයෙන් ක්‍රියාත්මක වේ."
+      ),
+      examTip = "විභාගයේදී ව්‍යවස්ථාදායකය, විධායකය සහ අධිකරණයේ බලතල වෙන් වෙන්ව ලිවීමට ලකුණු 4ක හෝ 5ක ප්‍රශ්නයක් නිතර ලැබේ.",
+      coreFormulaOrRule = "ආණ්ඩුවේ අංශ 3: ව්‍යවස්ථාදායකය (නීති පැනවීම) | විධායකය (පාලනය) | අධිකරණය (සාධාරණය)",
+      relatedTopic = "ප්‍රජාතන්ත්‍රවාදී පාලනය සහ ආණ්ඩුක්‍රම ව්‍යවස්ථාව"
+    ),
+
+    // HEALTH DOUBTS
+    DoubtItem(
+      id = "health_doubt_nutrition_bmi",
+      subject = "සෞඛ්‍යය",
+      grade = "11",
+      questionSinhala = "ශරීර ස්කන්ධ දර්ශකය (BMI) ගණනය කරන්නේ කෙසේද? සමබල ආහාර වේලක ප්‍රධාන පෝෂක මොනවාද?",
+      shortSummary = "BMI = බර (kg) / උස වර්ගය (m²). සමබල ආහාර වේලක කාබෝහයිඩ්‍රේට්, ප්‍රෝටීන, ලිපිඩ, විටමින්, ඛනිජ ලවණ සහ ජලය නිවැරදි අනුපාතයට අඩංගු විය යුතුය.",
+      detailedVoiceExplanation = "සෞඛ්‍ය හා ශාරීරික අධ්‍යාපන විෂයේදී ශරීර ස්කන්ධ දර්ශකය හෙවත් BMI අගය සෙවීම විභාගයේදී අනිවාර්යයෙන්ම ගණනය කිරීමට ලැබෙන ගැටලුවකි. BMI සෙවීමේ සූත්‍රය වන්නේ, පුද්ගලයෙකුගේ කිලෝග්‍රෑම් වලින් මනින ලද බර, මීටර් වලින් මනින ලද උසේ වර්ගයෙන් බෙදීමයි. උදාහරණයක් ලෙස යම් අයෙකුගේ බර කිලෝග්‍රෑම් 50ක් සහ උස මීටර් 1.5ක් නම්, 50 බෙදීම 1.5 ගුණ කිරීම 1.5 වේ. ලැබෙන BMI අගය 18.5 ට අඩු නම් අඩු බර තත්ත්වයකි. 18.5 ත් 24.9 ත් අතර නම් එය නිරෝගී සුදුසු බරයි. 25 ත් 29.9 ත් අතර නම් අධික බර වන අතර, 30 ට වැඩි නම් ස්ථුලතාවයයි. නිරෝගී ජීවිතයකට සහ නිවැරදි BMI අගයක් පවත්වා ගැනීමට කාබෝහයිඩ්‍රේට්, ප්‍රෝටීන, මේදය, විටමින්, ඛනිජ ලවණ සහ ජලය ප්‍රමාණවත්ව අඩංගු සමබල ආහාර වේලක් දිනපතා ලබාගත යුතුය.",
+      stepByStepSolution = listOf(
+        "1. BMI සූත්‍රය: BMI = ශරීර බර (kg) / [ උස (m) × උස (m) ]",
+        "2. ඒකක පරීක්ෂාව: උස සෙන්ටිමීටර වලින් දී ඇත්නම් එය 100න් බෙදා මීටර් බවට හරවන්න (උදා: 150cm = 1.5m).",
+        "3. වර්ගීකරණය: <18.5 = අඩු බර | 18.5 - 24.9 = සාමාන්‍ය නිරෝගී බර | 25 - 29.9 = අධික බර | ≥30 = ස්ථුලතාව.",
+        "4. ප්‍රධාන පෝෂක 6: කාබෝහයිඩ්‍රේට් (ශක්තිය), ප්‍රෝටීන (වර්ධනය), ලිපිඩ (තාපය), විටමින් (ආරක්ෂාව), ඛනිජ ලවණ (දත්/අස්ථි), ජලය.",
+        "5. විභාග ලකුණු: සූත්‍රය ලිවීමට ලකුණු 1ක්, ආදේශයට ලකුණු 1ක් සහ අවසන් නිගමනයට ලකුණු 1ක් ලැබේ."
+      ),
+      examTip = "සෙන්ටිමීටර වලින් දෙන උස මීටර් කිරීමට අමතක නොකරන්න. අවසන් අගය අනුව පුද්ගලයාගේ පෝෂණ මට්ටම ලියා දක්වන්න.",
+      coreFormulaOrRule = "BMI = Weight(kg) / Height(m)² | නිරෝගී සීමාව: 18.5 - 24.9 kg/m²",
+      relatedTopic = "පෝෂණය, ශරීර ස්කන්ධ දර්ශකය සහ සුවැති දිවිපැවැත්ම"
     )
   )
+
+  fun matchesSubject(itemSubject: String, filterSubject: String): Boolean {
+    if (filterSubject == "සියල්ල") return true
+    val normItem = itemSubject.trim().lowercase()
+    val normFilter = filterSubject.trim().lowercase()
+    if (normItem.contains(normFilter) || normFilter.contains(normItem)) return true
+    if ((normFilter.contains("ict") || normFilter.contains("තොරතුරු")) &&
+        (normItem.contains("ict") || normItem.contains("තොරතුරු"))) return true
+    if ((normFilter.contains("වාණිජ") || normFilter.contains("ගිණුම්") || normFilter.contains("ව්‍යාපාර")) &&
+        (normItem.contains("වාණිජ") || normItem.contains("ගිණුම්") || normItem.contains("ව්‍යාපාර"))) return true
+    if (normFilter.contains("සෞඛ්‍ය") && normItem.contains("සෞඛ්‍ය")) return true
+    if (normFilter.contains("පුරවැසි") && normItem.contains("පුරවැසි")) return true
+    if (normFilter.contains("සිංහල") && normItem.contains("සිංහල")) return true
+    if ((normFilter.contains("ඉංග්‍රීසි") || normFilter.contains("english")) &&
+        (normItem.contains("ඉංග්‍රීසි") || normItem.contains("english"))) return true
+    return false
+  }
 
   /**
    * Converts a SyllabusUnit into a full comprehensive DoubtItem with voice explanation and steps.
@@ -557,6 +621,18 @@ fun VoiceDoubtSolverScreen(
         if (res == TextToSpeech.LANG_MISSING_DATA || res == TextToSpeech.LANG_NOT_SUPPORTED) {
           tts?.language = Locale.US
         }
+        tts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
+          override fun onStart(utteranceId: String?) {
+            isSpeaking = true
+          }
+          override fun onDone(utteranceId: String?) {
+            isSpeaking = false
+          }
+          @Deprecated("Deprecated in Java")
+          override fun onError(utteranceId: String?) {
+            isSpeaking = false
+          }
+        })
       }
     }
     ttsEngine = tts
@@ -574,7 +650,9 @@ fun VoiceDoubtSolverScreen(
       isSpeaking = false
     } else {
       ttsEngine?.setSpeechRate(speechSpeed)
-      val params = Bundle()
+      val params = Bundle().apply {
+        putString(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "DOUBT_VOICE_${System.currentTimeMillis()}")
+      }
       val result = ttsEngine?.speak(text, TextToSpeech.QUEUE_FLUSH, params, "DOUBT_VOICE_${System.currentTimeMillis()}")
       if (result == TextToSpeech.SUCCESS || result == 0) {
         isSpeaking = true
@@ -594,17 +672,62 @@ fun VoiceDoubtSolverScreen(
     ttsEngine?.stop()
     isSpeaking = false
     ttsEngine?.setSpeechRate(speechSpeed)
-    val params = Bundle()
+    val params = Bundle().apply {
+      putString(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "DOUBT_VOICE_REPLAY_${System.currentTimeMillis()}")
+    }
     ttsEngine?.speak(activeDoubt.detailedVoiceExplanation, TextToSpeech.QUEUE_FLUSH, params, "DOUBT_VOICE_REPLAY_${System.currentTimeMillis()}")
     isSpeaking = true
     Toast.makeText(context, "🔄 නැවත මුල සිට කියවීම ආරම්භ විය", Toast.LENGTH_SHORT).show()
+  }
+
+  // Real Android Speech Recognizer Activity Result
+  val speechLauncher = rememberLauncherForActivityResult(
+    contract = ActivityResultContracts.StartActivityForResult()
+  ) { result ->
+    isSpeechRecognizerListening = false
+    if (result.resultCode == Activity.RESULT_OK && result.data != null) {
+      val matches = result.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+      val spokenText = matches?.firstOrNull()
+      if (!spokenText.isNullOrBlank()) {
+        doubtQueryInput = spokenText
+        activeDoubt = VoiceDoubtSolverRepository.resolveDoubt(spokenText, selectedGrade, selectedSubjectFilter)
+        speakExplanation(activeDoubt.detailedVoiceExplanation)
+        Toast.makeText(context, "🎙️ \"$spokenText\" හඳුනාගැනිණි!", Toast.LENGTH_SHORT).show()
+      }
+    }
+  }
+
+  fun launchSpeechRecognizer() {
+    val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+      putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+      putExtra(RecognizerIntent.EXTRA_LANGUAGE, "si-LK")
+      putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, "si-LK")
+      putExtra(RecognizerIntent.EXTRA_PROMPT, "ඔබේ ගැටලුව හෝ ප්‍රශ්නය පවසන්න (Speak your doubt)...")
+    }
+    try {
+      isSpeechRecognizerListening = true
+      speechLauncher.launch(intent)
+    } catch (e: Exception) {
+      isSpeechRecognizerListening = false
+      Toast.makeText(context, "Speech Recognition සේවාව ක්‍රියාත්මක කළ නොහැක", Toast.LENGTH_SHORT).show()
+    }
+  }
+
+  val permissionLauncher = rememberLauncherForActivityResult(
+    contract = ActivityResultContracts.RequestPermission()
+  ) { isGranted ->
+    if (isGranted) {
+      launchSpeechRecognizer()
+    } else {
+      Toast.makeText(context, "මයික්‍රෆෝනය භාවිතයට අවසර අවශ්‍ය වේ", Toast.LENGTH_SHORT).show()
+    }
   }
 
   // Filtered curated doubts
   val filteredDoubts = remember(selectedGrade, selectedSubjectFilter) {
     VoiceDoubtSolverRepository.curatedDoubts.filter { item ->
       (selectedGrade == "ALL" || item.grade == selectedGrade || item.grade.isBlank()) &&
-        (selectedSubjectFilter == "සියල්ල" || item.subject.contains(selectedSubjectFilter) || selectedSubjectFilter.contains(item.subject))
+        VoiceDoubtSolverRepository.matchesSubject(item.subject, selectedSubjectFilter)
     }
   }
 
@@ -863,27 +986,14 @@ fun VoiceDoubtSolverScreen(
                 // Voice Mic Button
                 Button(
                   onClick = {
-                    isSpeechRecognizerListening = !isSpeechRecognizerListening
-                    if (isSpeechRecognizerListening) {
-                      Toast.makeText(context, "🎙️ සවන්දෙමින් පවතී... ප්‍රශ්නය පවසන්න", Toast.LENGTH_SHORT).show()
-                      coroutineScope.launch {
-                        delay(1700)
-                        val sampleDoubts = listOf(
-                          "ප්‍රභාසංස්ලේෂණයේ ආලෝක සහ අඳුරු ප්‍රතික්‍රියා අතර වෙනස කුමක්ද?",
-                          "වර්ගජ සමීකරණ සූත්‍රය මගින් විසඳන්නේ කෙසේද?",
-                          "නිව්ටන්ගේ දෙවන චලිත නියමය සහ F = ma සූත්‍රය යොදන්නේ කෙසේද?",
-                          "පැරණි ලක්දිව වාරි ශිෂ්ටාචාරයේ බිසෝකොටුවේ තාක්ෂණික විශිෂ්ටත්වය කුමක්ද?",
-                          "AND සහ OR තර්ක ද්වාරවල සත්‍යතා වගු මතක තබාගන්නේ කෙසේද?",
-                          "Simple Present Tense සහ Continuous Tense අතර වෙනස කුමක්ද?",
-                          "අක්ෂර වින්‍යාසයේ ණ සහ න නීති මොනවාද?"
-                        )
-                        val picked = sampleDoubts.random()
-                        doubtQueryInput = picked
-                        isSpeechRecognizerListening = false
-                        activeDoubt = VoiceDoubtSolverRepository.resolveDoubt(picked, selectedGrade, selectedSubjectFilter)
-                        speakExplanation(activeDoubt.detailedVoiceExplanation)
-                        Toast.makeText(context, "🎙️ ප්‍රශ්නය හඳුනාගැනිණි! හඬින් පැහැදිලි කිරීම ඇරඹේ.", Toast.LENGTH_SHORT).show()
-                      }
+                    val hasPerm = ContextCompat.checkSelfPermission(
+                      context,
+                      Manifest.permission.RECORD_AUDIO
+                    ) == PackageManager.PERMISSION_GRANTED
+                    if (hasPerm) {
+                      launchSpeechRecognizer()
+                    } else {
+                      permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
                     }
                   },
                   shape = RoundedCornerShape(10.dp),
