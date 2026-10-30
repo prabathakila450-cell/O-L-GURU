@@ -54,8 +54,18 @@ object FlashcardDynamicContentProvider {
     if (subject.contains("ඉතිහාසය") || subject.contains("ඉතිහාස")) {
       val card = when {
         s in 1..4 -> FlashcardSetsHistorySocial.getHistoryCard(s, c, grade, theme)
-        s in 5..8 -> FlashcardBankHistorySetsPart1.getHistorySet(s, c, grade)
-        else -> FlashcardBankHistorySetsPart2.getHistorySet(s, c, grade)
+        grade == "10" -> when (s) {
+          in 5..10 -> FlashcardBankHistoryGrade10SetsPart1.getCard(s, c)
+          in 11..16 -> FlashcardBankHistoryGrade10SetsPart2.getCard(s, c)
+          in 17..20 -> FlashcardBankHistoryGrade10SetsPart3.getCard(s, c)
+          else -> null
+        }
+        else -> when (s) { // Grade 11 and others
+          in 5..10 -> FlashcardBankHistoryGrade11SetsPart1.getCard(s, c)
+          in 11..16 -> FlashcardBankHistoryGrade11SetsPart2.getCard(s, c)
+          in 17..20 -> FlashcardBankHistoryGrade11SetsPart3.getCard(s, c)
+          else -> null
+        }
       }
       if (card != null) return card
     }
@@ -135,7 +145,7 @@ object FlashcardDynamicContentProvider {
       val card = if (s in 1..10) {
         FlashcardBankHealthSetsPart1.getHealthSet(s, c, grade)
       } else {
-        FlashcardBankHealthSetsPart2.getHealthSet(s, c)
+        FlashcardBankHealthSetsPart2.getHealthSet(s, c, grade)
       }
       if (card != null) return card
     }

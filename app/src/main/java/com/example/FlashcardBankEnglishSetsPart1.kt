@@ -9,17 +9,18 @@ object FlashcardBankEnglishSetsPart1 {
 
   fun getCard(setNum: Int, cardNum: Int, grade: String): CardContentTuple? {
     val c = cardNum.coerceIn(1, 20)
+    val isGrade10 = grade.contains("10") || grade == "10"
     return when (setNum) {
-      1 -> if (grade == "10") set1_Grade10[(c - 1) % set1_Grade10.size] else set1[(c - 1) % set1.size]
-      2 -> if (grade == "10") set2_Grade10[(c - 1) % set2_Grade10.size] else set2[(c - 1) % set2.size]
-      3 -> if (grade == "10") set3_Grade10[(c - 1) % set3_Grade10.size] else set3[(c - 1) % set3.size]
-      4 -> if (grade == "10") set4_Grade10[(c - 1) % set4_Grade10.size] else set4[(c - 1) % set4.size]
-      5 -> set5[(c - 1) % set5.size]
-      6 -> set6[(c - 1) % set6.size]
-      7 -> set7[(c - 1) % set7.size]
-      8 -> set8[(c - 1) % set8.size]
-      9 -> set9[(c - 1) % set9.size]
-      10 -> set10[(c - 1) % set10.size]
+      1 -> if (isGrade10) set1_Grade10[(c - 1) % set1_Grade10.size] else set1[(c - 1) % set1.size]
+      2 -> if (isGrade10) set2_Grade10[(c - 1) % set2_Grade10.size] else set2[(c - 1) % set2.size]
+      3 -> if (isGrade10) set3_Grade10[(c - 1) % set3_Grade10.size] else set3[(c - 1) % set3.size]
+      4 -> if (isGrade10) set4_Grade10[(c - 1) % set4_Grade10.size] else set4[(c - 1) % set4.size]
+      5 -> if (isGrade10) set5_Grade10[(c - 1) % set5_Grade10.size] else set5[(c - 1) % set5.size]
+      6 -> if (isGrade10) set6_Grade10[(c - 1) % set6_Grade10.size] else set6[(c - 1) % set6.size]
+      7 -> if (isGrade10) set7_Grade10[(c - 1) % set7_Grade10.size] else set7[(c - 1) % set7.size]
+      8 -> if (isGrade10) set8_Grade10[(c - 1) % set8_Grade10.size] else set8[(c - 1) % set8.size]
+      9 -> if (isGrade10) set9_Grade10[(c - 1) % set9_Grade10.size] else set9[(c - 1) % set9.size]
+      10 -> if (isGrade10) set10_Grade10[(c - 1) % set10_Grade10.size] else set10[(c - 1) % set10.size]
       else -> FlashcardBankEnglishSetsPart2.getCard(setNum, cardNum, grade)
     }
   }
@@ -359,4 +360,149 @@ object FlashcardBankEnglishSetsPart1 {
     CardContentTuple("Explain the difference between 'hard' and 'hardly'.", "'hard' means with great effort/energy (He worked hard to pass);\n'hardly' means almost not / scarcely (He hardly worked at all).", "Totally different meanings.", "hard (diligently) vs hardly (barely)"),
     CardContentTuple("Explain the difference between 'late' and 'lately'.", "'late' means after the expected time (He arrived late);\n'lately' means recently in recent times (I haven't seen him lately).", "lately = recently.", "late (not on time) vs lately (recently)")
   )
+
+  // --- GRADE 10 ENGLISH SET 5: Present Perfect & Past Perfect Tenses ---
+  private val set5_Grade10 = listOf(
+    CardContentTuple("What is the structure of the Present Perfect Tense?", "Subject + has/have + Past Participle (V3). Example: 'She has completed her assignment.'", "I/We/You/They take 'have'; He/She/It takes 'has'.", "has/have + V3"),
+    CardContentTuple("When do we use the Present Perfect Tense?", "For actions completed in the recent past whose result is still connected to the present.", "Example: 'I have lost my key' (I still don't have it now).", "Past action with present result"),
+    CardContentTuple("What signal words are commonly used with the Present Perfect Tense?", "already, just, yet, ever, never, recently, so far, since, for.", "Key markers for O/L paper 1.", "already, just, yet, since, for"),
+    CardContentTuple("Where are 'already' and 'just' placed in a Present Perfect sentence?", "Between the auxiliary (has/have) and the past participle (e.g., 'He has already finished dinner').", "Middle position.", "has/have + already/just + V3"),
+    CardContentTuple("How is 'yet' used in Present Perfect sentences?", "Used at the end of negative sentences and questions (e.g., 'Has the train arrived yet?' / 'I haven't eaten yet').", "End of sentence in negatives & questions.", "yet at sentence end"),
+    CardContentTuple("Explain the difference between 'have been to' and 'have gone to'.", "'have been to' means visited and returned. 'have gone to' means went and is still there now.", "Example: 'Nimal has been to Kandy' vs 'Nimal has gone to Kandy'.", "been to (returned) vs gone to (still there)"),
+    CardContentTuple("What is the structure of the Past Perfect Tense?", "Subject + had + Past Participle (V3). Example: 'The train had left before we reached the station.'", "Used for all subjects.", "had + V3"),
+    CardContentTuple("When do we use the Past Perfect Tense?", "When two actions happened in the past, the earlier action takes Past Perfect (had + V3) and the later action takes Simple Past.", "The 'earlier past' tense.", "Earlier past action"),
+    CardContentTuple("Complete the sentence: 'When I arrived at school, the bell ________ (ring).'", "had already rung", "The bell rang first before I arrived.", "had already rung"),
+    CardContentTuple("Combine using 'after': 'She finished her homework. She went to bed.'", "After she had finished her homework, she went to bed.", "Earlier action takes 'had finished'.", "After she had finished..."),
+    CardContentTuple("Combine using 'before': 'The rain started. We reached home.'", "We had reached home before the rain started.", "Earlier action takes Past Perfect.", "We had reached home before..."),
+    CardContentTuple("Give the Past Participle (V3) of: speak, write, break, drive, eat.", "spoken, written, broken, driven, eaten.", "Must memorize irregular V3 forms.", "V3 participles"),
+    CardContentTuple("Correct the error: 'I didn't see him since last Monday.'", "I haven't seen him since last Monday.", "'since' requires Present Perfect (haven't seen), not Simple Past.", "haven't seen since..."),
+    CardContentTuple("Correct the error: 'She has saw that movie yesterday.'", "She saw that movie yesterday (or 'She has seen'). Specific past time 'yesterday' requires Simple Past 'saw'.", "Do not mix 'has' with specific past time.", "saw yesterday"),
+    CardContentTuple("Form a question tag: 'You have finished your work, ________?'", "haven't you?", "Positive Present Perfect takes 'haven't + subject'.", "haven't you?"),
+    CardContentTuple("Form a question tag: 'He hasn't called you, ________?'", "has he?", "Negative 'hasn't' takes 'has he?'.", "has he?"),
+    CardContentTuple("Fill in the blank: 'How long ________ you ________ (know) your best friend?'", "have ... known", "Duration up to present takes Present Perfect.", "have you known"),
+    CardContentTuple("What is the structure of Present Perfect Continuous Tense?", "has/have + been + verb-ing (e.g., 'It has been raining for two hours').", "Action started in past and continues now.", "has/have been + V-ing"),
+    CardContentTuple("When do we use Present Perfect Continuous instead of Simple Present Perfect?", "To emphasize the continuous duration or ongoing nature of an activity.", "Example: 'She has been studying since 6 a.m.'", "Emphasizes ongoing duration"),
+    CardContentTuple("Fill in the blank: 'My eyes hurt because I ________ (read) for three hours.'", "have been reading", "Focuses on the continuous activity causing a present result.", "have been reading")
+  )
+
+  // --- GRADE 10 ENGLISH SET 6: Conditionals (Types 0 & 1) & 'Unless' ---
+  private val set6_Grade10 = listOf(
+    CardContentTuple("What is a conditional sentence?", "A sentence containing a condition ('if' clause) and a result clause.", "tells what happens under certain conditions.", "Condition + Result"),
+    CardContentTuple("What is the Zero Conditional formula and usage?", "If + Simple Present, Simple Present. Used for general truths, scientific facts, and rules.", "Example: 'If you boil water, it turns to steam.'", "If + Present, Present"),
+    CardContentTuple("What is the First Conditional (Type 1) formula?", "If + Simple Present, will + base verb. Used for real, likely future possibilities.", "Example: 'If I study hard, I will pass the exam.'", "If + Present, will + verb"),
+    CardContentTuple("Complete the Type 1 sentence: 'If the weather ________ (be) good, we will go swimming.'", "is", "'if' clause takes Simple Present 'is'.", "If the weather is..."),
+    CardContentTuple("Complete the Type 1 sentence: 'If Sunil passes the test, his father ________ (buy) him a bicycle.'", "will buy", "Main result clause takes 'will buy'.", "will buy"),
+    CardContentTuple("Can modal verbs like 'can' or 'may' replace 'will' in Type 1 conditionals?", "Yes! 'can' shows ability and 'may' shows possibility (e.g., 'If you finish early, you can go home').", "Modals vary certainty.", "can / may in Type 1"),
+    CardContentTuple("What does the conjunction 'unless' mean?", "'unless' means 'if not' or 'except if'. Example: 'Unless it rains, we will play' = 'If it does not rain, we will play'.", "Contains a negative meaning within itself.", "Unless = If ... not"),
+    CardContentTuple("Rewrite using 'Unless': 'If you do not hurry, you will miss the train.'", "Unless you hurry, you will miss the train.", "Remove 'if' and 'do not'; keep 'hurry' positive.", "Unless you hurry..."),
+    CardContentTuple("Rewrite using 'If ... not': 'Unless you eat healthy food, you will get sick.'", "If you do not eat healthy food, you will get sick.", "Replace 'unless' with 'If you do not'.", "If you do not eat..."),
+    CardContentTuple("Where do we place a comma in conditional sentences?", "Place a comma after the 'if' clause when it comes first. No comma is needed if the result clause comes first.", "Example: 'If it rains, stay inside' vs 'Stay inside if it rains'.", "Comma after 'if' clause"),
+    CardContentTuple("Identify the error: 'If she will come tomorrow, we will go out.'", "If she comes tomorrow, we will go out (Never use 'will' inside the 'if' clause).", "No 'will' in 'if' clause.", "If she comes..."),
+    CardContentTuple("Fill in: 'If you heat ice, it ________ (melt).'", "melts (Zero conditional scientific law).", "Zero conditional uses Simple Present in both parts.", "melts"),
+    CardContentTuple("Fill in: 'Unless Kamal ________ (practice) every day, he cannot win the race.'", "practices", "'Kamal' singular takes 'practices'.", "Unless Kamal practices"),
+    CardContentTuple("Complete: 'You will not get good marks if you ________ (not write) neatly.'", "do not write", "'if' clause takes 'do not write'.", "if you do not write"),
+    CardContentTuple("What is the meaning of 'In case' vs 'If'?", "'In case' expresses precaution taken before an event occurs; 'If' depends on the event occurring first.", "Example: 'Take a raincoat in case it rains' (take it now).", "In case = precaution"),
+    CardContentTuple("Complete with 'in case' or 'if': 'Call me ________ you need any help.'", "if", "Action 'call me' depends on needing help.", "if you need help"),
+    CardContentTuple("Complete with 'in case' or 'if': 'I will take an extra pen ________ my pen runs out of ink.'", "in case", "Precaution taken beforehand.", "in case my pen runs out"),
+    CardContentTuple("Complete: 'If you do not water these flowers, they ________ (die).'", "will die", "Type 1 conditional result.", "will die"),
+    CardContentTuple("Rewrite: 'You cannot enter the hall if you do not have a ticket.' using 'Unless'.", "You cannot enter the hall unless you have a ticket.", "Unless replaces 'if you do not'.", "unless you have a ticket"),
+    CardContentTuple("Create a sentence combining Type 1 conditional with 'can': 'save money / buy a watch'", "If I save enough money, I can buy a new watch.", "Expresses potential ability.", "If I save..., I can buy...")
+  )
+
+  // --- GRADE 10 ENGLISH SET 7: Conjunctions, Connectors & Compound Sentences ---
+  private val set7_Grade10 = listOf(
+    CardContentTuple("What is a conjunction?", "A connecting word used to link words, phrases, or clauses together in a sentence (e.g., and, but, or, so, because).", "Joins ideas smoothly.", "Connecting word"),
+    CardContentTuple("What are coordinating conjunctions? Name the FANBOYS.", "Conjunctions that join equal clauses: For, And, Nor, But, Or, Yet, So.", "FANBOYS acronym.", "FANBOYS connectors"),
+    CardContentTuple("When do we use 'and', 'but', and 'or'?", "'and' adds similar ideas; 'but' shows contrast or opposition; 'or' shows a choice between alternatives.", "Example: 'He tried hard, but he failed.'", "and (addition) / but (contrast) / or (choice)"),
+    CardContentTuple("When do we use 'because' vs 'so'?", "'because' introduces the reason/cause; 'so' introduces the result/effect.", "Cause -> because; Effect -> so.", "because (reason) vs so (result)"),
+    CardContentTuple("Combine using 'because': 'He was absent. He was ill.'", "He was absent because he was ill.", "Reason follows 'because'.", "absent because he was ill"),
+    CardContentTuple("Combine using 'so': 'He was ill. He was absent.'", "He was ill, so he was absent.", "Result follows 'so'.", "ill, so he was absent"),
+    CardContentTuple("What connectors express contrast or unexpected results?", "although, even though, though, however, but.", "Example: 'Although it rained, we enjoyed the trip.'", "although / however / but"),
+    CardContentTuple("How do we use 'although' at the beginning of a sentence?", "'Although' + Subject + Verb clause, Main clause. Example: 'Although he is poor, he is honest.'", "Notice the comma between clauses.", "Although + clause, main clause"),
+    CardContentTuple("Combine using 'Although': 'The exam was difficult. Sunil passed it.'", "Although the exam was difficult, Sunil passed it.", "Contrasting result.", "Although exam was difficult..."),
+    CardContentTuple("Explain how 'however' is punctuated when connecting two sentences.", "Put a period before 'However' and a comma after it: 'He was tired. However, he continued working.'", "Or semicolon before and comma after.", ". However, ..."),
+    CardContentTuple("How do we use 'both ... and' to combine sentences?", "Joins two subjects, verbs, or adjectives: 'She is both talented and humble.'", "Plural verb if joining subjects.", "both ... and"),
+    CardContentTuple("How do we use 'either ... or'?", "Presents a choice between two positive options: 'You can choose either tea or coffee.'", "One of two options.", "either ... or"),
+    CardContentTuple("How do we use 'neither ... nor'?", "Negates both options: 'Neither Ruwan nor Kamal was present.'", "Takes singular verb if both subjects are singular.", "neither ... nor"),
+    CardContentTuple("Combine using 'neither ... nor': 'He does not smoke. He does not drink.'", "He neither smokes nor drinks.", "Both negative actions combined.", "neither smokes nor drinks"),
+    CardContentTuple("What connectors express purpose?", "so that, in order to, so as to.", "Example: 'He ran fast in order to catch the train.'", "in order to / so that"),
+    CardContentTuple("Explain the difference between 'in order to' and 'so that'.", "'in order to' is followed by a base verb; 'so that' is followed by a subject + modal clause.", "In order to win... vs So that he could win...", "in order to + verb vs so that + clause"),
+    CardContentTuple("Combine using 'so that': 'She saved money. She wanted to buy a laptop.'", "She saved money so that she could buy a laptop.", "Expresses purpose with modal 'could'.", "so that she could buy"),
+    CardContentTuple("What connector means 'otherwise' or 'or else'?", "'otherwise' (e.g., 'Study well; otherwise you will fail').", "Expresses an unwelcome alternative.", "otherwise / or else"),
+    CardContentTuple("Fill in: 'He worked hard, ________ he could not secure first place.'", "yet / but", "Shows contrast despite effort.", "yet / but"),
+    CardContentTuple("Fill in: 'You must leave now, ________ you will be late for school.'", "otherwise / or else", "Warning of consequence.", "otherwise")
+  )
+
+  // --- GRADE 10 ENGLISH SET 8: Introductory Reported Speech ---
+  private val set8_Grade10 = listOf(
+    CardContentTuple("What is Reported (Indirect) Speech?", "Reporting what someone said in our own words without using exact quotation marks.", "No quotation marks used.", "Reporting in own words"),
+    CardContentTuple("What happens to quotation marks and commas when changing to reported speech?", "All quotation marks (\") and speech commas are removed, and the connector 'that' is usually added.", "Remove quotes; add 'that'.", "Remove quotes & add 'that'"),
+    CardContentTuple("How do pronouns change in reported speech? Give an example.", "Pronouns shift according to speaker and listener: 'I' -> 'he/she', 'we' -> 'they', 'my' -> 'his/her'.", "Direct: \"I am ready\" -> Reported: He said that he was ready.", "Pronoun shift (I -> he/she)"),
+    CardContentTuple("What is tense backshift in reported speech?", "When the main reporting verb is in the past ('said'), present tenses shift back to past tenses.", "Simple Present -> Simple Past.", "Tense backshift rule"),
+    CardContentTuple("Change to reported speech: Kamal said, \"I play cricket every evening.\"", "Kamal said that he played cricket every evening.", "play (Simple Present) -> played (Simple Past).", "played cricket"),
+    CardContentTuple("Change to reported speech: Mary said, \"I am writing a letter.\"", "Mary said that she was writing a letter.", "am writing (Present Continuous) -> was writing (Past Continuous).", "was writing"),
+    CardContentTuple("Change to reported speech: Nimal said, \"I have passed the test.\"", "Nimal said that he had passed the test.", "have passed (Present Perfect) -> had passed (Past Perfect).", "had passed"),
+    CardContentTuple("Change to reported speech: The teacher said, \"I will mark your papers tomorrow.\"", "The teacher said that she/he would mark our papers the next day.", "will -> would; tomorrow -> the next day.", "would mark the next day"),
+    CardContentTuple("How do time expressions change in reported speech: today, yesterday, now, here?", "today -> that day; yesterday -> the day before / previous day; now -> then; here -> there.", "Time & place shift back.", "Adverb backshifts"),
+    CardContentTuple("Change to reported speech: She said, \"I am very happy today.\"", "She said that she was very happy that day.", "am -> was; today -> that day.", "was happy that day"),
+    CardContentTuple("How do we report commands and requests (imperatives)?", "Use 'told / ordered / requested + person + TO + base verb'.", "Example: \"Sit down\" -> He told me to sit down.", "told / requested + to + verb"),
+    CardContentTuple("Change to reported speech: Mother said to me, \"Clean your room now.\"", "Mother told me to clean my room then.", "\"Clean\" becomes \"to clean\"; now becomes then.", "told me to clean... then"),
+    CardContentTuple("How do we report negative commands (e.g., \"Don't make noise\")?", "Use 'NOT TO + base verb' (e.g., The teacher told us not to make noise).", "\"Don't touch\" -> told us not to touch.", "not to + base verb"),
+    CardContentTuple("Change to reported speech: The doctor said to him, \"Don't smoke.\"", "The doctor advised him not to smoke.", "'advised' conveys medical guidance.", "advised him not to smoke"),
+    CardContentTuple("Change to reported speech: \"Please give me a glass of water,\" said the old man.", "The old man requested me to give him a glass of water.", "'Please' becomes 'requested'.", "requested to give"),
+    CardContentTuple("What is the difference between reporting verbs 'said' and 'told'?", "'told' MUST have an object person (told ME, told HIM); 'said' does NOT take a direct person object.", "Say 'He told me that...' or 'He said that...'.", "told someone vs said that"),
+    CardContentTuple("Correct the error: 'He said me that he was tired.'", "He told me that he was tired (or 'He said that he was tired').", "Never say 'said me'.", "told me / said that"),
+    CardContentTuple("Change to reported speech: Roy said, \"I bought a new watch yesterday.\"", "Roy said that he had bought a new watch the previous day.", "bought (Simple Past) -> had bought (Past Perfect).", "had bought the previous day"),
+    CardContentTuple("Does tense change if the statement is a permanent scientific truth?", "No! (e.g., Teacher said, \"The sun rises in the east\" -> Teacher said that the sun rises in the east).", "Universal facts remain in Present Tense.", "Universal facts remain unchanged"),
+    CardContentTuple("Change to reported speech: She said, \"I can swim fast.\"", "She said that she could swim fast.", "modal 'can' shifts to 'could'.", "could swim fast")
+  )
+
+  // --- GRADE 10 ENGLISH SET 9: Active & Passive Voice in Simple Tenses ---
+  private val set9_Grade10 = listOf(
+    CardContentTuple("What is the difference between Active Voice and Passive Voice?", "Active Voice focuses on WHO performs the action (Subject does action). Passive Voice focuses on WHAT is affected by the action (Object receives action).", "Active: Sunil broke the glass. Passive: The glass was broken by Sunil.", "Active (doer) vs Passive (receiver)"),
+    CardContentTuple("What is the basic structure of a Passive Voice sentence?", "Object + appropriate form of 'to be' (is/are/was/were/will be) + Past Participle (V3) + (by + doer).", "Always requires V3 past participle.", "Obj + be + V3 + by agent"),
+    CardContentTuple("Change to passive: 'The gardener waters the plants every morning.'", "The plants are watered by the gardener every morning.", "Simple Present: plants (plural) takes 'are watered'.", "are watered"),
+    CardContentTuple("Change to passive: 'She wrote a letter yesterday.'", "A letter was written by her yesterday.", "Simple Past: letter (singular) takes 'was written'.", "was written"),
+    CardContentTuple("Change to passive: 'They will build a new bridge.'", "A new bridge will be built by them.", "Future Simple: takes 'will be built'.", "will be built"),
+    CardContentTuple("Change to passive: 'The cat killed a mouse.'", "A mouse was killed by the cat.", "Simple Past passive.", "was killed"),
+    CardContentTuple("Change to passive: 'People speak English all over the world.'", "English is spoken all over the world.", "'by people' is omitted because it is general and obvious.", "is spoken"),
+    CardContentTuple("When is 'by + agent' omitted in passive voice sentences?", "When the doer of the action is unknown, unimportant, or obvious to everyone.", "Example: 'My stolen wallet was found' (by someone omitted).", "Omission of 'by agent'"),
+    CardContentTuple("Change to passive: 'Someone stole my bicycle yesterday.'", "My bicycle was stolen yesterday.", "Omit 'by someone'.", "was stolen"),
+    CardContentTuple("Change to passive: 'The teacher praised the honest boy.'", "The honest boy was praised by the teacher.", "Simple Past passive.", "was praised"),
+    CardContentTuple("What form of the verb is ALWAYS used in passive voice?", "The Past Participle (V3) form (e.g., eaten, driven, written, made, done).", "Never use V1 base or V2 past.", "Past Participle (V3)"),
+    CardContentTuple("Change to passive: 'We clean our classroom every day.'", "Our classroom is cleaned by us every day.", "Simple Present passive.", "is cleaned"),
+    CardContentTuple("Change to passive: 'The postman delivered the letters.'", "The letters were delivered by the postman.", "Plural object 'letters' takes 'were delivered'.", "were delivered"),
+    CardContentTuple("Change to passive: 'Students must obey school rules.'", "School rules must be obeyed by students.", "Modal passive: must + be + V3.", "must be obeyed"),
+    CardContentTuple("Change to passive: 'You can solve this puzzle easily.'", "This puzzle can be solved easily by you.", "Modal passive: can + be + V3.", "can be solved"),
+    CardContentTuple("Correct the error: 'The song was sang by the choir.'", "The song was sung by the choir.", "'sung' is the V3 past participle, not 'sang' (V2).", "was sung (not was sang)"),
+    CardContentTuple("Correct the error: 'A new road is build near our school.'", "A new road is built near our school.", "Use V3 'built', not base verb 'build'.", "is built"),
+    CardContentTuple("Change to active: 'The window was broken by the naughty boy.'", "The naughty boy broke the window.", "Reverse passive back to Simple Past active.", "naughty boy broke..."),
+    CardContentTuple("Change to active: 'Rice is grown in Sri Lanka by farmers.'", "Farmers grow rice in Sri Lanka.", "Reverse passive back to Simple Present active.", "Farmers grow rice"),
+    CardContentTuple("Why do we use passive voice in newspaper headlines and notices?", "To highlight the main event or news item rather than who did it (e.g., 'Three Suspects Arrested in Kandy').", "Puts focus on headline action.", "Focus on main news event")
+  )
+
+  // --- GRADE 10 ENGLISH SET 10: Vocabulary, Prefixes, Suffixes & Dictionary Skills ---
+  private val set10_Grade10 = listOf(
+    CardContentTuple("What are Synonyms and Antonyms? Give examples.", "Synonyms are words with similar meanings (happy = joyful); Antonyms are words with opposite meanings (hot = cold).", "Key section in O/L paper 1 & 2.", "Synonyms (similar) vs Antonyms (opposite)"),
+    CardContentTuple("Give 3 synonyms for the word 'beautiful'.", "attractive, pretty, gorgeous, lovely.", "Enriches vocabulary.", "attractive, pretty, lovely"),
+    CardContentTuple("Give 3 synonyms for the word 'difficult'.", "hard, challenging, tough, arduous.", "Various degrees of difficulty.", "hard, challenging, tough"),
+    CardContentTuple("Give antonyms for: ancient, brave, artificial, export.", "ancient -> modern; brave -> cowardly; artificial -> natural; export -> import.", "Opposite words.", "modern, cowardly, natural, import"),
+    CardContentTuple("What is a Prefix? Give 3 negative prefixes.", "A letter or group of letters added to the BEGINNING of a word to alter its meaning (e.g., un-, dis-, im-, in-, ir-, il-).", "Added at start of word.", "Prefix at start (un-, dis-, im-)"),
+    CardContentTuple("Form negative antonyms using prefixes for: happy, possible, honest, regular, legal.", "unhappy, impossible, dishonest, irregular, illegal.", "Prefix rules.", "unhappy, impossible, dishonest"),
+    CardContentTuple("What is the rule for using prefixes 'im-', 'il-', and 'ir-'?", "Use 'im-' before words starting with 'p' or 'm' (patient -> impatient);\n'il-' before 'l' (legal -> illegal);\n'ir-' before 'r' (regular -> irregular).", "Prefix matching rule.", "im- (p/m), il- (l), ir- (r)"),
+    CardContentTuple("What is a Suffix? Give 3 common noun suffixes.", "A group of letters added to the END of a word to change its word class or function (e.g., -tion, -ment, -ness, -er, -ful).", "Added at end of word.", "Suffix at end (-tion, -ness)"),
+    CardContentTuple("Form nouns from these verbs using suffixes: achieve, educate, move, fail.", "achievement (-ment), education (-tion), movement (-ment), failure (-ure).", "Verb -> Noun conversion.", "achievement, education"),
+    CardContentTuple("Form adjectives from these nouns using suffixes: care, beauty, danger, friend.", "careful / careless (-ful/-less), beautiful (-ful), dangerous (-ous), friendly (-ly).", "Noun -> Adjective conversion.", "careful, beautiful, dangerous"),
+    CardContentTuple("What do the suffixes '-ful' and '-less' mean?", "'-ful' means full of (careful = full of care); '-less' means without (careless = without care).", "Opposite suffixes.", "-ful (full of) vs -less (without)"),
+    CardContentTuple("What are Homophones? Give 2 examples.", "Words that sound the SAME but have DIFFERENT spellings and meanings (e.g., write/right, sea/see, sun/son, flour/flower).", "Same sound, different spelling.", "write/right, sea/see"),
+    CardContentTuple("Explain the difference between 'their', 'there', and 'they're'.", "'their' = possessive (their books);\n'there' = place or existence (over there / there is);\n'they're' = short form of 'they are'.", "Common spelling confusion in O/L.", "their (possessive) / there (place) / they're (they are)"),
+    CardContentTuple("Explain the difference between 'its' and 'it's'.", "'its' = possessive pronoun (The dog wags its tail);\n'it's' = contraction of 'it is' or 'it has' (It's a sunny day).", "Check apostrophe position.", "its (possessive) vs it's (it is)"),
+    CardContentTuple("What are Guide Words in a dictionary?", "The two words printed at the top of a dictionary page indicating the first and last word listed on that page.", "Helps find words quickly.", "Dictionary guide words"),
+    CardContentTuple("In what order are words listed in a dictionary?", "In strict Alphabetical Order based on letter by letter arrangement (e.g., apple, april, art, autumn).", "A to Z letter sequence.", "Alphabetical order"),
+    CardContentTuple("Arrange in dictionary alphabetical order: blanket, black, blast, blame.", "black, blame, blast, blanket.", "Compare 3rd and 4th letters: a-c-k, a-m, a-s, a-n.", "black -> blame -> blanket -> blast"),
+    CardContentTuple("What information does a dictionary entry provide about a word?", "1. Correct spelling & pronunciation\n2. Part of speech (noun, verb, adj)\n3. Meaning & definition\n4. Sample sentence / usage.", "Complete lexical resource.", "Spelling, speech part, meaning"),
+    CardContentTuple("What is a Compound Word? Give 3 examples.", "A word formed by combining two smaller distinct words together (e.g., sun + flower = sunflower, tooth + brush = toothbrush, rain + bow = rainbow).", "Two words joined as one.", "sunflower, toothbrush, rainbow"),
+    CardContentTuple("Give the compound word for: 'a room where lessons are taught' and 'a book used at school'.", "classroom, textbook.", "O/L vocabulary skills.", "classroom & textbook")
+  )
 }
+

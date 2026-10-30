@@ -8,20 +8,20 @@ object FlashcardBankHistorySetsPart2 {
 
   fun getHistorySet(setNum: Int, cardNum: Int, grade: String = "11"): CardContentTuple? {
     val c = cardNum.coerceIn(1, 20)
-    return when (setNum) {
-      9 -> historySet9[(c - 1) % historySet9.size]
-      10 -> historySet10[(c - 1) % historySet10.size]
-      11 -> historySet11[(c - 1) % historySet11.size]
-      12 -> historySet12[(c - 1) % historySet12.size]
-      13 -> historySet13[(c - 1) % historySet13.size]
-      14 -> historySet14[(c - 1) % historySet14.size]
-      15 -> historySet15[(c - 1) % historySet15.size]
-      16 -> historySet16[(c - 1) % historySet16.size]
-      17 -> historySet17[(c - 1) % historySet17.size]
-      18 -> historySet18[(c - 1) % historySet18.size]
-      19 -> historySet19[(c - 1) % historySet19.size]
-      20 -> historySet20[(c - 1) % historySet20.size]
-      else -> null
+    return if (grade == "10") {
+      when (setNum) {
+        9, 10 -> FlashcardBankHistoryGrade10SetsPart1.getCard(setNum, c)
+        in 11..16 -> FlashcardBankHistoryGrade10SetsPart2.getCard(setNum, c)
+        in 17..20 -> FlashcardBankHistoryGrade10SetsPart3.getCard(setNum, c)
+        else -> null
+      }
+    } else {
+      when (setNum) {
+        9, 10 -> FlashcardBankHistoryGrade11SetsPart1.getCard(setNum, c)
+        in 11..16 -> FlashcardBankHistoryGrade11SetsPart2.getCard(setNum, c)
+        in 17..20 -> FlashcardBankHistoryGrade11SetsPart3.getCard(setNum, c)
+        else -> null
+      }
     }
   }
 

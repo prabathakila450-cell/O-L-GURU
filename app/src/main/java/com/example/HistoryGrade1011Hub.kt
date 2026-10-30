@@ -383,23 +383,22 @@ fun HistoryGrade10And11MasterHubDialog(
   categories: List<SubjectMasterCategory>,
   onDismiss: () -> Unit
 ) {
-  var activeGrade by remember { mutableStateOf(initialGrade) }
+  var activeGrade by remember { mutableStateOf(if (initialGrade.contains("11")) "11" else "10") }
   var selectedCategoryIndex by remember { mutableIntStateOf(initialCategoryIndex) }
   var hubMode by remember { mutableIntStateOf(if (initialCategoryIndex != -1) 0 else 1) } // 0 = 20 Categories (Fact Bank), 1 = Specialized Modules
-  var selectedModuleTab by remember { mutableIntStateOf(initialModuleIndex) }
+  var selectedModuleTab by remember { mutableIntStateOf(initialModuleIndex.coerceIn(0, HistoryModuleType.values().size - 1)) }
   var searchQuery by remember { mutableStateOf("") }
-  var isSearchExpanded by remember { mutableStateOf(false) }
+
+  val allModules = remember { HistoryModuleType.values() }
 
   val filteredCategories = remember(activeGrade) {
     if (activeGrade == "10") {
       categories.filter { it.categoryNumber <= 10 }
-    } else {
+    } else if (activeGrade == "11") {
       categories.filter { it.categoryNumber > 10 }
+    } else {
+      categories
     }
-  }
-
-  LaunchedEffect(activeGrade) {
-    selectedCategoryIndex = -1
   }
 
   BackHandler {
@@ -423,457 +422,610 @@ fun HistoryGrade10And11MasterHubDialog(
         .fillMaxSize()
         .systemBarsPadding()
         .testTag("history_10_11_fullscreen_dialog"),
-      color = Color(0xFF0F172A) // Deep background
+      color = Color(0xFF0F172A)
     ) {
-      Column(modifier = Modifier.fillMaxSize()) {
-        // ULTRA-COMPACT TOP APP BAR (Single slim row, ~44dp height)
-        Surface(
-          color = Color(0xFF1E1B4B),
-          tonalElevation = 2.dp,
-          modifier = Modifier.fillMaxWidth()
-        ) {
-          Row(
-            modifier = Modifier
-              .fillMaxWidth()
-              .statusBarsPadding()
-              .padding(horizontal = 8.dp, vertical = 4.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-          ) {
-            Row(
-              verticalAlignment = Alignment.CenterVertically,
-              modifier = Modifier.weight(1f)
-            ) {
-              IconButton(
-                onClick = {
-                  if (selectedCategoryIndex != -1) selectedCategoryIndex = -1 else onDismiss()
-                },
-                modifier = Modifier.size(36.dp)
-              ) {
-                Icon(
-                  imageVector = if (selectedCategoryIndex == -1) Icons.Default.Close else Icons.AutoMirrored.Filled.ArrowBack,
-                  contentDescription = "Back",
-                  tint = Color.White
-                )
-              }
-              Spacer(modifier = Modifier.width(4.dp))
-              Text(
-                text = if (selectedCategoryIndex == -1) "ඉතිහාසය විෂය නිර්දේශ Hub" else categories[selectedCategoryIndex].titleSinhala,
-                color = Color.White,
-                fontSize = 13.5.sp,
-                fontWeight = FontWeight.Bold,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-              )
-            }
-
-            // Quick Grade Switcher Pill in Top Bar
-            Surface(
-              onClick = { activeGrade = if (activeGrade == "10") "11" else "10" },
-              shape = RoundedCornerShape(12.dp),
-              color = Color(0xFFD97706),
-              modifier = Modifier.padding(horizontal = 4.dp)
-            ) {
-              Text(
-                text = if (activeGrade == "10") "📘 10 වසර" else "📙 11 වසර",
-                color = Color.White,
-                fontSize = 10.5.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.5.dp)
-              )
-            }
-
-            IconButton(
-              onClick = { isSearchExpanded = !isSearchExpanded },
-              modifier = Modifier.size(36.dp)
-            ) {
-              Icon(
-                imageVector = if (isSearchExpanded) Icons.Default.Close else Icons.Default.Search,
-                contentDescription = "Search",
-                tint = Color(0xFFFDE68A)
-              )
-            }
-          }
-        }
-
-        // Expandable Slim Search Bar
-        AnimatedVisibility(visible = isSearchExpanded) {
-          Surface(
-            color = Color(0xFF1E1B4B),
-            modifier = Modifier.fillMaxWidth()
-          ) {
-            OutlinedTextField(
-              value = searchQuery,
-              onValueChange = { searchQuery = it },
-              placeholder = { Text("රජුගේ නම, රාජධානිය, වැව, අරගලය සොයන්න...", fontSize = 11.sp, color = Color(0xFF94A3B8)) },
-              leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = Color(0xFFFDE68A), modifier = Modifier.size(18.dp)) },
-              trailingIcon = {
-                if (searchQuery.isNotEmpty()) {
-                  IconButton(onClick = { searchQuery = "" }) {
-                    Icon(Icons.Default.Clear, contentDescription = "Clear", tint = Color.White, modifier = Modifier.size(16.dp))
-                  }
-                }
-              },
-              singleLine = true,
-              colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = Color.White,
-                unfocusedTextColor = Color.White,
-                focusedBorderColor = Color(0xFFD97706),
-                unfocusedBorderColor = Color(0xFF334155),
-                focusedContainerColor = Color(0xFF0F172A),
-                unfocusedContainerColor = Color(0xFF0F172A)
-              ),
-              modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 10.dp, vertical = 4.dp)
-                .height(48.dp)
-            )
-          }
-        }
-
-        // CONTENT SECTION - FULL HEIGHT SCROLLABLE
-        Box(modifier = Modifier.fillMaxSize()) {
-          if (selectedCategoryIndex != -1) {
-            // Category Detail View: Full-screen scrollable 20 facts
-            SubjectMaster20CategoriesDetailView(
-              subjectName = "ඉතිහාසය",
-              categories = filteredCategories,
-              selectedCategoryNumber = categories[selectedCategoryIndex].categoryNumber,
-              onSelectCategory = { num ->
-                if (num == 0) selectedCategoryIndex = -1
-                else {
-                  val targetCat = categories.find { it.categoryNumber == num }
-                  if (targetCat != null) {
-                     selectedCategoryIndex = categories.indexOf(targetCat)
-                  }
-                }
-              },
-              modifier = Modifier.fillMaxSize()
-            )
-          } else {
-            // Overview Mode: Entire screen scrolls together (Mode Selector + Content)
-            LazyColumn(
-              modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 12.dp),
-              contentPadding = PaddingValues(top = 8.dp, bottom = 28.dp),
-              verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-              // 1. Scrollable Mode Selector (400 Facts vs Advanced Modules)
-              item(key = "mode_selector") {
-                Row(
-                  modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color(0xFF0F172A))
-                    .padding(2.dp),
-                  horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                  Surface(
-                    onClick = { hubMode = 0 },
-                    shape = RoundedCornerShape(6.dp),
-                    color = if (hubMode == 0) Color(0xFFD97706) else Color.Transparent,
-                    modifier = Modifier.weight(1f)
-                  ) {
-                    Text(
-                      text = "📚 කරුණු 400 බැංකුව (කාණ්ඩ 20)",
-                      fontSize = 10.5.sp,
-                      fontWeight = FontWeight.Bold,
-                      color = if (hubMode == 0) Color.White else Color(0xFFCBD5E1),
-                      textAlign = TextAlign.Center,
-                      modifier = Modifier.padding(vertical = 6.dp)
-                    )
-                  }
-                  Surface(
-                    onClick = { hubMode = 1 },
-                    shape = RoundedCornerShape(6.dp),
-                    color = if (hubMode == 1) Color(0xFF4F46E5) else Color.Transparent,
-                    modifier = Modifier.weight(1f)
-                  ) {
-                    Text(
-                      text = "🏛️ විෂය ඒකක (Advanced Modules)",
-                      fontSize = 10.5.sp,
-                      fontWeight = FontWeight.Bold,
-                      color = if (hubMode == 1) Color.White else Color(0xFFCBD5E1),
-                      textAlign = TextAlign.Center,
-                      modifier = Modifier.padding(vertical = 6.dp)
-                    )
-                  }
-                }
-              }
-
-              if (hubMode == 0) {
-                // 20 Categories Quick Overview Grid
-                item(key = "overview_grid") {
-                  HistoryQuickOverviewGrid(
-                    categories = filteredCategories,
-                    onSelectModule = { cat -> 
-                      selectedCategoryIndex = categories.indexOf(cat)
-                    }
-                  )
-                }
+      Box(modifier = Modifier.fillMaxSize()) {
+        if (selectedCategoryIndex != -1) {
+          val catNum = categories.getOrNull(selectedCategoryIndex)?.categoryNumber ?: 1
+          SubjectMaster20CategoriesDetailView(
+            subjectName = "ඉතිහාසය",
+            categories = categories,
+            selectedCategoryNumber = catNum,
+            onSelectCategory = { num ->
+              if (num == 0) {
+                selectedCategoryIndex = -1
               } else {
-                // Specialized Modules Tabs & Content
-                item(key = "module_tabs") {
-                  ScrollableTabRow(
-                    selectedTabIndex = selectedModuleTab,
-                    containerColor = Color.Transparent,
-                    contentColor = Color(0xFFFDE68A),
-                    edgePadding = 0.dp,
-                    indicator = { tabPositions ->
-                      TabRowDefaults.SecondaryIndicator(
-                        modifier = Modifier.tabIndicatorOffset(tabPositions[selectedModuleTab]),
-                        color = Color(0xFFD97706),
-                        height = 2.5.dp
+                val cat = categories.find { it.categoryNumber == num }
+                if (cat != null) {
+                  selectedCategoryIndex = categories.indexOf(cat)
+                }
+              }
+            },
+            modifier = Modifier.fillMaxSize()
+          )
+        } else {
+          LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(bottom = 60.dp)
+          ) {
+            // 1. TOP APP BAR
+            item(key = "history_top_app_bar") {
+              Box(
+                modifier = Modifier
+                  .fillMaxWidth()
+                  .background(
+                    Brush.verticalGradient(
+                      colors = listOf(Color(0xFFD97706), Color(0xFFB45309))
+                    )
+                  )
+                  .statusBarsPadding()
+                  .padding(horizontal = 12.dp, vertical = 10.dp)
+              ) {
+                Row(
+                  modifier = Modifier.fillMaxWidth(),
+                  verticalAlignment = Alignment.CenterVertically,
+                  horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                  Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(
+                      onClick = {
+                        if (selectedCategoryIndex != -1) selectedCategoryIndex = -1 else onDismiss()
+                      },
+                      modifier = Modifier
+                        .size(36.dp)
+                        .background(Color.White.copy(alpha = 0.2f), CircleShape)
+                    ) {
+                      Icon(
+                        imageVector = if (selectedCategoryIndex == -1) Icons.Default.Close else Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back",
+                        tint = Color.White
+                      )
+                    }
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Column {
+                      Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                          text = if (selectedCategoryIndex == -1) "🏛️ 10 & 11 ඉතිහාසය Master Hub" else categories.getOrNull(selectedCategoryIndex)?.titleSinhala ?: "ඉතිහාසය",
+                          color = Color.White,
+                          fontSize = 15.sp,
+                          fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Surface(
+                          color = Color(0xFFFEF08A),
+                          shape = RoundedCornerShape(4.dp)
+                        ) {
+                          Text(
+                            text = "100% SYLLABUS",
+                            color = Color(0xFF78350F),
+                            fontSize = 8.5.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.5.dp)
+                          )
+                        }
+                      }
+                      Text(
+                        text = "රාජධානි • වාරිමාර්ග • මූලාශ්‍ර • අරගල • ආණ්ඩුක්‍රම • O/L සිතියම්",
+                        color = Color(0xFFFDE68A),
+                        fontSize = 10.5.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                      )
+                    }
+                  }
+
+                  IconButton(
+                    onClick = onDismiss,
+                    modifier = Modifier
+                      .size(32.dp)
+                      .background(Color.White.copy(alpha = 0.15f), CircleShape)
+                  ) {
+                    Icon(
+                      imageVector = Icons.Default.Close,
+                      contentDescription = "Close",
+                      tint = Color.White
+                    )
+                  }
+                }
+              }
+            }
+
+            // 2. GRADE FILTER TOGGLE
+            item(key = "history_grade_toggle") {
+              Row(
+                modifier = Modifier
+                  .fillMaxWidth()
+                  .padding(horizontal = 12.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+              ) {
+                listOf("10 & 11", "10", "11").forEach { gLabel ->
+                  val isSelected = when (gLabel) {
+                    "10 & 11" -> activeGrade == "10 & 11"
+                    "10" -> activeGrade == "10"
+                    else -> activeGrade == "11"
+                  }
+                  FilterChip(
+                    selected = isSelected,
+                    onClick = { activeGrade = if (gLabel == "10 & 11") "10 & 11" else gLabel },
+                    label = {
+                      Text(
+                        text = if (gLabel == "10 & 11") "සියල්ල (10 & 11)" else "$gLabel ශ්‍රේණිය",
+                        fontSize = 11.5.sp,
+                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
                       )
                     },
-                    divider = { HorizontalDivider(color = Color(0xFF334155), thickness = 0.6.dp) }
-                  ) {
-                    val modules = HistoryModuleType.values()
-                    modules.forEachIndexed { index, module ->
-                      Tab(
-                        selected = selectedModuleTab == index,
-                        onClick = { selectedModuleTab = index },
-                        text = {
-                          Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(module.icon, fontSize = 11.sp)
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                              text = module.title,
-                              fontSize = 10.5.sp,
-                              fontWeight = if (selectedModuleTab == index) FontWeight.Bold else FontWeight.Normal,
-                              color = if (selectedModuleTab == index) Color(0xFFFDE68A) else Color(0xFF94A3B8)
-                            )
-                          }
-                        }
-                      )
+                    colors = FilterChipDefaults.filterChipColors(
+                      selectedContainerColor = Color(0xFFD97706),
+                      selectedLabelColor = Color.White,
+                      containerColor = Color(0xFF1E293B),
+                      labelColor = Color(0xFFFDE68A)
+                    ),
+                    border = FilterChipDefaults.filterChipBorder(
+                      enabled = true,
+                      selected = isSelected,
+                      borderColor = Color(0xFFF59E0B),
+                      selectedBorderColor = Color(0xFFFDE68A)
+                    ),
+                    modifier = Modifier.weight(1f)
+                  )
+                }
+              }
+            }
+
+            // 3. SEARCH BAR
+            item(key = "history_search_bar") {
+              OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                placeholder = { Text("රජුගේ නම, රාජධානිය, වැව, ගිවිසුම, අරගලය සොයන්න...", fontSize = 11.sp, color = Color(0xFF94A3B8)) },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = Color(0xFFFDE68A)) },
+                trailingIcon = {
+                  if (searchQuery.isNotEmpty()) {
+                    IconButton(onClick = { searchQuery = "" }) {
+                      Icon(Icons.Default.Clear, contentDescription = "Clear", tint = Color.White)
                     }
                   }
+                },
+                singleLine = true,
+                shape = RoundedCornerShape(10.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                  focusedContainerColor = Color(0xFF1E293B),
+                  unfocusedContainerColor = Color(0xFF1E293B),
+                  focusedBorderColor = Color(0xFFF59E0B),
+                  unfocusedBorderColor = Color(0xFF334155),
+                  focusedTextColor = Color.White,
+                  unfocusedTextColor = Color.White
+                ),
+                modifier = Modifier
+                  .fillMaxWidth()
+                  .padding(horizontal = 12.dp, vertical = 4.dp)
+              )
+            }
+
+            // 4. MAIN HUB MODE SELECTOR (📚 400 Facts Bank vs 🏛️ 12 Specialized Modules)
+            item(key = "history_hub_mode_selector") {
+              Row(
+                modifier = Modifier
+                  .fillMaxWidth()
+                  .padding(horizontal = 12.dp, vertical = 6.dp)
+                  .clip(RoundedCornerShape(10.dp))
+                  .background(Color(0xFF1E293B))
+                  .padding(3.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+              ) {
+                Surface(
+                  onClick = {
+                    hubMode = 0
+                  },
+                  shape = RoundedCornerShape(8.dp),
+                  color = if (hubMode == 0) Color(0xFFD97706) else Color.Transparent,
+                  modifier = Modifier.weight(1f)
+                ) {
+                  Text(
+                    text = "📚 කරුණු 400 බැංකුව (කාණ්ඩ 20)",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = if (hubMode == 0) Color.White else Color(0xFFCBD5E1),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(vertical = 7.dp)
+                  )
                 }
 
-                val currentModule = HistoryModuleType.values()[selectedModuleTab]
-                when (currentModule) {
-                  HistoryModuleType.KINGDOMS_RULERS -> {
-                    val items = HistoryAdvancedSyllabusRepository.rulersList.filter {
-                      (it.grade == activeGrade || it.grade.contains(activeGrade) || it.grade == "10 & 11" || it.grade.isEmpty()) && (searchQuery.isBlank() || it.rulerName.contains(searchQuery, true) || it.kingdom.contains(searchQuery, true) || it.epithet.contains(searchQuery, true))
-                    }
-                    if (items.isEmpty()) {
-                      item { EmptySearchResultNotice() }
-                    } else {
-                      items(items, key = { it.id }) { ruler ->
-                        HistoryRulerCard(ruler)
+                Surface(
+                  onClick = {
+                    hubMode = 1
+                    selectedCategoryIndex = -1
+                  },
+                  shape = RoundedCornerShape(8.dp),
+                  color = if (hubMode == 1) Color(0xFF4F46E5) else Color.Transparent,
+                  modifier = Modifier.weight(1f)
+                ) {
+                  Text(
+                    text = "🏛️ විෂය ඒකක (12 Sub-Sections)",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = if (hubMode == 1) Color.White else Color(0xFFCBD5E1),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(vertical = 7.dp)
+                  )
+                }
+              }
+            }
+
+            // 5. CONTENT AREA: DISPLAY DEPENDING ON hubMode
+            if (hubMode == 0) {
+              // MODE 0: 20 CATEGORIES QUICK OVERVIEW GRID (Showing all 20 categories: 1. මූලාශ්‍ර, 2. මුල් යුගය, 3. අනුරාධපුරය...)
+              item(key = "history_20_categories_overview_grid") {
+            Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)) {
+              Surface(
+                color = Color(0xFFD97706).copy(alpha = 0.2f),
+                border = BorderStroke(1.dp, Color(0xFFD97706)),
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier
+                  .fillMaxWidth()
+                  .padding(bottom = 8.dp)
+              ) {
+                Row(
+                  modifier = Modifier.padding(8.dp),
+                  verticalAlignment = Alignment.CenterVertically
+                ) {
+                  Text("📚", fontSize = 18.sp)
+                  Spacer(modifier = Modifier.width(8.dp))
+                  Column {
+                    Text(
+                      text = "ඉතිහාසය කරුණු 400 බැංකුව (කාණ්ඩ 20 x කරුණු 20)",
+                      color = Color.White,
+                      fontSize = 12.sp,
+                      fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                      text = "ඕනෑම කාණ්ඩයක් මත ක්ලික් කර එහි සියලුම කරුණු 20 අධ්‍යයනය කරන්න.",
+                      color = Color(0xFFFDE68A),
+                      fontSize = 10.sp
+                    )
+                  }
+                }
+              }
+
+              HistoryQuickOverviewGrid(
+                categories = filteredCategories,
+                onSelectModule = { cat ->
+                  selectedCategoryIndex = categories.indexOf(cat)
+                }
+              )
+            }
+          }
+        } else {
+          // MODE 1: 12 SPECIALIZED MODULES GRID (4 ITEMS PER ROW GOING DOWNWARDS)
+          item(key = "history_categories_4_per_row_grid") {
+            Column(
+              modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 6.dp),
+              verticalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+              val primaryModules = listOf(
+                HistoryModuleType.KINGDOMS_RULERS,
+                HistoryModuleType.IRRIGATION_CIVILIZATION,
+                HistoryModuleType.HISTORICAL_SOURCES,
+                HistoryModuleType.FOREIGN_RULE_STRUGGLES,
+                HistoryModuleType.CONSTITUTIONS,
+                HistoryModuleType.MAP_LOCATIONS,
+                HistoryModuleType.ART_SCULPTURE,
+                HistoryModuleType.HISTORICAL_TREATIES,
+                HistoryModuleType.NATIONAL_REVIVAL,
+                HistoryModuleType.RENAISSANCE,
+                HistoryModuleType.REVOLUTIONS_WORLD_WARS,
+                HistoryModuleType.EXAM_SECRETS
+              )
+
+              val categoryChunks = primaryModules.chunked(4)
+              categoryChunks.forEach { rowCategories ->
+                Row(
+                  modifier = Modifier.fillMaxWidth(),
+                  horizontalArrangement = Arrangement.spacedBy(5.dp)
+                ) {
+                  rowCategories.forEach { module ->
+                    val indexInEnum = allModules.indexOf(module)
+                    val isSelected = selectedModuleTab == indexInEnum
+
+                    Surface(
+                      onClick = {
+                        selectedModuleTab = indexInEnum
+                        selectedCategoryIndex = -1
+                      },
+                      shape = RoundedCornerShape(8.dp),
+                      color = if (isSelected) module.color else Color(0xFF1E293B),
+                      border = BorderStroke(
+                        width = if (isSelected) 2.dp else 1.dp,
+                        color = if (isSelected) Color(0xFFFDE68A) else Color(0xFF334155)
+                      ),
+                      modifier = Modifier
+                        .weight(1f)
+                        .height(58.dp)
+                    ) {
+                      Column(
+                        modifier = Modifier
+                          .fillMaxSize()
+                          .padding(2.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                      ) {
+                        Text(
+                          text = module.icon,
+                          fontSize = 16.sp
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                          text = module.title,
+                          fontSize = 8.5.sp,
+                          fontWeight = if (isSelected) FontWeight.ExtraBold else FontWeight.Medium,
+                          color = if (isSelected) Color.White else Color(0xFFCBD5E1),
+                          textAlign = TextAlign.Center,
+                          maxLines = 2,
+                          lineHeight = 10.sp,
+                          overflow = TextOverflow.Ellipsis
+                        )
                       }
                     }
                   }
 
-                  HistoryModuleType.IRRIGATION_CIVILIZATION -> {
-                    val items = HistoryAdvancedSyllabusRepository.irrigationList.filter {
-                      (it.grade == activeGrade || it.grade.contains(activeGrade) || it.grade == "10 & 11" || it.grade.isEmpty()) && (searchQuery.isBlank() || it.name.contains(searchQuery, true) || it.builtBy.contains(searchQuery, true) || it.technologyComponent.contains(searchQuery, true))
-                    }
-                    if (items.isEmpty()) {
-                      item { EmptySearchResultNotice() }
-                    } else {
-                      items(items, key = { it.id }) { irrigation ->
-                        HistoryIrrigationCard(irrigation)
-                      }
-                    }
-                  }
-
-                  HistoryModuleType.HISTORICAL_SOURCES -> {
-                    val items = HistoryAdvancedSyllabusRepository.sourcesList.filter {
-                      (it.grade == activeGrade || it.grade.contains(activeGrade) || it.grade == "10 & 11" || it.grade.isEmpty()) && (searchQuery.isBlank() || it.sourceName.contains(searchQuery, true) || it.category.contains(searchQuery, true) || it.authorOrOrigin.contains(searchQuery, true))
-                    }
-                    if (items.isEmpty()) {
-                      item { EmptySearchResultNotice() }
-                    } else {
-                      items(items, key = { it.id }) { source ->
-                        HistorySourceCard(source)
-                      }
-                    }
-                  }
-
-                  HistoryModuleType.FOREIGN_RULE_STRUGGLES -> {
-                  val items = HistoryAdvancedSyllabusRepository.colonialUprisingsList.filter {
-                    (it.grade == activeGrade || it.grade.contains(activeGrade) || it.grade == "10 & 11" || it.grade.isEmpty()) && (searchQuery.isBlank() || it.title.contains(searchQuery, true) || it.leaders.any { l -> l.contains(searchQuery, true) })
-                  }
-                  if (items.isEmpty()) {
-                    item { EmptySearchResultNotice() }
-                  } else {
-                    items(items, key = { it.id }) { uprising ->
-                      HistoryUprisingCard(uprising)
+                  if (rowCategories.size < 4) {
+                    repeat(4 - rowCategories.size) {
+                      Spacer(modifier = Modifier.weight(1f))
                     }
                   }
                 }
+              }
+            }
+          }
 
-                HistoryModuleType.CONSTITUTIONS -> {
-                  val items = HistoryAdvancedSyllabusRepository.constitutionsList.filter {
-                    (it.grade == activeGrade || it.grade.contains(activeGrade) || it.grade == "10 & 11" || it.grade.isEmpty()) && (searchQuery.isBlank() || it.name.contains(searchQuery, true) || it.year.contains(searchQuery) || it.governorOrCommission.contains(searchQuery, true))
-                  }
-                  if (items.isEmpty()) {
-                    item { EmptySearchResultNotice() }
-                  } else {
-                    items(items, key = { it.id }) { constitution ->
-                      HistoryConstitutionCard(constitution)
-                    }
-                  }
+          // SELECTED MODULE BANNER HEADER
+          item(key = "history_selected_module_header") {
+            val currentModule = allModules.getOrElse(selectedModuleTab) { HistoryModuleType.KINGDOMS_RULERS }
+            Surface(
+              color = currentModule.color.copy(alpha = 0.25f),
+              border = BorderStroke(1.dp, currentModule.color),
+              shape = RoundedCornerShape(10.dp),
+              modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp, vertical = 6.dp)
+            ) {
+              Row(
+                modifier = Modifier
+                  .fillMaxWidth()
+                  .padding(10.dp),
+                verticalAlignment = Alignment.CenterVertically
+              ) {
+                Text(
+                  text = currentModule.icon,
+                  fontSize = 24.sp
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+                Column {
+                  Text(
+                    text = "අනු කොටස: ${currentModule.title}",
+                    color = Color.White,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold
+                  )
+                  Text(
+                    text = "ශ්‍රී ලංකා හා ලෝක ඉතිහාසය O/L විෂය නිර්දේශ සාරාංශය",
+                    color = Color(0xFFFDE68A),
+                    fontSize = 10.5.sp
+                  )
                 }
+              }
+            }
+          }
 
-                HistoryModuleType.MAP_LOCATIONS -> {
-                  val items = HistoryAdvancedSyllabusRepository.mapLocationsList.filter {
-                    (it.grade == activeGrade || it.grade.contains(activeGrade) || it.grade == "10 & 11" || it.grade.isEmpty()) && (searchQuery.isBlank() || it.locationName.contains(searchQuery, true) || it.provinceOrDistrict.contains(searchQuery, true) || it.category.contains(searchQuery, true))
-                  }
-                  if (items.isEmpty()) {
-                    item { EmptySearchResultNotice() }
-                  } else {
-                    items(items, key = { it.id }) { location ->
-                      HistoryMapLocationCard(location)
-                    }
-                  }
-                }
+          // MODULE CONTENT RENDERING WITH FALLBACK FILTER
+          val currentModule = allModules.getOrElse(selectedModuleTab) { HistoryModuleType.KINGDOMS_RULERS }
+          when (currentModule) {
+            HistoryModuleType.KINGDOMS_RULERS -> {
+              val items = filterHistoryModuleList(
+                allItems = HistoryAdvancedSyllabusRepository.rulersList,
+                activeGrade = activeGrade,
+                searchQuery = searchQuery,
+                getGrade = { it.grade },
+                matchesSearch = { item, q -> item.rulerName.contains(q, true) || item.kingdom.contains(q, true) || item.epithet.contains(q, true) }
+              )
+              items(items, key = { it.id }) { ruler ->
+                HistoryRulerCard(ruler)
+              }
+            }
 
-                HistoryModuleType.WORLD_HISTORY -> {
-                  val items = HistoryAdvancedSyllabusRepository.worldHistoryList.filter {
-                    (it.grade == activeGrade || it.grade.contains(activeGrade) || it.grade == "10 & 11" || it.grade.isEmpty()) && (searchQuery.isBlank() || it.eventTitle.contains(searchQuery, true) || it.region.contains(searchQuery, true))
-                  }
-                  if (items.isEmpty()) {
-                    item { EmptySearchResultNotice() }
-                  } else {
-                    items(items, key = { it.id }) { worldEvent ->
-                      HistoryWorldEventCard(worldEvent)
-                    }
-                  }
-                }
+            HistoryModuleType.IRRIGATION_CIVILIZATION -> {
+              val items = filterHistoryModuleList(
+                allItems = HistoryAdvancedSyllabusRepository.irrigationList,
+                activeGrade = activeGrade,
+                searchQuery = searchQuery,
+                getGrade = { it.grade },
+                matchesSearch = { item, q -> item.name.contains(q, true) || item.builtBy.contains(q, true) || item.technologyComponent.contains(q, true) }
+              )
+              items(items, key = { it.id }) { irrigation ->
+                HistoryIrrigationCard(irrigation)
+              }
+            }
 
-                HistoryModuleType.ART_SCULPTURE -> {
-                  val items = HistoryExpandedRepository.artSculpturesList.filter {
-                    (it.grade == activeGrade || it.grade.contains(activeGrade) || it.grade == "10 & 11" || it.grade.isEmpty()) && (searchQuery.isBlank() || it.title.contains(searchQuery, true) || it.category.contains(searchQuery, true))
-                  }
-                  if (items.isEmpty()) {
-                    item { EmptySearchResultNotice() }
-                  } else {
-                    item { HistoryArtSculptureSection(items) }
-                  }
-                }
+            HistoryModuleType.HISTORICAL_SOURCES -> {
+              val items = filterHistoryModuleList(
+                allItems = HistoryAdvancedSyllabusRepository.sourcesList,
+                activeGrade = activeGrade,
+                searchQuery = searchQuery,
+                getGrade = { it.grade },
+                matchesSearch = { item, q -> item.sourceName.contains(q, true) || item.category.contains(q, true) || item.authorOrOrigin.contains(q, true) }
+              )
+              items(items, key = { it.id }) { source ->
+                HistorySourceCard(source)
+              }
+            }
 
-                HistoryModuleType.HISTORICAL_TREATIES -> {
-                  val items = HistoryExpandedRepository.treatiesList.filter {
-                    (it.grade == activeGrade || it.grade.contains(activeGrade) || it.grade == "10 & 11" || it.grade.isEmpty()) && (searchQuery.isBlank() || it.treatyName.contains(searchQuery, true) || it.signatoryParties.contains(searchQuery, true))
-                  }
-                  if (items.isEmpty()) {
-                    item { EmptySearchResultNotice() }
-                  } else {
-                    item { HistoryTreatiesSection(items) }
-                  }
-                }
+            HistoryModuleType.FOREIGN_RULE_STRUGGLES -> {
+              val items = filterHistoryModuleList(
+                allItems = HistoryAdvancedSyllabusRepository.colonialUprisingsList,
+                activeGrade = activeGrade,
+                searchQuery = searchQuery,
+                getGrade = { it.grade },
+                matchesSearch = { item, q -> item.title.contains(q, true) || item.leaders.any { l -> l.contains(q, true) } }
+              )
+              items(items, key = { it.id }) { uprising ->
+                HistoryUprisingCard(uprising)
+              }
+            }
 
-                HistoryModuleType.REVOLUTIONS_WORLD_WARS -> {
-                  val items = HistoryExpandedRepository.worldErasList.filter {
-                    (it.grade == activeGrade || it.grade.contains(activeGrade) || it.grade == "10 & 11" || it.grade.isEmpty()) && (searchQuery.isBlank() || it.eraTitle.contains(searchQuery, true))
-                  }
-                  if (items.isEmpty()) {
-                    item { EmptySearchResultNotice() }
-                  } else {
-                    item { HistoryWorldErasSection(items) }
-                  }
-                }
+            HistoryModuleType.CONSTITUTIONS -> {
+              val items = filterHistoryModuleList(
+                allItems = HistoryAdvancedSyllabusRepository.constitutionsList,
+                activeGrade = activeGrade,
+                searchQuery = searchQuery,
+                getGrade = { it.grade },
+                matchesSearch = { item, q -> item.name.contains(q, true) || item.year.contains(q) || item.governorOrCommission.contains(q, true) }
+              )
+              items(items, key = { it.id }) { constitution ->
+                HistoryConstitutionCard(constitution)
+              }
+            }
 
-                HistoryModuleType.EXAM_SECRETS -> {
-                  val items = HistoryAdvancedSyllabusRepository.examTipsList.filter {
-                    (it.grade == activeGrade || it.grade.contains(activeGrade) || it.grade == "10 & 11" || it.grade.isEmpty()) && (searchQuery.isBlank() || it.questionTopic.contains(searchQuery, true))
-                  }
-                  if (items.isEmpty()) {
-                    item { EmptySearchResultNotice() }
-                  } else {
-                    items(items, key = { it.id }) { tip ->
-                      HistoryExamTipCard(tip)
-                    }
-                  }
-                }
+            HistoryModuleType.MAP_LOCATIONS -> {
+              val items = filterHistoryModuleList(
+                allItems = HistoryAdvancedSyllabusRepository.mapLocationsList,
+                activeGrade = activeGrade,
+                searchQuery = searchQuery,
+                getGrade = { it.grade },
+                matchesSearch = { item, q -> item.locationName.contains(q, true) || item.provinceOrDistrict.contains(q, true) || item.category.contains(q, true) }
+              )
+              items(items, key = { it.id }) { location ->
+                HistoryMapLocationCard(location)
+              }
+            }
 
-                HistoryModuleType.RAPID_MCQS -> {
-                  val items = HistoryAdvancedSyllabusRepository.rapidMcqsList.filter {
-                    (it.grade == activeGrade || it.grade.contains(activeGrade) || it.grade == "10 & 11" || it.grade.isEmpty()) && (searchQuery.isBlank() || it.question.contains(searchQuery, true))
-                  }
-                  if (items.isEmpty()) {
-                    item { EmptySearchResultNotice() }
-                  } else {
-                    items(items, key = { it.id }) { mcq ->
-                      HistoryRapidMcqCard(mcq)
-                    }
-                  }
-                }
+            HistoryModuleType.WORLD_HISTORY, HistoryModuleType.REVOLUTIONS_WORLD_WARS -> {
+              val items = filterHistoryModuleList(
+                allItems = HistoryAdvancedSyllabusRepository.worldHistoryList,
+                activeGrade = activeGrade,
+                searchQuery = searchQuery,
+                getGrade = { it.grade },
+                matchesSearch = { item, q -> item.eventTitle.contains(q, true) || item.region.contains(q, true) }
+              )
+              items(items, key = { it.id }) { worldEvent ->
+                HistoryWorldEventCard(worldEvent)
+              }
+            }
 
-                HistoryModuleType.CASCADE_TANKS -> {
-                  val items = HistoryExpandedRepository.cascadeTanksList.filter {
-                    (it.grade == activeGrade || it.grade.contains(activeGrade) || it.grade == "10 & 11" || it.grade.isEmpty()) && (searchQuery.isBlank() || it.componentName.contains(searchQuery, true) || it.mainFunction.contains(searchQuery, true))
-                  }
-                  if (items.isEmpty()) {
-                    item { EmptySearchResultNotice() }
-                  } else {
-                    item { HistoryCascadeTanksSection(items) }
-                  }
-                }
+            HistoryModuleType.ART_SCULPTURE -> {
+              val items = filterHistoryModuleList(
+                allItems = HistoryExpandedRepository.artSculpturesList,
+                activeGrade = activeGrade,
+                searchQuery = searchQuery,
+                getGrade = { it.grade },
+                matchesSearch = { item, q -> item.title.contains(q, true) || item.category.contains(q, true) }
+              )
+              item { HistoryArtSculptureSection(items) }
+            }
 
-                HistoryModuleType.NATIONAL_REVIVAL -> {
-                  val items = HistoryExpandedRepository.revivalList.filter {
-                    (it.grade == activeGrade || it.grade.contains(activeGrade) || it.grade == "10 & 11" || it.grade.isEmpty()) && (searchQuery.isBlank() || it.leaderOrMovement.contains(searchQuery, true))
-                  }
-                  if (items.isEmpty()) {
-                    item { EmptySearchResultNotice() }
-                  } else {
-                    item { HistoryRevivalSection(items) }
-                  }
-                }
+            HistoryModuleType.HISTORICAL_TREATIES -> {
+              val items = filterHistoryModuleList(
+                allItems = HistoryExpandedRepository.treatiesList,
+                activeGrade = activeGrade,
+                searchQuery = searchQuery,
+                getGrade = { it.grade },
+                matchesSearch = { item, q -> item.treatyName.contains(q, true) || item.signatoryParties.contains(q, true) }
+              )
+              item { HistoryTreatiesSection(items) }
+            }
 
-                HistoryModuleType.TIMELINE_CHALLENGE -> {
-                  val items = HistoryExpandedRepository.timelineChallengesList.filter {
-                    (it.grade == activeGrade || it.grade.contains(activeGrade) || it.grade == "10 & 11" || it.grade.isEmpty()) && (searchQuery.isBlank() || it.challengeTitle.contains(searchQuery, true))
-                  }
-                  if (items.isEmpty()) {
-                    item { EmptySearchResultNotice() }
-                  } else {
-                    item { HistoryTimelineChallengeSection(items) }
-                  }
-                }
+            HistoryModuleType.RENAISSANCE -> {
+              val items = filterHistoryModuleList(
+                allItems = HistoryExpandedRepository.worldErasList,
+                activeGrade = activeGrade,
+                searchQuery = searchQuery,
+                getGrade = { it.grade },
+                matchesSearch = { item, q -> item.eraTitle.contains(q, true) }
+              )
+              item { HistoryWorldErasSection(items) }
+            }
 
-                HistoryModuleType.ARTIFACT_IDENTIFIER -> {
-                  val items = HistoryExpandedRepository.artifactsList.filter {
-                    (it.grade == activeGrade || it.grade.contains(activeGrade) || it.grade == "10 & 11" || it.grade.isEmpty()) && (searchQuery.isBlank() || it.artifactName.contains(searchQuery, true) || it.location.contains(searchQuery, true))
-                  }
-                  if (items.isEmpty()) {
-                    item { EmptySearchResultNotice() }
-                  } else {
-                    item { HistoryArtifactSection(items) }
-                  }
-                }
+            HistoryModuleType.EXAM_SECRETS, HistoryModuleType.ESSAY_GUIDE, HistoryModuleType.ESSAY_TEMPLATES -> {
+              val items = filterHistoryModuleList(
+                allItems = HistoryAdvancedSyllabusRepository.examTipsList,
+                activeGrade = activeGrade,
+                searchQuery = searchQuery,
+                getGrade = { it.grade },
+                matchesSearch = { item, q -> item.questionTopic.contains(q, true) }
+              )
+              items(items, key = { it.id }) { tip ->
+                HistoryExamTipCard(tip)
+              }
+            }
 
-                HistoryModuleType.ESSAY_GUIDE -> {
-                  item { HistoryEssayGuideSubSection(grade = activeGrade) }
-                }
+            HistoryModuleType.RAPID_MCQS -> {
+              val items = filterHistoryModuleList(
+                allItems = HistoryAdvancedSyllabusRepository.rapidMcqsList,
+                activeGrade = activeGrade,
+                searchQuery = searchQuery,
+                getGrade = { it.grade },
+                matchesSearch = { item, q -> item.question.contains(q, true) }
+              )
+              items(items, key = { it.id }) { mcq ->
+                HistoryRapidMcqCard(mcq)
+              }
+            }
 
-                HistoryModuleType.MAP_QUIZ -> {
-                  item { HistoryMapQuizSection(onClose = { selectedModuleTab = 0 }) }
-                }
+            HistoryModuleType.CASCADE_TANKS -> {
+              val items = filterHistoryModuleList(
+                allItems = HistoryExpandedRepository.cascadeTanksList,
+                activeGrade = activeGrade,
+                searchQuery = searchQuery,
+                getGrade = { it.grade },
+                matchesSearch = { item, q -> item.componentName.contains(q, true) || item.mainFunction.contains(q, true) }
+              )
+              item { HistoryCascadeTanksSection(items) }
+            }
 
-                HistoryModuleType.TIMELINE -> {
-                  item { HistoryTimelineSection(onClose = { selectedModuleTab = 0 }) }
-                }
+            HistoryModuleType.NATIONAL_REVIVAL -> {
+              val items = filterHistoryModuleList(
+                allItems = HistoryExpandedRepository.revivalList,
+                activeGrade = activeGrade,
+                searchQuery = searchQuery,
+                getGrade = { it.grade },
+                matchesSearch = { item, q -> item.leaderOrMovement.contains(q, true) }
+              )
+              item { HistoryRevivalSection(items) }
+            }
 
-                HistoryModuleType.VISUAL_GALLERY -> {
-                  item { HistoryVisualGallerySection(onClose = { selectedModuleTab = 0 }) }
-                }
+            HistoryModuleType.TIMELINE_CHALLENGE, HistoryModuleType.TIMELINE -> {
+              val items = filterHistoryModuleList(
+                allItems = HistoryExpandedRepository.timelineChallengesList,
+                activeGrade = activeGrade,
+                searchQuery = searchQuery,
+                getGrade = { it.grade },
+                matchesSearch = { item, q -> item.challengeTitle.contains(q, true) }
+              )
+              item { HistoryTimelineChallengeSection(items) }
+            }
 
-                HistoryModuleType.COMPARISON -> {
-                  item { HistoryComparisonSection(onClose = { selectedModuleTab = 0 }) }
-                }
+            HistoryModuleType.ARTIFACT_IDENTIFIER, HistoryModuleType.VISUAL_GALLERY -> {
+              val items = filterHistoryModuleList(
+                allItems = HistoryExpandedRepository.artifactsList,
+                activeGrade = activeGrade,
+                searchQuery = searchQuery,
+                getGrade = { it.grade },
+                matchesSearch = { item, q -> item.artifactName.contains(q, true) || item.location.contains(q, true) }
+              )
+              item { HistoryArtifactSection(items) }
+            }
 
-                HistoryModuleType.ESSAY_TEMPLATES -> {
-                  item { HistoryEssayTemplatesSection(onClose = { selectedModuleTab = 0 }) }
-                }
-
-                else -> {
-                  item { Text("තවම සම්පූර්ණ කර නොමැත.", color = Color.Gray, modifier = Modifier.padding(16.dp)) }
-                }
+            else -> {
+              val items = filterHistoryModuleList(
+                allItems = HistoryAdvancedSyllabusRepository.rulersList,
+                activeGrade = activeGrade,
+                searchQuery = searchQuery,
+                getGrade = { it.grade },
+                matchesSearch = { item, q -> item.rulerName.contains(q, true) }
+              )
+              items(items, key = { it.id }) { ruler ->
+                HistoryRulerCard(ruler)
               }
             }
           }
@@ -882,6 +1034,28 @@ fun HistoryGrade10And11MasterHubDialog(
     }
   }
 }
+}
+}
+
+private fun <T> filterHistoryModuleList(
+  allItems: List<T>,
+  activeGrade: String,
+  searchQuery: String,
+  getGrade: (T) -> String,
+  matchesSearch: (T, String) -> Boolean
+): List<T> {
+  val searchFiltered = if (searchQuery.isBlank()) {
+    allItems
+  } else {
+    allItems.filter { matchesSearch(it, searchQuery) }
+  }
+
+  val gradeFiltered = searchFiltered.filter { item ->
+    val g = getGrade(item)
+    activeGrade == "10 & 11" || g.isEmpty() || g == "10 & 11" || g == activeGrade || g.contains(activeGrade)
+  }
+
+  return if (gradeFiltered.isNotEmpty()) gradeFiltered else searchFiltered
 }
 
 /**

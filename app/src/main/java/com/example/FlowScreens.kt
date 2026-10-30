@@ -1593,6 +1593,8 @@ fun SubjectContentScreen(
   var artMasterHubInitialCategory by remember { mutableStateOf<ArtSectionCategory?>(null) }
   var showMusicMasterHubDialog by remember { mutableStateOf(false) }
   var musicMasterHubInitialCategory by remember { mutableStateOf<MusicSectionCategory?>(null) }
+  var showAgriMasterHubDialog by remember { mutableStateOf(false) }
+  var agriMasterHubInitialCategory by remember { mutableStateOf<AgriSectionCategory?>(null) }
 
   val subjectNotes = remember(notesList, subject.id, noteSearchFilter, grade) {
     notesList.filter { isMatchSubject(it.subject, it.topicSinhala, subject) }
@@ -1845,6 +1847,19 @@ fun SubjectContentScreen(
       },
       initialSectionCategory = musicMasterHubInitialCategory,
       onDismiss = { showMusicMasterHubDialog = false }
+    )
+  }
+
+  // 🌱 Agriculture Grade 10 & 11 Master Hub Fullscreen Dialog (Strictly exclusive to Agriculture subject only)
+  if (showAgriMasterHubDialog) {
+    AgricultureGrade10And11MasterHubDialog(
+      initialGradeTab = when (grade) {
+        "10" -> AgriGradeTab.GRADE_10
+        "11" -> AgriGradeTab.GRADE_11
+        else -> AgriGradeTab.ALL
+      },
+      initialSectionCategory = agriMasterHubInitialCategory,
+      onDismiss = { showAgriMasterHubDialog = false }
     )
   }
 
@@ -4039,6 +4054,19 @@ fun SubjectContentScreen(
           onOpenFullHub = { cat ->
             musicMasterHubInitialCategory = cat
             showMusicMasterHubDialog = true
+          }
+        )
+      }
+
+      // 🌱 Grade 10 & 11 Agriculture Master Hub (Strictly exclusive to 10 & 11 Agriculture subject only)
+      val isAgriSubject = (subject.nameSinhala.contains("කෘෂි") || subject.name.contains("Agri", ignoreCase = true) || subject.id.contains("agri")) &&
+          !subject.nameSinhala.contains("විද්‍යාව")
+      if (isAgriSubject) {
+        // 🌟 100% ACCURATE GRADE 10 & 11 AGRICULTURE SYLLABUS MASTER HUB
+        AgricultureGrade10And11MasterHubCard(
+          onOpenFullHub = { cat ->
+            agriMasterHubInitialCategory = cat
+            showAgriMasterHubDialog = true
           }
         )
       }

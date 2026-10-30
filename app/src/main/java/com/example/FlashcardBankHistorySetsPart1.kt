@@ -8,14 +8,17 @@ object FlashcardBankHistorySetsPart1 {
 
   fun getHistorySet(setNum: Int, cardNum: Int, grade: String = "10"): CardContentTuple? {
     val c = cardNum.coerceIn(1, 20)
+    if (setNum in 5..8) {
+      return if (grade == "11") {
+        FlashcardBankHistoryGrade11SetsPart1.getCard(setNum, c)
+      } else {
+        FlashcardBankHistoryGrade10SetsPart1.getCard(setNum, c)
+      }
+    }
     return when (setNum) {
       2 -> historySet2[(c - 1) % historySet2.size]
       3 -> historySet3[(c - 1) % historySet3.size]
       4 -> historySet4[(c - 1) % historySet4.size]
-      5 -> historySet5[(c - 1) % historySet5.size]
-      6 -> historySet6[(c - 1) % historySet6.size]
-      7 -> historySet7[(c - 1) % historySet7.size]
-      8 -> historySet8[(c - 1) % historySet8.size]
       else -> null
     }
   }

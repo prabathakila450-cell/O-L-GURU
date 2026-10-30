@@ -8,22 +8,50 @@ import java.io.File
 class StudentPortalApplication : Application() {
   override fun onCreate() {
     super.onCreate()
-    // Pre-create Chromium WebView cache and code cache directories
-    // to prevent simple_backend_impl.cc directory creation errors
-    try {
-      val webViewDefault = File(cacheDir, "WebView/Default")
-      val httpCache = File(webViewDefault, "HTTP Cache")
-      val codeCache = File(httpCache, "Code Cache")
-      File(codeCache, "wasm").mkdirs()
-      File(codeCache, "js").mkdirs()
-    } catch (_: Exception) {}
 
     // Multi-process safety for WebView in Android 9+ (API 28+)
+    var activeProcessName: String? = null
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
       try {
-        val processName = getProcessName()
-        if (packageName != processName) {
-          WebView.setDataDirectorySuffix(processName)
+        activeProcessName = getProcessName()
+        if (packageName != activeProcessName) {
+          WebView.setDataDirectorySuffix(activeProcessName)
+        }
+      } catch (_: Exception) {}
+    }
+
+    // Pre-create and ensure full read/write/execute permissions on Chromium WebView cache directories
+    // to prevent simple_backend_impl.cc "cache directory inaccessible right after creation" errors
+    initWebViewCacheDirectories(cacheDir)
+  }
+
+  companion object {
+    fun initWebViewCacheDirectories(baseCacheDir: File) {
+      try {
+        val webViewDir = File(baseCacheDir, "WebView")
+        val defaultDir = File(webViewDir, "Default")
+        val httpCacheDir = File(defaultDir, "HTTP Cache")
+        val codeCacheDir = File(httpCacheDir, "Code Cache")
+        val wasmDir = File(codeCacheDir, "wasm")
+        val jsDir = File(codeCacheDir, "js")
+
+        val targetDirs = listOf(
+          baseCacheDir,
+          webViewDir,
+          defaultDir,
+          httpCacheDir,
+          codeCacheDir,
+          wasmDir,
+          jsDir
+        )
+
+        for (dir in targetDirs) {
+          if (!dir.exists()) {
+            dir.mkdirs()
+          }
+          dir.setReadable(true, false)
+          dir.setWritable(true, false)
+          dir.setExecutable(true, false)
         }
       } catch (_: Exception) {}
     }

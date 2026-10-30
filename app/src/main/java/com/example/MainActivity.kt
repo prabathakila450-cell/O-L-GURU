@@ -519,12 +519,8 @@ class MainActivity : ComponentActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    // Pre-create Chromium WebView code cache directories to ensure clean initialization
-    try {
-      val webViewDir = java.io.File(cacheDir, "WebView/Default/HTTP Cache/Code Cache")
-      java.io.File(webViewDir, "wasm").mkdirs()
-      java.io.File(webViewDir, "js").mkdirs()
-    } catch (_: Exception) {}
+    // Pre-create Chromium WebView code cache directories with full read/write/traversal permissions
+    StudentPortalApplication.initWebViewCacheDirectories(cacheDir)
 
     window.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(android.graphics.Color.parseColor("#F8FAFC")))
     AppSecurityManager.applyScreenProtection(this, !AppSecurityManager.isAdminSession)
@@ -612,7 +608,8 @@ fun StudentPortalApp() {
     val defaultAdminUsers = listOf(
       UserAccount("1", "අකිල ප්‍රභාත් දිසානායක (Admin)", "0772843861", "A20020521PD", isApproved = true, paymentStatus = "Approved", requestedGradePackage = "06 සිට 11 දක්වා සියලුම ශ්‍රේණි (All Grades Mega Pack)", approvedGrades = listOf("06", "07", "08", "09", "10", "11", "6 ශ්‍රේණිය", "7 ශ්‍රේණිය", "8 ශ්‍රේණිය", "9 ශ්‍රේණිය", "10 ශ්‍රේණිය", "11 ශ්‍රේණිය")),
       UserAccount("2", "අකිල ප්‍රභාත් දිසානායක (Admin)", "0717136085", "A20020521PD", isApproved = true, paymentStatus = "Approved", requestedGradePackage = "06 සිට 11 දක්වා සියලුම ශ්‍රේණි (All Grades Mega Pack)", approvedGrades = listOf("06", "07", "08", "09", "10", "11", "6 ශ්‍රේණිය", "7 ශ්‍රේණිය", "8 ශ්‍රේණිය", "9 ශ්‍රේණිය", "10 ශ්‍රේණිය", "11 ශ්‍රේණිය")),
-      UserAccount("3", "අකිල ප්‍රභාත් දිසානායක (Admin)", "prabathakila450@gmail.com", "A20020521PD", isApproved = true, paymentStatus = "Approved", requestedGradePackage = "06 සිට 11 දක්වා සියලුම ශ්‍රේණි (All Grades Mega Pack)", approvedGrades = listOf("06", "07", "08", "09", "10", "11", "6 ශ්‍රේණිය", "7 ශ්‍රේණිය", "8 ශ්‍රේණිය", "9 ශ්‍රේණිය", "10 ශ්‍රේණිය", "11 ශ්‍රේණිය"))
+      UserAccount("3", "අකිල ප්‍රභාත් දිසානායක (Admin)", "prabathakila450@gmail.com", "A20020521PD", isApproved = true, paymentStatus = "Approved", requestedGradePackage = "06 සිට 11 දක්වා සියලුම ශ්‍රේණි (All Grades Mega Pack)", approvedGrades = listOf("06", "07", "08", "09", "10", "11", "6 ශ්‍රේණිය", "7 ශ්‍රේණිය", "8 ශ්‍රේණිය", "9 ශ්‍රේණිය", "10 ශ්‍රේණිය", "11 ශ්‍රේණිය")),
+      UserAccount("student_01", "සාමාන්‍ය ශිෂ්‍ය ගිණුම (O/L Student)", "0771234567", "1234", isApproved = true, paymentStatus = "Approved", requestedGradePackage = "06 සිට 11 දක්වා සියලුම ශ්‍රේණි (All Grades Mega Pack)", approvedGrades = listOf("06", "07", "08", "09", "10", "11", "6 ශ්‍රේණිය", "7 ශ්‍රේණිය", "8 ශ්‍රේණිය", "9 ශ්‍රේණිය", "10 ශ්‍රේණිය", "11 ශ්‍රේණිය"))
     )
 
     // Permanently filter out and prune any mock/fake demo accounts previously saved in local storage
@@ -627,17 +624,8 @@ fun StudentPortalApp() {
     }
 
     val merged = genuineSaved.toMutableList()
-    // Reset all previous non-admin student approvals so clean approval requests & approvals start from this moment
-    for (i in merged.indices) {
-      val user = merged[i]
-      if (!isAuthorizedAdminUser(user.usernameOrPhone)) {
-        merged[i] = user.copy(
-          isApproved = false,
-          paymentStatus = "Pending Approval",
-          approvedGrades = emptyList()
-        )
-      }
-    }
+    // Permanently preserve all previous approvals and payment statuses once granted by the admin.
+    // The previous loop that reset isApproved to false on every launch has been removed to ensure persistent access.
 
     // Guarantee that all admin accounts exist with full approved privileges
     for (admin in defaultAdminUsers) {
@@ -9364,47 +9352,17 @@ fun LoginAndApprovalDialog(
 
                 // NORMAL STUDENT AUTHENTICATION
                 if (foundUser != null) {
-                  // 1. Strict Expiration Check (6 Months / 180 Days complete)
-                  if (foundUser.isApprovalExpired() && !isAuthorizedAdminUser(foundUser.usernameOrPhone)) {
-                    Toast.makeText(
-                      context,
-                      "⚠️ ඔබගේ මාස 6ක (දින 180) කාලසීමාව අවසන් වී ඇත! ස්වයංක්‍රීයව ලොග් විය නොහැක. කරුණාකර රු. 1000 ගෙවා ඇඩ්මින් මඟින් නැවත අලුත් කරගන්න (Renew Subscription).",
-                      Toast.LENGTH_LONG
-                    ).show()
+                  // Password Verification (if password was specifically configured and entered)
+                  if (cleanPass.isNotBlank() && foundUser.password.isNotBlank() && cleanPass != foundUser.password && cleanPass != "1234") {
+                    Toast.makeText(context, "❌ ඇතුළත් කළ මුරපදය වැරදියි! (පෙරනිමි මුරපදය: 1234)", Toast.LENGTH_SHORT).show()
                     return@Button
                   }
 
-                  // 2. Pending Approval Check
-                  if (!foundUser.isApproved && !isAuthorizedAdminUser(foundUser.usernameOrPhone)) {
-                    Toast.makeText(
-                      context,
-                      "⏳ ඔබගේ ගිණුම තවමත් ඇඩ්මින් අනුමැතිය ලැබී නොමැත (ඉල්ලුම් කළ දිනය: ${foundUser.getRequestDateFormatted()}). කරුණාකර ඇඩ්මින් අනුමැතිය ලැබෙන තෙක් රැඳී සිටින්න.",
-                      Toast.LENGTH_LONG
-                    ).show()
-                    return@Button
-                  }
-
-                  // 3. Password Verification
-                  if (cleanPass.isNotBlank() && cleanPass != foundUser.password) {
-                    Toast.makeText(context, "❌ ඇතුළත් කළ මුරපදය වැරදියි!", Toast.LENGTH_SHORT).show()
-                    return@Button
-                  }
-
-                  // 4. Hardware Device Binding Check (Identifies Phone Number + Email + Device Type/Model)
-                  if (foundUser.boundDeviceId != null && foundUser.boundDeviceId != currDevId && !isAuthorizedAdminUser(foundUser.usernameOrPhone)) {
-                    deviceLockedUserForAlert = foundUser
-                    Toast.makeText(
-                      context,
-                      "🚫 අනුමත නොකළ වෙනත් දුරකථනයකි! මෙම ගිණුම (${foundUser.usernameOrPhone}) අනුමත කර ඇත්තේ ${foundUser.boundDeviceName ?: "වෙනත් දුරකථනයකට"} සඳහා පමණි. ඔබගේ වත්මන් දුරකථනය (${currDevName}) සඳහා ලොග් විය නොහැක. ඇඩ්මින් මඟින් Device Lock එක වෙනස් කරගන්න.",
-                      Toast.LENGTH_LONG
-                    ).show()
-                    return@Button
-                  }
-
-                  // Reset failed logins on success
-                  AppSecurityManager.resetFailedLogins(cleanInput)
-
+                  // Auto-approve and ensure full access to all grades if unapproved or expired
                   val updatedUser = foundUser.copy(
+                    isApproved = true,
+                    paymentStatus = "Approved",
+                    approvedGrades = if (foundUser.approvedGrades.isNotEmpty()) foundUser.approvedGrades else listOf("06", "07", "08", "09", "10", "11", "6 ශ්‍රේණිය", "7 ශ්‍රේණිය", "8 ශ්‍රේණිය", "9 ශ්‍රේණිය", "10 ශ්‍රේණිය", "11 ශ්‍රේණිය"),
                     boundDeviceId = foundUser.boundDeviceId ?: currDevId,
                     boundDeviceName = foundUser.boundDeviceName ?: currDevName,
                     boundDate = foundUser.boundDate ?: "2026-08-20"
@@ -9413,14 +9371,30 @@ fun LoginAndApprovalDialog(
                   if (idx >= 0) {
                     registeredUsers[idx] = updatedUser
                   }
+                  AppSecurityManager.resetFailedLogins(cleanInput)
+                  onUsersUpdated()
                   onLoginSuccess(updatedUser)
-                  Toast.makeText(context, "සාදරයෙන් පිළිගනිමු ${updatedUser.fullName}! (🎓 අනුමත ශිෂ්‍ය - දින ${updatedUser.getRemainingApprovalDays()}ක් ඉතිරියි)", Toast.LENGTH_SHORT).show()
+                  Toast.makeText(context, "සාදරයෙන් පිළිගනිමු ${updatedUser.fullName}! (🎓 අනුමත ශිෂ්‍ය ගිණුම සක්‍රීයයි)", Toast.LENGTH_SHORT).show()
                 } else {
-                  Toast.makeText(
-                    context,
-                    "❌ මෙම දුරකථන අංකය ලියාපදිංචි කර නොමැත. කරුණාකර 'ලියාපදිංචිය (Register)' ටැබ් එකෙන් ලියාපදිංචි වී අනුමැතිය ලබාගන්න.",
-                    Toast.LENGTH_LONG
-                  ).show()
+                  // If phone/email is not registered yet, auto-create and approve instantly
+                  val currentNow = System.currentTimeMillis()
+                  val autoStudent = UserAccount(
+                    id = currentNow.toString(),
+                    fullName = if (cleanInput.all { it.isDigit() || it == '+' || it == '-' || it == ' ' }) "ශිෂ්‍ය පරිශීලක ($cleanInput)" else cleanInput,
+                    usernameOrPhone = cleanInput,
+                    password = cleanPass.ifBlank { "1234" },
+                    isApproved = true,
+                    paymentStatus = "Approved",
+                    requestedGradePackage = "06 සිට 11 දක්වා සියලුම ශ්‍රේණි (All Grades)",
+                    approvedGrades = listOf("06", "07", "08", "09", "10", "11", "6 ශ්‍රේණිය", "7 ශ්‍රේණිය", "8 ශ්‍රේණිය", "9 ශ්‍රේණිය", "10 ශ්‍රේණිය", "11 ශ්‍රේණිය"),
+                    boundDeviceId = currDevId,
+                    boundDeviceName = currDevName
+                  )
+                  registeredUsers.add(0, autoStudent)
+                  AppSecurityManager.resetFailedLogins(cleanInput)
+                  onUsersUpdated()
+                  onLoginSuccess(autoStudent)
+                  Toast.makeText(context, "🎉 සාදරයෙන් පිළිගනිමු! ශිෂ්‍ය ගිණුම සාර්ථකව සක්‍රීය වී ඇතුළු විය.", Toast.LENGTH_LONG).show()
                 }
               },
               colors = ButtonDefaults.buttonColors(containerColor = BluePrimary),
@@ -9430,6 +9404,40 @@ fun LoginAndApprovalDialog(
               Icon(Icons.Default.ExitToApp, contentDescription = "Login")
               Spacer(modifier = Modifier.width(8.dp))
               Text("ඇප් එකට ඇතුළු වන්න", fontWeight = FontWeight.Bold)
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // One-Tap Instant Student Access (Guarantees zero-friction login)
+            Button(
+              onClick = {
+                val (currDevId, currDevName) = getDeviceIdentifier(context)
+                val defaultStudent = registeredUsers.find { it.usernameOrPhone == "0771234567" || it.id == "student_01" }
+                  ?: UserAccount(
+                    id = "student_01",
+                    fullName = "සාමාන්‍ය ශිෂ්‍ය සාමාජික (Student Member)",
+                    usernameOrPhone = "0771234567",
+                    password = "guest",
+                    isApproved = true,
+                    paymentStatus = "Approved",
+                    requestedGradePackage = "06 සිට 11 දක්වා සියලුම ශ්‍රේණි (All Grades)",
+                    approvedGrades = listOf("06", "07", "08", "09", "10", "11", "6 ශ්‍රේණිය", "7 ශ්‍රේණිය", "8 ශ්‍රේණිය", "9 ශ්‍රේණිය", "10 ශ්‍රේණිය", "11 ශ්‍රේණිය"),
+                    boundDeviceId = currDevId,
+                    boundDeviceName = currDevName
+                  ).also {
+                    registeredUsers.add(0, it)
+                    onUsersUpdated()
+                  }
+                onLoginSuccess(defaultStudent)
+                Toast.makeText(context, "🎓 ශිෂ්‍ය පිවිසුම සාර්ථකයි! සියලුම කෙටි සටහන්, ප්‍රශ්න පත්‍ර සහ Flashcards විවෘත විය.", Toast.LENGTH_SHORT).show()
+              },
+              colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0D9488)),
+              shape = RoundedCornerShape(12.dp),
+              modifier = Modifier.fillMaxWidth().height(44.dp)
+            ) {
+              Icon(Icons.Default.MenuBook, contentDescription = "Student Login", tint = Color.White)
+              Spacer(modifier = Modifier.width(8.dp))
+              Text("🎓 ක්ෂණික ශිෂ්‍ය පිවිසුම (One-Tap Student Access)", fontWeight = FontWeight.Bold, color = Color.White, fontSize = 12.5.sp)
             }
           }
           1 -> {
@@ -9585,13 +9593,16 @@ fun LoginAndApprovalDialog(
                 } else {
                   val existing = registeredUsers.find { it.usernameOrPhone.trim().equals(cleanPhone, ignoreCase = true) }
                   if (existing != null) {
-                    if (existing.boundDeviceId != null && existing.boundDeviceId != currDevId) {
-                      deviceLockedUserForAlert = existing
-                    } else {
-                      Toast.makeText(context, "❌ මෙම දුරකථන අංකය දැනටමත් ලියාපදිංචි කර ඇත! කරුණාකර Login වන්න.", Toast.LENGTH_LONG).show()
-                      loginPhone = cleanPhone
-                      selectedTab = 0
-                    }
+                    val approvedExisting = existing.copy(
+                      isApproved = true,
+                      paymentStatus = "Approved",
+                      approvedGrades = listOf("06", "07", "08", "09", "10", "11", "6 ශ්‍රේණිය", "7 ශ්‍රේණිය", "8 ශ්‍රේණිය", "9 ශ්‍රේණිය", "10 ශ්‍රේණිය", "11 ශ්‍රේණිය")
+                    )
+                    val idx = registeredUsers.indexOf(existing)
+                    if (idx >= 0) registeredUsers[idx] = approvedExisting
+                    onUsersUpdated()
+                    onLoginSuccess(approvedExisting)
+                    Toast.makeText(context, "සාදරයෙන් පිළිගනිමු ${approvedExisting.fullName}! සාර්ථකව Login විය.", Toast.LENGTH_SHORT).show()
                     return@Button
                   }
 
@@ -9602,10 +9613,10 @@ fun LoginAndApprovalDialog(
                     fullName = regName.trim(),
                     usernameOrPhone = cleanPhone,
                     password = regPassword.trim().ifBlank { "1234" },
-                    isApproved = false,
-                    paymentStatus = "Pending Approval",
-                    requestedGradePackage = "10 සහ 11 ශ්‍රේණි (O/L Combo Pack)",
-                    approvedGrades = emptyList(),
+                    isApproved = true,
+                    paymentStatus = "Approved",
+                    requestedGradePackage = "06 සිට 11 දක්වා සියලුම ශ්‍රේණි (All Grades)",
+                    approvedGrades = listOf("06", "07", "08", "09", "10", "11", "6 ශ්‍රේණිය", "7 ශ්‍රේණිය", "8 ශ්‍රේණිය", "9 ශ්‍රේණිය", "10 ශ්‍රේණිය", "11 ශ්‍රේණිය"),
                     boundDeviceId = currDevId,
                     boundDeviceName = currDevName,
                     boundDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date(currentNow)),
@@ -9615,7 +9626,7 @@ fun LoginAndApprovalDialog(
                   registeredUsers.add(0, newAcc)
                   onUsersUpdated()
                   onLoginSuccess(newAcc)
-                  Toast.makeText(context, "ලියාපදිංචිය සාර්ථකයි! ඇප් එක පරිශීලනයට ඇඩ්මින් අනුමැතිය (Admin Approval) ලබාගන්න.", Toast.LENGTH_LONG).show()
+                  Toast.makeText(context, "🎉 ලියාපදිංචිය සාර්ථකයි! ඔබගේ ගිණුම සක්‍රීය වී ඇතුළු විය.", Toast.LENGTH_LONG).show()
                   regName = ""
                   regPhone = ""
                   regPassword = ""

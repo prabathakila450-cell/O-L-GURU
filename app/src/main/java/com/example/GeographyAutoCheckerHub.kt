@@ -62,342 +62,353 @@ fun GeographyAutoCheckerScreen(
         modifier = Modifier.fillMaxSize(),
         color = Color(0xFF0A1128) // Dark Navy Background
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = 16.dp)
-        ) {
-            BackHandler {
-                if (selectedCategoryNumber != 0) {
-                    selectedCategoryNumber = 0
-                } else {
-                    onBack()
-                }
+        BackHandler {
+            if (selectedCategoryNumber != 0) {
+                selectedCategoryNumber = 0
+            } else {
+                onBack()
             }
-            // Top Hero Card Banner matching Screenshot 20261027-103528
-            Card(
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF132A3E)),
-                border = BorderStroke(1.dp, Color(0xFF1E3A5F)),
+        }
+
+        if (activeTab == 0 && selectedCategoryNumber != 0) {
+            val filteredForGrade = masterCategories.filter { cat ->
+                if (currentGradeTab == "10") cat.categoryNumber <= 10 else cat.categoryNumber > 10
+            }
+            SubjectMaster20CategoriesDetailView(
+                subjectName = "භූගෝල විද්‍යාව",
+                categories = filteredForGrade,
+                selectedCategoryNumber = selectedCategoryNumber,
+                onSelectCategory = { selectedCategoryNumber = it },
+                modifier = Modifier.fillMaxSize()
+            )
+        } else {
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 12.dp, vertical = 8.dp)
+                    .fillMaxSize()
+                    .padding(bottom = 16.dp)
             ) {
-                Row(
+                // Top Hero Card Banner matching Screenshot 20261027-103528
+                Card(
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFF132A3E)),
+                    border = BorderStroke(1.dp, Color(0xFF1E3A5F)),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 12.dp, vertical = 10.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                        .padding(horizontal = 12.dp, vertical = 8.dp)
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        IconButton(onClick = onBack) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "ආපසු",
-                                tint = Color.White
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Column {
-                            Surface(
-                                shape = RoundedCornerShape(6.dp),
-                                color = Color(0xFF0284C7).copy(alpha = 0.3f),
-                                border = BorderStroke(0.8.dp, Color(0xFF38BDF8))
-                            ) {
-                                Text(
-                                    text = if (currentGradeTab == "10") "10 ශ්‍රේණිය" else "11 ශ්‍රේණිය (O/L)",
-                                    color = Color(0xFF38BDF8),
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 12.dp, vertical = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            IconButton(onClick = onBack) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = "ආපසු",
+                                    tint = Color.White
                                 )
                             }
-                            Spacer(modifier = Modifier.height(2.dp))
-                            Text(
-                                text = "භූගෝල විද්‍යාව",
-                                color = Color.White,
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Text(
-                                text = "Geography • 5-Section Hub",
-                                color = Color(0xFF94A3B8),
-                                fontSize = 11.sp
-                            )
-                        }
-                    }
-                    Text("💡", fontSize = 28.sp)
-                }
-            }
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            // 5 Horizontal Pill Buttons Row matching Screenshot 20261027-103528
-            LazyRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 12.dp),
-                horizontalArrangement = Arrangement.spacedBy(6.dp)
-            ) {
-                item {
-                    Surface(
-                        onClick = { showProgressModal = true },
-                        shape = RoundedCornerShape(20.dp),
-                        color = Color(0xFF0369A1).copy(alpha = 0.25f),
-                        border = BorderStroke(1.dp, Color(0xFF38BDF8))
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text("📊", fontSize = 12.sp)
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text("ප්‍රගතිය", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFF38BDF8))
-                        }
-                    }
-                }
-                item {
-                    Surface(
-                        onClick = {
-                            activeTab = 0
-                            selectedCategoryNumber = 1 // 1:50,000 maps
-                        },
-                        shape = RoundedCornerShape(20.dp),
-                        color = Color(0xFF059669).copy(alpha = 0.25f),
-                        border = BorderStroke(1.dp, Color(0xFF34D399))
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text("🎨", fontSize = 12.sp)
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text("රූප සටහන්", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFF34D399))
-                        }
-                    }
-                }
-                item {
-                    Surface(
-                        onClick = {
-                            activeTab = 0
-                            selectedCategoryNumber = 0
-                        },
-                        shape = RoundedCornerShape(20.dp),
-                        color = Color(0xFF7C3AED).copy(alpha = 0.25f),
-                        border = BorderStroke(1.dp, Color(0xFFA78BFA))
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text("📗", fontSize = 12.sp)
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text("සටහන්", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFFA78BFA))
-                        }
-                    }
-                }
-                item {
-                    Surface(
-                        onClick = { activeTab = 1 }, // Auto-Checker
-                        shape = RoundedCornerShape(20.dp),
-                        color = Color(0xFFD97706).copy(alpha = 0.25f),
-                        border = BorderStroke(1.dp, Color(0xFFFBBF24))
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text("⚡", fontSize = 12.sp)
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text("ප්‍රශ්න 500", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFFFBBF24))
-                        }
-                    }
-                }
-                item {
-                    Surface(
-                        onClick = { showSyllabusModal = true },
-                        shape = RoundedCornerShape(20.dp),
-                        color = Color(0xFF0D9488).copy(alpha = 0.25f),
-                        border = BorderStroke(1.dp, Color(0xFF2DD4BF))
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text("📜", fontSize = 12.sp)
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text("ශ්‍රේණිගතය", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2DD4BF))
-                        }
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            // White Surface Box with 4 Tabs matching Screenshot 20261027-103528
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 12.dp),
-                shape = RoundedCornerShape(12.dp),
-                color = Color.White,
-                shadowElevation = 2.dp
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    val tabs = listOf(
-                        Triple("📄", "කෙටි සටහන්", 0),
-                        Triple("❓", "ප්‍රශ්න පත්‍ර", 1),
-                        Triple("📖", "ස්වයං පුහුණු", 2),
-                        Triple("✦", "AI Assistant", 3)
-                    )
-                    tabs.forEach { (emoji, label, index) ->
-                        val isSelected = activeTab == index
-                        Column(
-                            modifier = Modifier
-                                .weight(1f)
-                                .clickable { activeTab = index }
-                                .padding(vertical = 8.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(
-                                    text = emoji,
-                                    fontSize = 12.sp,
-                                    color = if (isSelected) Color(0xFF0284C7) else Color(0xFF64748B)
-                                )
-                                Spacer(modifier = Modifier.width(3.dp))
-                                Text(
-                                    text = label,
-                                    fontSize = 11.sp,
-                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                                    color = if (isSelected) Color(0xFF0284C7) else Color(0xFF475569)
-                                )
-                            }
-                            if (isSelected) {
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Box(
-                                    modifier = Modifier
-                                        .width(36.dp)
-                                        .height(2.5.dp)
-                                        .clip(RoundedCornerShape(2.dp))
-                                        .background(Color(0xFF0284C7))
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Main Green/Emerald Master Hub Container Box matching Screenshot 20261027-103528
-            Box(modifier = Modifier.weight(1f)) {
-                when (activeTab) {
-                    0 -> {
-                        Surface(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 12.dp),
-                            shape = RoundedCornerShape(16.dp),
-                            color = Color(0xFF022C22), // Emerald dark green container
-                            border = BorderStroke(1.5.dp, Color(0xFF10B981))
-                        ) {
-                            Column(modifier = Modifier.padding(12.dp)) {
-                                // Header of Master Hub
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
+                            Column {
+                                Surface(
+                                    shape = RoundedCornerShape(6.dp),
+                                    color = Color(0xFF0284C7).copy(alpha = 0.3f),
+                                    border = BorderStroke(0.8.dp, Color(0xFF38BDF8))
                                 ) {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        modifier = Modifier.weight(1f)
-                                    ) {
-                                        Text("🔬", fontSize = 18.sp)
-                                        Spacer(modifier = Modifier.width(6.dp))
-                                        Text(
-                                            text = "10 & 11 භූගෝල විද්‍යාව විෂය නිර්දේශ Master Hub",
-                                            color = Color.White,
-                                            fontSize = 13.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis
-                                        )
-                                    }
-                                    Surface(
-                                        shape = RoundedCornerShape(12.dp),
-                                        color = Color(0xFFF59E0B)
-                                    ) {
-                                        Text(
-                                            text = "100% ආවරණය",
-                                            color = Color(0xFF1E1B4B),
-                                            fontSize = 10.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
-                                        )
-                                    }
+                                    Text(
+                                        text = if (currentGradeTab == "10") "10 ශ්‍රේණිය" else "11 ශ්‍රේණිය (O/L)",
+                                        color = Color(0xFF38BDF8),
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                    )
                                 }
-
                                 Spacer(modifier = Modifier.height(2.dp))
                                 Text(
-                                    text = "සිතියම් • භෞතික භූගෝල විද්‍යාව • මානසික භූගෝල විද්‍යාව • ආපදා • කරුණු 400",
-                                    color = Color(0xFF6EE7B7),
-                                    fontSize = 10.5.sp
+                                    text = "භූගෝල විද්‍යාව",
+                                    color = Color.White,
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold
                                 )
+                                Text(
+                                    text = "Geography • 5-Section Hub",
+                                    color = Color(0xFF94A3B8),
+                                    fontSize = 11.sp
+                                )
+                            }
+                        }
+                        Text("💡", fontSize = 28.sp)
+                    }
+                }
 
-                                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(4.dp))
 
-                                // Grade Selector Buttons inside Green Master Hub
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
-                                    Button(
-                                        onClick = { currentGradeTab = "10" },
-                                        colors = ButtonDefaults.buttonColors(
-                                            containerColor = if (currentGradeTab == "10") Color(0xFF10B981) else Color(0xFF064E3B)
-                                        ),
-                                        shape = RoundedCornerShape(8.dp),
-                                        modifier = Modifier
-                                            .weight(1f)
-                                            .height(38.dp)
-                                    ) {
-                                        Text(
-                                            text = "📖 10 ශ්‍රේණිය",
-                                            fontSize = 12.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = Color.White
-                                        )
-                                    }
-                                    Button(
-                                        onClick = { currentGradeTab = "11" },
-                                        colors = ButtonDefaults.buttonColors(
-                                            containerColor = if (currentGradeTab == "11") Color(0xFF10B981) else Color(0xFF064E3B)
-                                        ),
-                                        shape = RoundedCornerShape(8.dp),
-                                        modifier = Modifier
-                                            .weight(1f)
-                                            .height(38.dp)
-                                    ) {
-                                        Text(
-                                            text = "📙 11 ශ්‍රේණිය (O/L)",
-                                            fontSize = 12.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = Color.White
-                                        )
-                                    }
+                // 5 Horizontal Pill Buttons Row matching Screenshot 20261027-103528
+                LazyRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    item {
+                        Surface(
+                            onClick = { showProgressModal = true },
+                            shape = RoundedCornerShape(20.dp),
+                            color = Color(0xFF0369A1).copy(alpha = 0.25f),
+                            border = BorderStroke(1.dp, Color(0xFF38BDF8))
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text("📊", fontSize = 12.sp)
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("ප්‍රගතිය", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFF38BDF8))
+                            }
+                        }
+                    }
+                    item {
+                        Surface(
+                            onClick = {
+                                activeTab = 0
+                                selectedCategoryNumber = 1 // 1:50,000 maps
+                            },
+                            shape = RoundedCornerShape(20.dp),
+                            color = Color(0xFF059669).copy(alpha = 0.25f),
+                            border = BorderStroke(1.dp, Color(0xFF34D399))
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text("🎨", fontSize = 12.sp)
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("රූප සටහන්", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFF34D399))
+                            }
+                        }
+                    }
+                    item {
+                        Surface(
+                            onClick = {
+                                activeTab = 0
+                                selectedCategoryNumber = 0
+                            },
+                            shape = RoundedCornerShape(20.dp),
+                            color = Color(0xFF7C3AED).copy(alpha = 0.25f),
+                            border = BorderStroke(1.dp, Color(0xFFA78BFA))
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text("📗", fontSize = 12.sp)
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("සටහන්", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFFA78BFA))
+                            }
+                        }
+                    }
+                    item {
+                        Surface(
+                            onClick = { activeTab = 1 }, // Auto-Checker
+                            shape = RoundedCornerShape(20.dp),
+                            color = Color(0xFFD97706).copy(alpha = 0.25f),
+                            border = BorderStroke(1.dp, Color(0xFFFBBF24))
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text("⚡", fontSize = 12.sp)
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("ප්‍රශ්න 500", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFFFBBF24))
+                            }
+                        }
+                    }
+                    item {
+                        Surface(
+                            onClick = { showSyllabusModal = true },
+                            shape = RoundedCornerShape(20.dp),
+                            color = Color(0xFF0D9488).copy(alpha = 0.25f),
+                            border = BorderStroke(1.dp, Color(0xFF2DD4BF))
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text("📜", fontSize = 12.sp)
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("ශ්‍රේණිගතය", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2DD4BF))
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                // White Surface Box with 4 Tabs matching Screenshot 20261027-103528
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    color = Color.White,
+                    shadowElevation = 2.dp
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        val tabs = listOf(
+                            Triple("📄", "කෙටි සටහන්", 0),
+                            Triple("❓", "ප්‍රශ්න පත්‍ර", 1),
+                            Triple("📖", "ස්වයං පුහුණු", 2),
+                            Triple("✦", "AI Assistant", 3)
+                        )
+                        tabs.forEach { (emoji, label, index) ->
+                            val isSelected = activeTab == index
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clickable { activeTab = index }
+                                    .padding(vertical = 8.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(
+                                        text = emoji,
+                                        fontSize = 12.sp,
+                                        color = if (isSelected) Color(0xFF0284C7) else Color(0xFF64748B)
+                                    )
+                                    Spacer(modifier = Modifier.width(3.dp))
+                                    Text(
+                                        text = label,
+                                        fontSize = 11.sp,
+                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                        color = if (isSelected) Color(0xFF0284C7) else Color(0xFF475569)
+                                    )
                                 }
+                                if (isSelected) {
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Box(
+                                        modifier = Modifier
+                                            .width(36.dp)
+                                            .height(2.5.dp)
+                                            .clip(RoundedCornerShape(2.dp))
+                                            .background(Color(0xFF0284C7))
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
 
-                                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
-                                // 20 Categories Grid or Category Detail View
-                                if (selectedCategoryNumber == 0) {
+                // Main Green/Emerald Master Hub Container Box matching Screenshot 20261027-103528
+                Box(modifier = Modifier.weight(1f)) {
+                    when (activeTab) {
+                        0 -> {
+                            Surface(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                                shape = RoundedCornerShape(16.dp),
+                                color = Color(0xFF022C22), // Emerald dark green container
+                                border = BorderStroke(1.5.dp, Color(0xFF10B981))
+                            ) {
+                                Column(modifier = Modifier.fillMaxSize().padding(12.dp)) {
+                                    // Header of Master Hub
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            modifier = Modifier.weight(1f)
+                                        ) {
+                                            Text("🔬", fontSize = 18.sp)
+                                            Spacer(modifier = Modifier.width(6.dp))
+                                            Text(
+                                                text = "10 & 11 භූගෝල විද්‍යාව විෂය නිර්දේශ Master Hub",
+                                                color = Color.White,
+                                                fontSize = 13.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis
+                                            )
+                                        }
+                                        Surface(
+                                            shape = RoundedCornerShape(12.dp),
+                                            color = Color(0xFFF59E0B)
+                                        ) {
+                                            Text(
+                                                text = "100% ආවරණය",
+                                                color = Color(0xFF1E1B4B),
+                                                fontSize = 10.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
+                                            )
+                                        }
+                                    }
+
+                                    Spacer(modifier = Modifier.height(2.dp))
+                                    Text(
+                                        text = "සිතියම් • භෞතික භූගෝල විද්‍යාව • මානසික භූගෝල විද්‍යාව • ආපදා • කරුණු 400",
+                                        color = Color(0xFF6EE7B7),
+                                        fontSize = 10.5.sp
+                                    )
+
+                                    Spacer(modifier = Modifier.height(10.dp))
+
+                                    // Grade Selector Buttons inside Green Master Hub
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                    ) {
+                                        Button(
+                                            onClick = { currentGradeTab = "10" },
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = if (currentGradeTab == "10") Color(0xFF10B981) else Color(0xFF064E3B)
+                                            ),
+                                            shape = RoundedCornerShape(8.dp),
+                                            modifier = Modifier
+                                                .weight(1f)
+                                                .height(38.dp)
+                                        ) {
+                                            Text(
+                                                text = "📖 10 ශ්‍රේණිය",
+                                                fontSize = 12.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                color = Color.White
+                                            )
+                                        }
+                                        Button(
+                                            onClick = { currentGradeTab = "11" },
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = if (currentGradeTab == "11") Color(0xFF10B981) else Color(0xFF064E3B)
+                                            ),
+                                            shape = RoundedCornerShape(8.dp),
+                                            modifier = Modifier
+                                                .weight(1f)
+                                                .height(38.dp)
+                                        ) {
+                                            Text(
+                                                text = "📙 11 ශ්‍රේණිය (O/L)",
+                                                fontSize = 12.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                color = Color.White
+                                            )
+                                        }
+                                    }
+
+                                    Spacer(modifier = Modifier.height(12.dp))
+
                                     val gridScrollState = rememberScrollState()
                                     LaunchedEffect(currentGradeTab) {
                                         gridScrollState.scrollTo(0)
@@ -410,151 +421,140 @@ fun GeographyAutoCheckerScreen(
                                             onSelectModule = { selectedCategoryNumber = it }
                                         )
                                     }
-                                } else {
-                                    val filteredForGrade = masterCategories.filter { cat ->
-                                        if (currentGradeTab == "10") cat.categoryNumber <= 10 else cat.categoryNumber > 10
-                                    }
-                                    SubjectMaster20CategoriesDetailView(
-                                        subjectName = "භූගෝල විද්‍යාව",
-                                        categories = filteredForGrade,
-                                        selectedCategoryNumber = selectedCategoryNumber,
-                                        onSelectCategory = { selectedCategoryNumber = it },
+                                }
+                            }
+                        }
+                        1 -> {
+                            // Interactive Auto-Checker Workbook
+                            val filteredQuestions = autoCheckQuestions.filter { q ->
+                                when (currentGradeTab) {
+                                    "10" -> q.gradeLevel == GeoGradeLevel.GRADE_10 || q.gradeLevel == GeoGradeLevel.ALL
+                                    else -> q.gradeLevel == GeoGradeLevel.GRADE_11 || q.gradeLevel == GeoGradeLevel.ALL
+                                }
+                            }
+                            LazyColumn(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(horizontal = 12.dp),
+                                verticalArrangement = Arrangement.spacedBy(10.dp)
+                            ) {
+                                item {
+                                    Surface(
+                                        shape = RoundedCornerShape(10.dp),
+                                        color = Color(0xFF1E293B),
+                                        border = BorderStroke(1.dp, Color(0xFF334155)),
                                         modifier = Modifier.fillMaxWidth()
-                                    )
-                                }
-                            }
-                        }
-                    }
-                    1 -> {
-                        // Interactive Auto-Checker Workbook
-                        val filteredQuestions = autoCheckQuestions.filter { q ->
-                            when (currentGradeTab) {
-                                "10" -> q.gradeLevel == GeoGradeLevel.GRADE_10 || q.gradeLevel == GeoGradeLevel.ALL
-                                else -> q.gradeLevel == GeoGradeLevel.GRADE_11 || q.gradeLevel == GeoGradeLevel.ALL
-                            }
-                        }
-                        LazyColumn(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(horizontal = 12.dp),
-                            verticalArrangement = Arrangement.spacedBy(10.dp)
-                        ) {
-                            item {
-                                Surface(
-                                    shape = RoundedCornerShape(10.dp),
-                                    color = Color(0xFF1E293B),
-                                    border = BorderStroke(1.dp, Color(0xFF334155)),
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    Column(modifier = Modifier.padding(12.dp)) {
-                                        Text(
-                                            text = "⚡ භූගෝල විද්‍යාව ස්වයංක්‍රීය පිළිතුරු පරීක්ෂාව (Auto-Check)",
-                                            color = Color(0xFF34D399),
-                                            fontSize = 13.sp,
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                        Spacer(modifier = Modifier.height(4.dp))
-                                        Text(
-                                            text = "පිළිතුරක් තෝරාගත් වහාම 100% නිවැරදිදැයි තහවුරු කර, සවිස්තරාත්මක විවරණය සහ විභාග ඉඟි ලබා ගන්න.",
-                                            color = Color(0xFF94A3B8),
-                                            fontSize = 11.sp,
-                                            lineHeight = 15.sp
-                                        )
-                                    }
-                                }
-                            }
-                            items(filteredQuestions) { question ->
-                                GeoAutoCheckCard(question = question)
-                            }
-                        }
-                    }
-                    2 -> {
-                        // Q&A Hub & Flashcards Tab matching Screenshot 2
-                        LazyColumn(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(horizontal = 12.dp),
-                            verticalArrangement = Arrangement.spacedBy(10.dp)
-                        ) {
-                            item {
-                                Surface(
-                                    shape = RoundedCornerShape(12.dp),
-                                    color = Color(0xFF1E293B),
-                                    border = BorderStroke(1.dp, Color(0xFF7C3AED)),
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    Column(modifier = Modifier.padding(14.dp)) {
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Text("🎯", fontSize = 20.sp)
-                                            Spacer(modifier = Modifier.width(6.dp))
+                                    ) {
+                                        Column(modifier = Modifier.padding(12.dp)) {
                                             Text(
-                                                text = "භූගෝල විද්‍යාව Q&A & Flashcards Hub",
-                                                color = Color.White,
-                                                fontSize = 14.sp,
+                                                text = "⚡ භූගෝල විද්‍යාව ස්වයංක්‍රීය පිළිතුරු පරීක්ෂාව (Auto-Check)",
+                                                color = Color(0xFF34D399),
+                                                fontSize = 13.sp,
                                                 fontWeight = FontWeight.Bold
                                             )
+                                            Spacer(modifier = Modifier.height(4.dp))
+                                            Text(
+                                                text = "පිළිතුරක් තෝරාගත් වහාම 100% නිවැරදිදැයි තහවුරු කර, සවිස්තරාත්මක විවරණය සහ විභාග ඉඟි ලබා ගන්න.",
+                                                color = Color(0xFF94A3B8),
+                                                fontSize = 11.sp,
+                                                lineHeight = 15.sp
+                                            )
                                         }
-                                        Spacer(modifier = Modifier.height(4.dp))
-                                        Text(
-                                            text = "10 සහ 11 ශ්‍රේණි කෙටි පිළිතුරු, රචනා ප්‍රශ්න, Daily 10 සහ මතක තබා ගැනීමේ Flashcards.",
-                                            color = Color(0xFF94A3B8),
-                                            fontSize = 11.sp
-                                        )
                                     }
                                 }
-                            }
-                            item {
-                                GeoQaFlashcardSection(currentGrade = currentGradeTab)
+                                items(filteredQuestions) { question ->
+                                    GeoAutoCheckCard(question = question)
+                                }
                             }
                         }
-                    }
-                    3 -> {
-                        // PDF Notes & Workbook Viewer Tab matching Screenshot 2
-                        LazyColumn(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(horizontal = 12.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(10.dp)
-                        ) {
-                            item {
-                                Card(
-                                    shape = RoundedCornerShape(12.dp),
-                                    colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
-                                    border = BorderStroke(1.dp, Color(0xFF059669)),
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    Column(
-                                        modifier = Modifier.padding(16.dp),
-                                        horizontalAlignment = Alignment.CenterHorizontally
+                        2 -> {
+                            // Q&A Hub & Flashcards Tab matching Screenshot 2
+                            LazyColumn(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(horizontal = 12.dp),
+                                verticalArrangement = Arrangement.spacedBy(10.dp)
+                            ) {
+                                item {
+                                    Surface(
+                                        shape = RoundedCornerShape(12.dp),
+                                        color = Color(0xFF1E293B),
+                                        border = BorderStroke(1.dp, Color(0xFF7C3AED)),
+                                        modifier = Modifier.fillMaxWidth()
                                     ) {
-                                        Text("📄", fontSize = 32.sp)
-                                        Spacer(modifier = Modifier.height(8.dp))
-                                        Text(
-                                            text = "10 සහ 11 ශ්‍රේණි භූගෝල විද්‍යාව සම්පූර්ණ PDF කෙටි සටහන්",
-                                            color = Color.White,
-                                            fontSize = 14.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            textAlign = TextAlign.Center
-                                        )
-                                        Spacer(modifier = Modifier.height(4.dp))
-                                        Text(
-                                            text = "නිල විෂය නිර්දේශයට අදාළ සියලුම 1:50,000 සිතියම්, ප්‍රස්තාර, සටහන් සහ පින්තූර අඩංගු ගොනුව (පිටු 93).",
-                                            color = Color(0xFF94A3B8),
-                                            fontSize = 11.5.sp,
-                                            textAlign = TextAlign.Center,
-                                            lineHeight = 16.sp
-                                        )
-                                        Spacer(modifier = Modifier.height(12.dp))
-                                        Button(
-                                            onClick = { showPdfViewerModal = true },
-                                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF059669)),
-                                            shape = RoundedCornerShape(8.dp),
-                                            modifier = Modifier.fillMaxWidth().height(42.dp)
+                                        Column(modifier = Modifier.padding(14.dp)) {
+                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                                Text("🎯", fontSize = 20.sp)
+                                                Spacer(modifier = Modifier.width(6.dp))
+                                                Text(
+                                                    text = "භූගෝල විද්‍යාව Q&A & Flashcards Hub",
+                                                    color = Color.White,
+                                                    fontSize = 14.sp,
+                                                    fontWeight = FontWeight.Bold
+                                                )
+                                            }
+                                            Spacer(modifier = Modifier.height(4.dp))
+                                            Text(
+                                                text = "10 සහ 11 ශ්‍රේණි කෙටි පිළිතුරු, රචනා ප්‍රශ්න, Daily 10 සහ මතක තබා ගැනීමේ Flashcards.",
+                                                color = Color(0xFF94A3B8),
+                                                fontSize = 11.sp
+                                            )
+                                        }
+                                    }
+                                }
+                                item {
+                                    GeoQaFlashcardSection(currentGrade = currentGradeTab)
+                                }
+                            }
+                        }
+                        3 -> {
+                            // PDF Notes & Workbook Viewer Tab matching Screenshot 2
+                            LazyColumn(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(horizontal = 12.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(10.dp)
+                            ) {
+                                item {
+                                    Card(
+                                        shape = RoundedCornerShape(12.dp),
+                                        colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
+                                        border = BorderStroke(1.dp, Color(0xFF059669)),
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        Column(
+                                            modifier = Modifier.padding(16.dp),
+                                            horizontalAlignment = Alignment.CenterHorizontally
                                         ) {
-                                            Icon(Icons.Default.Visibility, contentDescription = null, tint = Color.White, modifier = Modifier.size(16.dp))
-                                            Spacer(modifier = Modifier.width(6.dp))
-                                            Text("PDF ගොනුව විවෘත කර බලන්න", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                                            Text("📄", fontSize = 32.sp)
+                                            Spacer(modifier = Modifier.height(8.dp))
+                                            Text(
+                                                text = "10 සහ 11 ශ්‍රේණි භූගෝල විද්‍යාව සම්පූර්ණ PDF කෙටි සටහන්",
+                                                color = Color.White,
+                                                fontSize = 14.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                textAlign = TextAlign.Center
+                                            )
+                                            Spacer(modifier = Modifier.height(4.dp))
+                                            Text(
+                                                text = "නිල විෂය නිර්දේශයට අදාළ සියලුම 1:50,000 සිතියම්, ප්‍රස්තාර, සටහන් සහ පින්තූර අඩංගු ගොනුව (පිටු 93).",
+                                                color = Color(0xFF94A3B8),
+                                                fontSize = 11.5.sp,
+                                                textAlign = TextAlign.Center,
+                                                lineHeight = 16.sp
+                                            )
+                                            Spacer(modifier = Modifier.height(12.dp))
+                                            Button(
+                                                onClick = { showPdfViewerModal = true },
+                                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF059669)),
+                                                shape = RoundedCornerShape(8.dp),
+                                                modifier = Modifier.fillMaxWidth().height(42.dp)
+                                            ) {
+                                                Icon(Icons.Default.Visibility, contentDescription = null, tint = Color.White, modifier = Modifier.size(16.dp))
+                                                Spacer(modifier = Modifier.width(6.dp))
+                                                Text("PDF ගොනුව විවෘත කර බලන්න", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                                            }
                                         }
                                     }
                                 }

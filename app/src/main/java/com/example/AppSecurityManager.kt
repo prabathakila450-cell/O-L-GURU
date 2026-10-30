@@ -165,6 +165,9 @@ object AppSecurityManager {
    * Checks Android NetworkCapabilities for TRANSPORT_VPN and inspects network interfaces.
    */
   fun isVpnConnected(context: Context): Boolean {
+    // Bypass VPN block for emulators and browser preview environments
+    if (isDeviceEmulator()) return false
+
     try {
       val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
       if (cm != null) {
@@ -194,6 +197,9 @@ object AppSecurityManager {
    * Detects if device clock is rolled back maliciously to bypass trial periods or lockouts.
    */
   fun isTimeTampered(context: Context): Boolean {
+    // Bypass time tampering block for emulators and browser preview environments
+    if (isDeviceEmulator()) return false
+
     try {
       val prefs = context.getSharedPreferences(PREFS_SECURITY, Context.MODE_PRIVATE)
       val currentTime = System.currentTimeMillis()

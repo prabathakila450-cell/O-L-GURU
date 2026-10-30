@@ -59,7 +59,6 @@ fun ReferralBanner(modifier: Modifier = Modifier) {
 
             මේ සියල්ල දැන්ම ලබාගෙන ඔබේ විභාග ජයග්‍රහණය තහවුරු කරගන්න!
             🎁👇
-            $downloadUrl
 
             😍😍😍😍😍😍😍😍
             Playstore හරහා O/L Guru ඇප් එක ඩවුන්ලෝඩ් කරගන්න😘😘😘😘
