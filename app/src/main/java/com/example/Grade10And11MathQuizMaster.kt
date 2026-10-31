@@ -846,8 +846,8 @@ object MathQuizEngine {
       18 -> {
         // Topic 19: වෘත්ත ප්‍රමේය - ජ්‍යාය හා කේන්ද්‍රය (Circle: Chord & Centre)
         val triples = listOf(
-          Triple(3, 4, 5), Triple(6, 8, 10), Triple(5, 12, 13), Triple(8, 15, 17),
-          Triple(9, 12, 15), Triple(7, 24, 25), Triple(12, 16, 20), Triple(10, 24, 26)
+          Triple(3, 4, 5), Triple(5, 12, 13), Triple(7, 24, 25), Triple(8, 15, 17),
+          Triple(9, 40, 41), Triple(11, 60, 61), Triple(12, 35, 37), Triple(20, 21, 29)
         )
         val mult = 1 + (k - 1) / 8
         val baseTriple = triples[(k - 1) % triples.size]

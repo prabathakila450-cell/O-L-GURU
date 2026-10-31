@@ -39,7 +39,6 @@ import androidx.compose.ui.unit.sp
 // ==============================================================================
 
 enum class SpecialFeatureSection(val id: String, val titleSinhala: String, val icon: String, val color: Color) {
-  OL_100_SUBJECT_TOOLS("ol_100_tools", "O/L මෙවලම් 100 (10x10 කාණ්ඩ)", "🛠️", Color(0xFF38BDF8)),
   SCIENCE_DIAGRAMS("sci_diagrams", "විද්‍යාව රූප සටහන් & සූත්‍ර", "🔬", Color(0xFF0D9488)),
   ENGLISH_WRITING_VAULT("eng_vault", "ඉංග්‍රීසි Writing Vault & Verbs", "✍️", Color(0xFF0284C7)),
   HISTORY_TIMELINE_MAPS("hist_suite", "ඉතිහාසය Timeline & සිතියම්", "🏛️", Color(0xFFD97706)),
@@ -61,7 +60,6 @@ fun OlSpecialMasterFeaturesHubScreen(
   initialCategoryNumber: Int? = null,
   onBack: () -> Unit,
   onOpenPdfModal: ((url: String, title: String) -> Unit)? = null,
-  onOpenTools100: (() -> Unit)? = null,
   lockedSubjectName: String? = null,
   subject: String? = null
 ) {
@@ -104,12 +102,12 @@ fun OlSpecialMasterFeaturesHubScreen(
   var isToolsFullScreen by remember { mutableStateOf(false) }
 
   // Fallback for general unconstrained access
-  var selectedSection by remember { mutableStateOf(initialSection ?: SpecialFeatureSection.OL_100_SUBJECT_TOOLS) }
+  var selectedSection by remember { mutableStateOf(initialSection ?: SpecialFeatureSection.SCIENCE_DIAGRAMS) }
 
   val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
-  // Suppress static outer top bar & tab row for OL_100_SUBJECT_TOOLS view so its internal LazyColumn can scroll full screen!
-  val showOuterBars = !isToolsFullScreen && selectedSection != SpecialFeatureSection.OL_100_SUBJECT_TOOLS
+  // Suppress static outer top bar & tab row for views so internal LazyColumn can scroll full screen!
+  val showOuterBars = !isToolsFullScreen
 
   Scaffold(
     modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -355,14 +353,6 @@ fun OlSpecialMasterFeaturesHubScreen(
           }
         } else {
           when (selectedSection) {
-            SpecialFeatureSection.OL_100_SUBJECT_TOOLS -> OlSubjectToolsScreen(
-              showInnerTopBar = false,
-              isFullScreenMode = isToolsFullScreen,
-              onToggleFullScreen = { isToolsFullScreen = !isToolsFullScreen },
-              onSelectSection = { selectedSection = it },
-              activeSection = selectedSection,
-              onBack = onBack
-            )
             SpecialFeatureSection.SCIENCE_DIAGRAMS -> ScienceDiagramsAndFormulaFeatureView()
             SpecialFeatureSection.ENGLISH_WRITING_VAULT -> EnglishWritingVaultAndVerbsFeatureView()
             SpecialFeatureSection.HISTORY_TIMELINE_MAPS -> HistoryTimelineAndMapPinningFeatureView()
@@ -372,14 +362,14 @@ fun OlSpecialMasterFeaturesHubScreen(
             SpecialFeatureSection.SINHALA_LITERATURE -> SinhalaLiteratureFeatureView()
             SpecialFeatureSection.BUDDHISM_DHAMMA -> BuddhismDhammaFeatureView()
             SpecialFeatureSection.GEOMETRY_STRUCTURED -> GeometryStructuredQuestionsHubScreen(
-              onBack = { selectedSection = SpecialFeatureSection.OL_100_SUBJECT_TOOLS }
+              onBack = { selectedSection = SpecialFeatureSection.SCIENCE_DIAGRAMS }
             )
             SpecialFeatureSection.DAILY_5MIN_CHALLENGE -> Daily5MinChallengeFeatureView()
             SpecialFeatureSection.OFFICIAL_MARKING_SCHEME -> OfficialMarkingSchemesFeatureView(onOpenPdfModal)
             SpecialFeatureSection.OL_ORIGINAL_PAST_PAPERS_10YEARS -> OlTenYearOriginalPastPapersHubScreen(
               studentName = "ශිෂ්‍ය ගිණුම",
               onOpenPdfModal = onOpenPdfModal,
-              onBack = { selectedSection = SpecialFeatureSection.OL_100_SUBJECT_TOOLS }
+              onBack = { selectedSection = SpecialFeatureSection.SCIENCE_DIAGRAMS }
             )
           }
         }

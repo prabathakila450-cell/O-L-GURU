@@ -65,13 +65,16 @@ enum class QaHubTab(val title: String, val icon: String, val badge: String, val 
 @Composable
 fun InteractiveQaMasterHubScreen(
   onBack: () -> Unit,
-  initialTab: QaHubTab = QaHubTab.SHORT_ANSWER
+  initialTab: QaHubTab = QaHubTab.SHORT_ANSWER,
+  isFullScreen: Boolean = false,
+  onFullScreenToggle: (Boolean) -> Unit = {}
 ) {
   var activeTab by remember { mutableStateOf(initialTab) }
 
   Scaffold(
     topBar = {
-      TopAppBar(
+      if (!isFullScreen) {
+        TopAppBar(
         title = {
           Column {
             Text(
@@ -99,8 +102,18 @@ fun InteractiveQaMasterHubScreen(
             )
           }
         },
+        actions = {
+          IconButton(onClick = { onFullScreenToggle(true) }) {
+            Icon(
+              imageVector = Icons.Default.Fullscreen,
+              contentDescription = "Full Screen",
+              tint = Color.White
+            )
+          }
+        },
         colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF0F172A))
       )
+      }
     }
   ) { padding ->
     Column(
@@ -110,33 +123,35 @@ fun InteractiveQaMasterHubScreen(
         .padding(padding)
     ) {
       // Horizontal Tab Row
-      ScrollableTabRow(
-        selectedTabIndex = activeTab.ordinal,
-        containerColor = Color(0xFF111C44),
-        contentColor = Color.White,
-        edgePadding = 12.dp,
-        divider = {}
-      ) {
-        QaHubTab.values().forEach { tab ->
-          Tab(
-            selected = activeTab == tab,
-            onClick = { activeTab = tab },
-            text = {
-              Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp)
-              ) {
-                Text(tab.icon, fontSize = 14.sp)
-                Text(
-                  text = tab.title,
-                  fontSize = 11.5.sp,
-                  fontWeight = if (activeTab == tab) FontWeight.Bold else FontWeight.Normal,
-                  color = if (activeTab == tab) tab.color else Color(0xFF94A3B8)
-                )
-              }
-            },
-            modifier = Modifier.testTag("tab_${tab.name}")
-          )
+      if (!isFullScreen) {
+        ScrollableTabRow(
+          selectedTabIndex = activeTab.ordinal,
+          containerColor = Color(0xFF111C44),
+          contentColor = Color.White,
+          edgePadding = 12.dp,
+          divider = {}
+        ) {
+          QaHubTab.values().forEach { tab ->
+            Tab(
+              selected = activeTab == tab,
+              onClick = { activeTab = tab },
+              text = {
+                Row(
+                  verticalAlignment = Alignment.CenterVertically,
+                  horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                  Text(tab.icon, fontSize = 14.sp)
+                  Text(
+                    text = tab.title,
+                    fontSize = 11.5.sp,
+                    fontWeight = if (activeTab == tab) FontWeight.Bold else FontWeight.Normal,
+                    color = if (activeTab == tab) tab.color else Color(0xFF94A3B8)
+                  )
+                }
+              },
+              modifier = Modifier.testTag("tab_${tab.name}")
+            )
+          }
         }
       }
 
@@ -144,15 +159,39 @@ fun InteractiveQaMasterHubScreen(
       Box(
         modifier = Modifier
           .fillMaxSize()
-          .padding(horizontal = 12.dp, vertical = 8.dp)
+          .padding(if (isFullScreen) PaddingValues(0.dp) else PaddingValues(horizontal = 12.dp, vertical = 8.dp))
       ) {
         when (activeTab) {
           QaHubTab.SHORT_ANSWER -> ShortAnswerEvaluationSection()
           QaHubTab.FLASHCARDS -> FlashcardQaSection()
-          QaHubTab.DAILY_CHALLENGE -> DailyMixedChallengeSection()
-          QaHubTab.MATCHING -> MatchingAndOrderingSection()
-          QaHubTab.TRUE_FALSE -> TrueFalseWithJustificationSection()
+          QaHubTab.DAILY_CHALLENGE -> DailyMixedChallengeSection(isFullScreen = isFullScreen, onFullScreenToggle = onFullScreenToggle)
+          QaHubTab.MATCHING -> MatchingAndOrderingSection(isFullScreen = isFullScreen, onFullScreenToggle = onFullScreenToggle)
+          QaHubTab.TRUE_FALSE -> TrueFalseWithJustificationSection(isFullScreen = isFullScreen, onFullScreenToggle = onFullScreenToggle)
           QaHubTab.CUSTOM_QUIZ -> CustomQuizMakerSection()
+        }
+      }
+
+      // Floating "Exit Full Screen" button (only for tabs without their own in-screen back headers)
+      if (isFullScreen && activeTab != QaHubTab.TRUE_FALSE && activeTab != QaHubTab.MATCHING && activeTab != QaHubTab.DAILY_CHALLENGE) {
+        Box(
+          modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+          contentAlignment = Alignment.TopEnd
+        ) {
+          IconButton(
+            onClick = { onFullScreenToggle(false) },
+            modifier = Modifier
+              .background(Color.Black.copy(alpha = 0.5f), CircleShape)
+              .size(40.dp)
+          ) {
+            Icon(
+              imageVector = Icons.Default.Close,
+              contentDescription = "Exit Full Screen",
+              tint = Color.White,
+              modifier = Modifier.size(24.dp)
+            )
+          }
         }
       }
     }
@@ -1244,7 +1283,10 @@ fun FlashcardQaSection() {
 // ==============================================================================
 
 @Composable
-fun DailyMixedChallengeSection() {
+fun DailyMixedChallengeSection(
+  isFullScreen: Boolean = false,
+  onFullScreenToggle: (Boolean) -> Unit = {}
+) {
   val context = LocalContext.current
   val prefs = remember { context.getSharedPreferences("ol_daily_quiz_prefs", Context.MODE_PRIVATE) }
 
@@ -1361,7 +1403,10 @@ fun DailyMixedChallengeSection() {
         // Special "Mixed All" Card
         QaSubjectMiniCard(
           category = ShortAnswerSubjectInfo("සියලුම විෂයයන්", "Mixed Subjects", "🎯", Color(0xFF10B981), "දිනපතා 10", "ප්‍රශ්න 50 • කාණ්ඩ 5", "සියලුම විෂයයන්ගෙන් සැකසූ මිශ්‍ර ප්‍රශ්න"),
-          onClick = { activeSubjectName = "සියලුම විෂයයන්" }
+          onClick = { 
+            activeSubjectName = "සියලුම විෂයයන්"
+            onFullScreenToggle(true)
+          }
         )
       }
 
@@ -1383,6 +1428,7 @@ fun DailyMixedChallengeSection() {
                 category = subjInfo,
                 onClick = {
                   activeSubjectName = subjInfo.subjectName
+                  onFullScreenToggle(true)
                 }
               )
             }
@@ -1411,7 +1457,10 @@ fun DailyMixedChallengeSection() {
             verticalAlignment = Alignment.CenterVertically
           ) {
             Text("විෂය මාරු කරන්න:", fontWeight = FontWeight.Bold, fontSize = 11.sp, color = Color(0xFF94A3B8))
-            TextButton(onClick = { activeSubjectName = null }) {
+            TextButton(onClick = { 
+              activeSubjectName = null 
+              onFullScreenToggle(false)
+            }) {
               Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null, modifier = Modifier.size(13.dp), tint = Color(0xFF10B981))
               Spacer(modifier = Modifier.width(3.dp))
               Text("සියලු විෂයන්", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFF10B981))
@@ -1744,7 +1793,10 @@ fun DailyMixedChallengeSection() {
 // ==============================================================================
 
 @Composable
-fun MatchingAndOrderingSection() {
+fun MatchingAndOrderingSection(
+  isFullScreen: Boolean = false,
+  onFullScreenToggle: (Boolean) -> Unit = {}
+) {
   var activeSubjectName by remember { mutableStateOf<String?>(null) }
   var subTab by remember { mutableIntStateOf(0) } // 0 = Matching, 1 = Timeline
   var subjectSearchQuery by remember { mutableStateOf("") }
@@ -1813,9 +1865,9 @@ fun MatchingAndOrderingSection() {
       }
 
       val bankSubjects = if (subTab == 0) {
-        InteractiveMatchingAndTimelineBank.matchSets.map { it.subject }
+        InteractiveMatchingAndTimelineBank.matchSets.map { it.subject }.distinct()
       } else {
-        InteractiveMatchingAndTimelineBank.timelineSets.map { it.subject }
+        InteractiveMatchingAndTimelineBank.timelineSets.map { it.subject }.distinct()
       }
 
       val filtered = if (subjectSearchQuery.isBlank()) bankSubjects else {
@@ -1841,11 +1893,14 @@ fun MatchingAndOrderingSection() {
                   subjectEnglish = if (subTab == 0) "Matching" else "Timeline",
                   icon = icon,
                   color = Color(0xFF8B5CF6),
-                  badge = if (subTab == 0) "MATCH" else "TIME",
-                  setsCountDesc = "අභ්‍යාස 20 • මට්ටම 1",
-                  unitsSummaryBrief = "විෂය කරුණු නිවැරදිව ගැලපීම"
+                  badge = if (subTab == 0) "10x10" else "TIME",
+                  setsCountDesc = if (subTab == 0) "කාණ්ඩ 10 • ප්‍රශ්න 100" else "අභ්‍යාස • කාලරේඛා",
+                  unitsSummaryBrief = if (subTab == 0) "10x10 කාණ්ඩ ක්‍රමය (ප්‍රශ්න 100)" else "විෂය කරුණු නිවැරදිව පෙළගැස්වීම"
                 ),
-                onClick = { activeSubjectName = subjName }
+                onClick = { 
+                  activeSubjectName = subjName
+                  onFullScreenToggle(true)
+                }
               )
             }
           }
@@ -1866,7 +1921,10 @@ fun MatchingAndOrderingSection() {
         verticalAlignment = Alignment.CenterVertically
       ) {
         Text("විෂය: $activeSubjectName", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = Color.White)
-        TextButton(onClick = { activeSubjectName = null }) {
+        TextButton(onClick = { 
+          activeSubjectName = null 
+          onFullScreenToggle(false)
+        }) {
           Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null, modifier = Modifier.size(13.dp), tint = Color(0xFF8B5CF6))
           Spacer(modifier = Modifier.width(3.dp))
           Text("සියලු විෂයන්", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFF8B5CF6))
@@ -1874,14 +1932,100 @@ fun MatchingAndOrderingSection() {
       }
 
       if (subTab == 0) {
-        val matchSet = InteractiveMatchingAndTimelineBank.matchSets.find { it.subject == activeSubjectName }
+        val subjectSets = InteractiveMatchingAndTimelineBank.matchSets.filter { it.subject == activeSubjectName }
+        var selectedSetIndex by remember(activeSubjectName) { mutableIntStateOf(0) }
+        
+        if (subjectSets.size > 1) {
+          Column {
+            Text(
+              text = "කාණ්ඩය තෝරන්න (Select Group):",
+              fontSize = 11.sp,
+              fontWeight = FontWeight.Bold,
+              color = Color(0xFF94A3B8),
+              modifier = Modifier.padding(bottom = 6.dp)
+            )
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+              itemsIndexed(subjectSets) { idx, set ->
+                val isSelected = selectedSetIndex == idx
+                Surface(
+                  onClick = { selectedSetIndex = idx },
+                  shape = RoundedCornerShape(10.dp),
+                  color = if (isSelected) Color(0xFF8B5CF6) else Color(0xFF1E293B),
+                  border = BorderStroke(1.dp, if (isSelected) Color.White else Color(0xFF334155)),
+                  modifier = Modifier.testTag("match_group_btn_$idx")
+                ) {
+                  Text(
+                    text = "කාණ්ඩය ${idx + 1}",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = if (isSelected) Color.White else Color(0xFFCBD5E1),
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp)
+                  )
+                }
+              }
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+          }
+        }
+
+        val matchSet = subjectSets.getOrNull(selectedSetIndex)
         if (matchSet != null) {
-          MatchingGameView(matchSet, onBack = { activeSubjectName = null })
+          Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+            key(matchSet.title) {
+              MatchingGameView(matchSet, onBack = { 
+                activeSubjectName = null 
+                onFullScreenToggle(false)
+              })
+            }
+          }
         }
       } else {
-        val timelineSet = InteractiveMatchingAndTimelineBank.timelineSets.find { it.subject == activeSubjectName }
+        val subjectSets = InteractiveMatchingAndTimelineBank.timelineSets.filter { it.subject == activeSubjectName }
+        var selectedSetIndex by remember(activeSubjectName) { mutableIntStateOf(0) }
+
+        if (subjectSets.size > 1) {
+           Column {
+            Text(
+              text = "කාණ්ඩය තෝරන්න (Select Group):",
+              fontSize = 11.sp,
+              fontWeight = FontWeight.Bold,
+              color = Color(0xFF94A3B8),
+              modifier = Modifier.padding(bottom = 6.dp)
+            )
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+              itemsIndexed(subjectSets) { idx, set ->
+                val isSelected = selectedSetIndex == idx
+                Surface(
+                  onClick = { selectedSetIndex = idx },
+                  shape = RoundedCornerShape(10.dp),
+                  color = if (isSelected) Color(0xFF8B5CF6) else Color(0xFF1E293B),
+                  border = BorderStroke(1.dp, if (isSelected) Color.White else Color(0xFF334155)),
+                  modifier = Modifier.testTag("timeline_group_btn_$idx")
+                ) {
+                  Text(
+                    text = "කාණ්ඩය ${idx + 1}",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = if (isSelected) Color.White else Color(0xFFCBD5E1),
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp)
+                  )
+                }
+              }
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+          }
+        }
+
+        val timelineSet = subjectSets.getOrNull(selectedSetIndex)
         if (timelineSet != null) {
-          TimelineOrderingView(timelineSet, onBack = { activeSubjectName = null })
+          Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+            key(timelineSet.title) {
+              TimelineOrderingView(timelineSet, onBack = { 
+                activeSubjectName = null 
+                onFullScreenToggle(false)
+              })
+            }
+          }
         }
       }
     }
@@ -1889,13 +2033,21 @@ fun MatchingAndOrderingSection() {
 }
 
 @Composable
-fun TrueFalseWithJustificationSection() {
-  var activeSubjectName by remember { mutableStateOf<String?>(null) }
+fun TrueFalseWithJustificationSection(
+  isFullScreen: Boolean = false,
+  onFullScreenToggle: (Boolean) -> Unit = {}
+) {
+  var activeSubjectName by remember { mutableStateOf<String?>("විද්‍යාව (Science)") }
   var subjectSearchQuery by remember { mutableStateOf("") }
+
+  LaunchedEffect(Unit) {
+    onFullScreenToggle(true)
+  }
 
   // BackHandler
   BackHandler(enabled = activeSubjectName != null) {
     activeSubjectName = null
+    onFullScreenToggle(false)
   }
 
   if (activeSubjectName == null) {
@@ -1956,7 +2108,10 @@ fun TrueFalseWithJustificationSection() {
                   setsCountDesc = "ප්‍රශ්න 500",
                   unitsSummaryBrief = "සත්‍ය/අසත්‍ය හා ගැඹුරු හේතු"
                 ),
-                onClick = { activeSubjectName = subject.displayName }
+                onClick = { 
+                  activeSubjectName = subject.displayName
+                  onFullScreenToggle(true)
+                }
               )
             }
           }
@@ -1969,7 +2124,15 @@ fun TrueFalseWithJustificationSection() {
   } else {
     val subject = TrueFalseSubject.values().find { it.displayName == activeSubjectName }
     if (subject != null) {
-      TrueFalse500Content(subject, onBack = { activeSubjectName = null })
+      TrueFalse500Content(
+        initialSubject = subject,
+        isFullScreen = isFullScreen,
+        onFullScreenToggle = onFullScreenToggle,
+        onBack = { 
+          activeSubjectName = null 
+          onFullScreenToggle(false)
+        }
+      )
     }
   }
 }
@@ -1977,14 +2140,14 @@ fun TrueFalseWithJustificationSection() {
 @Composable
 fun MatchingGameView(matchSet: SubjectMatchSet, onBack: () -> Unit) {
   val matchData = matchSet.items
-  val shuffledRight = remember(matchSet.subject) { matchData.map { it.rightCorrectText }.shuffled() }
-  var selectedLeft by remember(matchSet.subject) { mutableStateOf<String?>(null) }
-  var studentPairs by remember(matchSet.subject) { mutableStateOf<Map<String, String>>(emptyMap()) }
-  var isChecked by remember(matchSet.subject) { mutableStateOf(false) }
+  val shuffledRight = remember(matchSet.title) { matchData.map { it.rightCorrectText }.shuffled() }
+  var selectedLeft by remember(matchSet.title) { mutableStateOf<String?>(null) }
+  var studentPairs by remember(matchSet.title) { mutableStateOf<Map<String, String>>(emptyMap()) }
+  var isChecked by remember(matchSet.title) { mutableStateOf(false) }
 
   LazyColumn(
     modifier = Modifier.fillMaxSize(),
-    contentPadding = PaddingValues(bottom = 40.dp),
+    contentPadding = PaddingValues(bottom = 80.dp),
     verticalArrangement = Arrangement.spacedBy(10.dp)
   ) {
     item {
@@ -1999,13 +2162,20 @@ fun MatchingGameView(matchSet: SubjectMatchSet, onBack: () -> Unit) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
           ) {
-            Text(
-              text = "🔗 ${matchSet.icon} ${matchSet.subject} - ${matchSet.title}",
-              fontSize = 12.5.sp,
-              fontWeight = FontWeight.Bold,
-              color = Color.White,
-              modifier = Modifier.weight(1f)
-            )
+            Column(modifier = Modifier.weight(1f)) {
+              Text(
+                text = "${matchSet.icon} ${matchSet.subject}",
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFFA78BFA)
+              )
+              Text(
+                text = matchSet.title,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+              )
+            }
 
             OutlinedButton(
               onClick = onBack,
@@ -2018,7 +2188,7 @@ fun MatchingGameView(matchSet: SubjectMatchSet, onBack: () -> Unit) {
           }
           Spacer(modifier = Modifier.height(4.dp))
           Text(
-            text = "පළමුව වම් පසින් කරුණක් තෝරා, පසුව දකුණු පසින් අදාළ නිවැරදි ගැලපීම මත ඔබන්න.",
+            text = "පළමුව A තීරුවෙන් කරුණක් තෝරා, පසුව B තීරුවෙන් අදාළ නිවැරදි ගැලපීම මත ඔබන්න.",
             fontSize = 11.sp,
             color = Color(0xFFCBD5E1)
           )
@@ -2031,68 +2201,134 @@ fun MatchingGameView(matchSet: SubjectMatchSet, onBack: () -> Unit) {
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
       ) {
-        // Left Column
+        // Left Column (A තීරුව)
         Column(
           modifier = Modifier.weight(1f),
           verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-          Text("A තීරුව:", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFFC4B5FD))
-          matchData.forEach { item ->
+          Surface(
+            shape = RoundedCornerShape(6.dp),
+            color = Color(0xFF8B5CF6).copy(alpha = 0.25f),
+            modifier = Modifier.fillMaxWidth()
+          ) {
+            Text(
+              text = "A තීරුව (ප්‍රශ්න)",
+              fontSize = 11.sp,
+              fontWeight = FontWeight.Bold,
+              color = Color(0xFFC4B5FD),
+              modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
+              textAlign = TextAlign.Center
+            )
+          }
+
+          matchData.forEachIndexed { index, item ->
             val isSelected = selectedLeft == item.leftText
             val pairedWith = studentPairs[item.leftText]
             val isCorrect = pairedWith == item.rightCorrectText
 
             Surface(
-              shape = RoundedCornerShape(8.dp),
+              shape = RoundedCornerShape(10.dp),
               color = when {
                 isChecked && isCorrect -> Color(0xFF065F46)
                 isChecked && pairedWith != null && !isCorrect -> Color(0xFF7F1D1D)
                 isSelected -> Color(0xFF6D28D9)
-                pairedWith != null -> Color(0xFF4C1D95)
+                pairedWith != null -> Color(0xFF312E81)
                 else -> Color(0xFF1E293B)
               },
               border = BorderStroke(
-                1.dp,
-                if (isSelected) Color(0xFFA78BFA) else Color(0xFF475569)
+                if (isSelected) 2.dp else 1.dp,
+                when {
+                  isChecked && isCorrect -> Color(0xFF34D399)
+                  isChecked && pairedWith != null && !isCorrect -> Color(0xFFF87171)
+                  isSelected -> Color(0xFFA78BFA)
+                  pairedWith != null -> Color(0xFF818CF8)
+                  else -> Color(0xFF475569)
+                }
               ),
               modifier = Modifier
                 .fillMaxWidth()
-                .clickable { selectedLeft = item.leftText }
+                .clickable {
+                  selectedLeft = if (selectedLeft == item.leftText) null else item.leftText
+                }
+                .testTag("match_left_${item.id}")
             ) {
               Column(modifier = Modifier.padding(8.dp)) {
-                Text(text = item.leftText, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
-                if (pairedWith != null) {
+                Row(verticalAlignment = Alignment.Top) {
                   Text(
-                    text = "➔ $pairedWith",
-                    fontSize = 9.5.sp,
-                    color = if (isChecked) {
-                      if (isCorrect) Color(0xFF86EFAC) else Color(0xFFFCA5A5)
-                    } else Color(0xFFE9D5FF)
+                    text = "${index + 1}. ",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFFA78BFA)
                   )
+                  Text(
+                    text = item.leftText,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.White
+                  )
+                }
+                if (pairedWith != null) {
+                  Spacer(modifier = Modifier.height(4.dp))
+                  Surface(
+                    shape = RoundedCornerShape(4.dp),
+                    color = Color.Black.copy(alpha = 0.35f),
+                    modifier = Modifier.fillMaxWidth()
+                  ) {
+                    Text(
+                      text = "➔ $pairedWith",
+                      fontSize = 10.sp,
+                      color = if (isChecked) {
+                        if (isCorrect) Color(0xFF86EFAC) else Color(0xFFFCA5A5)
+                      } else Color(0xFFDDD6FE),
+                      modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
+                    )
+                  }
                 }
               }
             }
           }
         }
 
-        // Right Column
+        // Right Column (B තීරුව)
         Column(
           modifier = Modifier.weight(1f),
           verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-          Text("B තීරුව:", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFFC4B5FD))
+          Surface(
+            shape = RoundedCornerShape(6.dp),
+            color = Color(0xFF38BDF8).copy(alpha = 0.25f),
+            modifier = Modifier.fillMaxWidth()
+          ) {
+            Text(
+              text = "B තීරුව (පිළිතුරු)",
+              fontSize = 11.sp,
+              fontWeight = FontWeight.Bold,
+              color = Color(0xFFBAE6FD),
+              modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
+              textAlign = TextAlign.Center
+            )
+          }
+
           shuffledRight.forEach { rightText ->
             val isAlreadyPaired = studentPairs.values.contains(rightText)
 
             Surface(
-              shape = RoundedCornerShape(8.dp),
-              color = if (isAlreadyPaired) Color(0xFF334155) else Color(0xFF1E293B),
-              border = BorderStroke(1.dp, Color(0xFF475569)),
+              shape = RoundedCornerShape(10.dp),
+              color = if (isAlreadyPaired) Color(0xFF1E293B).copy(alpha = 0.7f) else Color(0xFF1E293B),
+              border = BorderStroke(
+                1.dp,
+                if (isAlreadyPaired) Color(0xFF475569) else Color(0xFF38BDF8).copy(alpha = 0.5f)
+              ),
               modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
                   if (selectedLeft != null) {
                     val updated = studentPairs.toMutableMap()
+                    // If rightText was previously used, remove the previous mapping
+                    val previousKey = updated.entries.find { it.value == rightText }?.key
+                    if (previousKey != null) {
+                      updated.remove(previousKey)
+                    }
                     updated[selectedLeft!!] = rightText
                     studentPairs = updated
                     selectedLeft = null
@@ -2100,12 +2336,22 @@ fun MatchingGameView(matchSet: SubjectMatchSet, onBack: () -> Unit) {
                   }
                 }
             ) {
-              Text(
-                text = rightText,
-                fontSize = 11.sp,
-                color = if (isAlreadyPaired) Color(0xFF94A3B8) else Color.White,
-                modifier = Modifier.padding(8.dp)
-              )
+              Column(modifier = Modifier.padding(8.dp)) {
+                Text(
+                  text = rightText,
+                  fontSize = 11.sp,
+                  color = if (isAlreadyPaired) Color(0xFF94A3B8) else Color.White
+                )
+                if (isAlreadyPaired) {
+                  Spacer(modifier = Modifier.height(2.dp))
+                  Text(
+                    text = "✓ ගැලපුවා",
+                    fontSize = 9.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF10B981)
+                  )
+                }
+              }
             }
           }
         }
@@ -2117,14 +2363,21 @@ fun MatchingGameView(matchSet: SubjectMatchSet, onBack: () -> Unit) {
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
       ) {
+        val allPaired = studentPairs.size == matchData.size
         Button(
           onClick = { isChecked = true },
-          enabled = studentPairs.size == matchData.size,
+          enabled = studentPairs.isNotEmpty(),
           modifier = Modifier.weight(1f),
-          colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8B5CF6)),
+          colors = ButtonDefaults.buttonColors(
+            containerColor = if (allPaired) Color(0xFF10B981) else Color(0xFF8B5CF6)
+          ),
           shape = RoundedCornerShape(8.dp)
         ) {
-          Text("පරීක්ෂා කරන්න (Check)", fontSize = 11.5.sp, fontWeight = FontWeight.Bold)
+          Text(
+            text = if (allPaired) "පරීක්ෂා කරන්න (සියල්ල ගැලපුවා)" else "පරීක්ෂා කරන්න (${studentPairs.size}/${matchData.size})",
+            fontSize = 11.5.sp,
+            fontWeight = FontWeight.Bold
+          )
         }
 
         OutlinedButton(
@@ -2136,7 +2389,44 @@ fun MatchingGameView(matchSet: SubjectMatchSet, onBack: () -> Unit) {
           shape = RoundedCornerShape(8.dp),
           colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFCBD5E1))
         ) {
-          Text("Reset", fontSize = 11.sp)
+          Text("නැවත සකසන්න", fontSize = 11.sp)
+        }
+      }
+    }
+
+    if (isChecked) {
+      item {
+        val correctCount = matchData.count { studentPairs[it.leftText] == it.rightCorrectText }
+        val isAllCorrect = correctCount == matchData.size
+        Card(
+          shape = RoundedCornerShape(12.dp),
+          colors = CardDefaults.cardColors(
+            containerColor = if (isAllCorrect) Color(0xFF064E3B) else Color(0xFF1E293B)
+          ),
+          border = BorderStroke(1.2.dp, if (isAllCorrect) Color(0xFF10B981) else Color(0xFF8B5CF6)),
+          modifier = Modifier.fillMaxWidth().testTag("matching_result_card")
+        ) {
+          Column(
+            modifier = Modifier.padding(14.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+          ) {
+            Text(
+              text = if (isAllCorrect) "🎉 විශිෂ්ටයි! සියලු ගැලපීම් 10 ම 100% ක් නිවැරදියි!" else "📊 ප්‍රතිඵලය: ලකුණු $correctCount / ${matchData.size} ක් නිවැරදියි",
+              fontSize = 13.5.sp,
+              fontWeight = FontWeight.Bold,
+              color = Color.White
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+              text = if (isAllCorrect) 
+                "ඔබ මෙම කාණ්ඩය සාර්ථකව අවසන් කළා! ඉහළින් වෙනත් කාණ්ඩයක් තෝරා පුහුණු වන්න."
+              else 
+                "කොළ පැහැයෙන් නිවැරදි ගැලපීම්ද, රතු පැහැයෙන් වැරදි ගැලපීම්ද දැක්වේ. නැවත උත්සාහ කිරීමට 'නැවත සකසන්න' ඔබන්න.",
+              fontSize = 11.sp,
+              color = Color(0xFFCBD5E1),
+              textAlign = TextAlign.Center
+            )
+          }
         }
       }
     }
@@ -2145,12 +2435,12 @@ fun MatchingGameView(matchSet: SubjectMatchSet, onBack: () -> Unit) {
 
 @Composable
 fun TimelineOrderingView(timelineSet: SubjectTimelineSet, onBack: () -> Unit) {
-  var currentList by remember(timelineSet.subject) { mutableStateOf(timelineSet.items.shuffled()) }
-  var isChecked by remember(timelineSet.subject) { mutableStateOf(false) }
+  var currentList by remember(timelineSet.title) { mutableStateOf(timelineSet.items.shuffled()) }
+  var isChecked by remember(timelineSet.title) { mutableStateOf(false) }
 
   LazyColumn(
     modifier = Modifier.fillMaxSize(),
-    contentPadding = PaddingValues(bottom = 40.dp),
+    contentPadding = PaddingValues(bottom = 80.dp),
     verticalArrangement = Arrangement.spacedBy(10.dp)
   ) {
     item {
@@ -2294,7 +2584,12 @@ fun TimelineOrderingView(timelineSet: SubjectTimelineSet, onBack: () -> Unit) {
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun TrueFalse500Content(initialSubject: TrueFalseSubject, onBack: () -> Unit) {
+fun TrueFalse500Content(
+  initialSubject: TrueFalseSubject,
+  isFullScreen: Boolean = false,
+  onFullScreenToggle: (Boolean) -> Unit = {},
+  onBack: () -> Unit
+) {
   val context = LocalContext.current
 
   // State: Grade selection (9, 10, 11)
@@ -2314,6 +2609,21 @@ fun TrueFalse500Content(initialSubject: TrueFalseSubject, onBack: () -> Unit) {
 
   // User answers map: Key = question.id ("tf_g11_sci_q42"), Value = chosen Boolean
   var userAnswers by remember { mutableStateOf<Map<String, Boolean>>(emptyMap()) }
+
+  // Focus Question Mode: When true, screen is 100% full screen with all outer/inner clutter removed
+  var isFocusQuestionMode by remember { mutableStateOf(true) }
+  var showQuestionSheet by remember { mutableStateOf(false) }
+  var showSubjectBatchDialog by remember { mutableStateOf(false) }
+
+  LaunchedEffect(isFocusQuestionMode) {
+    onFullScreenToggle(isFocusQuestionMode)
+  }
+
+  // Intercept back button when in Focus Mode
+  BackHandler(enabled = isFocusQuestionMode) {
+    isFocusQuestionMode = false
+    onFullScreenToggle(false)
+  }
 
   // TTS for reading statements
   var tts by remember { mutableStateOf<TextToSpeech?>(null) }
@@ -2357,303 +2667,160 @@ fun TrueFalse500Content(initialSubject: TrueFalseSubject, onBack: () -> Unit) {
   val correctInBatch = batchQuestions.count { userAnswers[it.id] == it.isTrue }
   val batchRange = TrueFalse500Repository.getBatchRange(selectedBatchIndex)
 
-  LazyColumn(
-    modifier = Modifier
-      .fillMaxSize()
-      .testTag("true_false_master_section"),
-    contentPadding = PaddingValues(bottom = 40.dp),
-    verticalArrangement = Arrangement.spacedBy(12.dp)
-  ) {
-    // 1. Grade Selector Banner (9 / 10 / 11)
-    item {
-      Card(
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
-        border = BorderStroke(1.dp, Color(0xFFEC4899).copy(alpha = 0.6f))
+  // =========================================================================
+  // MODE A: FULL SCREEN FOCUS QUESTION VIEW (Distraction-Free)
+  // When active: Top App Bar, Tabs, Bottom Navigation, and all inner selectors are removed!
+  // =========================================================================
+  if (isFocusQuestionMode && activeQ != null) {
+    val userAnswer = userAnswers[activeQ.id]
+    val hasAnswered = userAnswer != null
+    val isCorrect = hasAnswered && userAnswer == activeQ.isTrue
+
+    Column(
+      modifier = Modifier
+        .fillMaxSize()
+        .background(Color(0xFF0B132B))
+        .statusBarsPadding()
+        .navigationBarsPadding()
+        .padding(horizontal = 14.dp, vertical = 6.dp)
+        .testTag("true_false_focus_fullscreen")
+    ) {
+      // 1. Sleek Top Header
+      Row(
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
       ) {
-        Column(modifier = Modifier.padding(12.dp)) {
+        // Back / Exit Focus button
+        Surface(
+          onClick = {
+            isFocusQuestionMode = false
+            onFullScreenToggle(false)
+          },
+          shape = RoundedCornerShape(10.dp),
+          color = Color(0xFF1E293B),
+          border = BorderStroke(1.dp, Color(0xFF334155))
+        ) {
           Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically
           ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-              IconButton(onClick = onBack, modifier = Modifier.size(32.dp)) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.White, modifier = Modifier.size(18.dp))
-              }
-              Spacer(modifier = Modifier.width(4.dp))
-              Text("⚖️", fontSize = 18.sp)
-              Spacer(modifier = Modifier.width(6.dp))
-              Text(
-                text = "සත්‍ය / අසත්‍ය පුහුණුව • විෂයකට ප්‍රශ්න 500",
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-              )
-            }
-            Surface(
-              shape = RoundedCornerShape(6.dp),
-              color = Color(0xFFEC4899).copy(alpha = 0.25f)
-            ) {
-              Text(
-                text = "Grade $selectedGrade",
-                fontSize = 11.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = Color(0xFFF472B6),
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
-              )
-            }
-          }
-
-          Spacer(modifier = Modifier.height(10.dp))
-
-          // Grade Selection Buttons (9, 10, 11)
-          Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-          ) {
-            listOf(9, 10, 11).forEach { grade ->
-              val isSelected = selectedGrade == grade
-              OutlinedButton(
-                onClick = {
-                  selectedGrade = grade
-                  selectedBatchIndex = 0
-                  questionIndexInBatch = 0
-                },
-                modifier = Modifier
-                  .weight(1f)
-                  .testTag("grade_btn_$grade"),
-                colors = ButtonDefaults.outlinedButtonColors(
-                  containerColor = if (isSelected) Color(0xFFEC4899) else Color(0xFF0F172A),
-                  contentColor = if (isSelected) Color.White else Color(0xFFE2E8F0)
-                ),
-                border = BorderStroke(
-                  1.5.dp,
-                  if (isSelected) Color(0xFFF472B6) else Color(0xFF334155)
-                ),
-                shape = RoundedCornerShape(10.dp),
-                contentPadding = PaddingValues(vertical = 6.dp)
-              ) {
-                Text(
-                  text = "$grade ශ්‍රේණිය",
-                  fontSize = 12.sp,
-                  fontWeight = if (isSelected) FontWeight.ExtraBold else FontWeight.Medium
-                )
-              }
-            }
-          }
-        }
-      }
-    }
-
-    // 2. Subject Selection Chips
-    item {
-      Column {
-        Text(
-          text = "විෂය තෝරන්න (Select Subject):",
-          fontSize = 11.sp,
-          fontWeight = FontWeight.Bold,
-          color = Color(0xFF94A3B8),
-          modifier = Modifier.padding(bottom = 6.dp)
-        )
-        LazyRow(
-          horizontalArrangement = Arrangement.spacedBy(8.dp),
-          contentPadding = PaddingValues(horizontal = 2.dp)
-        ) {
-          items(TrueFalseSubject.values()) { subject ->
-            val isSelected = selectedSubject == subject
-            Surface(
-              shape = RoundedCornerShape(10.dp),
-              color = if (isSelected) subject.primaryColor else Color(0xFF1E293B),
-              border = BorderStroke(
-                1.dp,
-                if (isSelected) Color.White else Color(0xFF334155)
-              ),
-              modifier = Modifier
-                .clickable {
-                  selectedSubject = subject
-                  selectedBatchIndex = 0
-                  questionIndexInBatch = 0
-                }
-                .testTag("subject_chip_${subject.id}")
-            ) {
-              Row(
-                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                verticalAlignment = Alignment.CenterVertically
-              ) {
-                Text(subject.iconEmoji, fontSize = 14.sp)
-                Spacer(modifier = Modifier.width(5.dp))
-                Text(
-                  text = subject.displayName,
-                  fontSize = 11.sp,
-                  fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                  color = if (isSelected) Color.White else Color(0xFFCBD5E1)
-                )
-              }
-            }
-          }
-        }
-      }
-    }
-
-    // 3. Batch Selection Chips (17 Batches of 30 questions)
-    item {
-      Column {
-        Row(
-          modifier = Modifier.fillMaxWidth(),
-          horizontalArrangement = Arrangement.SpaceBetween,
-          verticalAlignment = Alignment.CenterVertically
-        ) {
-          Text(
-            text = "තිහේ කාණ්ඩය තෝරන්න (30 Questions Batch):",
-            fontSize = 11.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF94A3B8)
-          )
-          Text(
-            text = "කාණ්ඩ 17 න් #${selectedBatchIndex + 1}",
-            fontSize = 10.5.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFFF472B6)
-          )
-        }
-        Spacer(modifier = Modifier.height(6.dp))
-        LazyRow(
-          horizontalArrangement = Arrangement.spacedBy(8.dp),
-          contentPadding = PaddingValues(horizontal = 2.dp)
-        ) {
-          items(TrueFalse500Repository.TOTAL_BATCHES) { batchIdx ->
-            val isSelected = selectedBatchIndex == batchIdx
-            val (start, end) = TrueFalse500Repository.getBatchRange(batchIdx)
-            val batchCount = (start..end).count { qNum ->
-              userAnswers.containsKey("tf_g${selectedGrade}_${selectedSubject.id}_q$qNum")
-            }
-            val isCompleted = batchCount == (end - start + 1)
-
-            Surface(
-              shape = RoundedCornerShape(10.dp),
-              color = if (isSelected) Color(0xFF831843) else Color(0xFF1E293B),
-              border = BorderStroke(
-                1.5.dp,
-                if (isSelected) Color(0xFFF472B6) else if (isCompleted) Color(0xFF10B981) else Color(0xFF334155)
-              ),
-              modifier = Modifier
-                .clickable {
-                  selectedBatchIndex = batchIdx
-                  questionIndexInBatch = 0
-                }
-                .testTag("batch_chip_$batchIdx")
-            ) {
-              Column(
-                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-              ) {
-                Text(
-                  text = "කාණ්ඩය ${batchIdx + 1}",
-                  fontSize = 11.sp,
-                  fontWeight = FontWeight.Bold,
-                  color = if (isSelected) Color.White else Color(0xFFE2E8F0)
-                )
-                Text(
-                  text = "ප්‍රශ්න $start - $end",
-                  fontSize = 9.sp,
-                  color = if (isSelected) Color(0xFFFCE7F3) else Color(0xFF94A3B8)
-                )
-                if (batchCount > 0) {
-                  Text(
-                    text = if (isCompleted) "සම්පූර්ණයි ✅" else "$batchCount/${end - start + 1}",
-                    fontSize = 8.5.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = if (isCompleted) Color(0xFF4ADE80) else Color(0xFFFBBF24)
-                  )
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-
-    // 4. Batch Progress & Controls Bar
-    item {
-      Card(
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF0F172A)),
-        border = BorderStroke(1.dp, Color(0xFF334155))
-      ) {
-        Row(
-          modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 8.dp),
-          horizontalArrangement = Arrangement.SpaceBetween,
-          verticalAlignment = Alignment.CenterVertically
-        ) {
-          Column {
+            Icon(
+              imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+              contentDescription = "Back",
+              tint = Color(0xFFEC4899),
+              modifier = Modifier.size(16.dp)
+            )
+            Spacer(modifier = Modifier.width(4.dp))
             Text(
-              text = "කාණ්ඩයේ ප්‍රගතිය: $answeredInBatch / ${batchQuestions.size} පිළිතුරු",
-              fontSize = 10.5.sp,
+              text = "කාණ්ඩ වෙත",
+              fontSize = 11.sp,
               fontWeight = FontWeight.Bold,
               color = Color.White
             )
-            Text(
-              text = "ලකුණු: $correctInBatch • නිරවද්‍යතාව: ${if (answeredInBatch > 0) (correctInBatch * 100) / answeredInBatch else 0}%",
-              fontSize = 9.5.sp,
-              color = Color(0xFF38BDF8)
-            )
           }
+        }
 
-          Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            // Filter mistakes
-            FilterChip(
-              selected = filterOnlyMistakes,
-              onClick = { filterOnlyMistakes = !filterOnlyMistakes },
-              label = { Text("වැරදුණු ඒවා", fontSize = 9.5.sp) },
-              colors = FilterChipDefaults.filterChipColors(
-                selectedContainerColor = Color(0xFFEF4444),
-                selectedLabelColor = Color.White
-              ),
-              modifier = Modifier.testTag("filter_mistakes_chip")
-            )
-
-            // Reset batch
-            IconButton(
-              onClick = {
-                val newAnswers = userAnswers.toMutableMap()
-                batchQuestions.forEach { newAnswers.remove(it.id) }
-                userAnswers = newAnswers
-                questionIndexInBatch = 0
-              },
-              modifier = Modifier.size(32.dp).testTag("reset_batch_btn")
-            ) {
-              Icon(
-                imageVector = Icons.Default.Refresh,
-                contentDescription = "Reset Batch",
-                tint = Color(0xFF94A3B8),
-                modifier = Modifier.size(18.dp)
+        // Center: Title & Batch Info (Tappable for Quick Switch Dialog)
+        Surface(
+          onClick = { showSubjectBatchDialog = true },
+          shape = RoundedCornerShape(10.dp),
+          color = Color(0xFF1E293B),
+          border = BorderStroke(1.dp, Color(0xFF334155))
+        ) {
+          Row(
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+            verticalAlignment = Alignment.CenterVertically
+          ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+              Text(
+                text = "${selectedSubject.iconEmoji} ${selectedSubject.displayName}",
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+              )
+              Text(
+                text = "${selectedGrade} ශ්‍රේණිය • කාණ්ඩය #${selectedBatchIndex + 1} (${batchRange.first}-${batchRange.second})",
+                fontSize = 9.sp,
+                color = Color(0xFFF472B6)
               )
             }
+            Spacer(modifier = Modifier.width(4.dp))
+            Icon(
+              imageVector = Icons.Default.ArrowDropDown,
+              contentDescription = "Switch",
+              tint = Color(0xFFEC4899),
+              modifier = Modifier.size(18.dp)
+            )
+          }
+        }
+
+        // Right Action: Question jump & progress badge
+        Surface(
+          onClick = { showQuestionSheet = true },
+          shape = RoundedCornerShape(10.dp),
+          color = Color(0xFF1E293B),
+          border = BorderStroke(1.dp, Color(0xFFEC4899).copy(alpha = 0.5f))
+        ) {
+          Row(
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
+            verticalAlignment = Alignment.CenterVertically
+          ) {
+            Icon(
+              imageVector = Icons.Default.List,
+              contentDescription = "Question List",
+              tint = Color(0xFF38BDF8),
+              modifier = Modifier.size(14.dp)
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(
+              text = "${effectiveIndex + 1}/${displayedQuestions.size}",
+              fontSize = 11.sp,
+              fontWeight = FontWeight.ExtraBold,
+              color = Color.White
+            )
           }
         }
       }
-    }
 
-    // 5. Active Question Card
-    if (activeQ != null) {
-      val userAnswer = userAnswers[activeQ.id]
-      val hasAnswered = userAnswer != null
-      val isCorrect = hasAnswered && userAnswer == activeQ.isTrue
+      Spacer(modifier = Modifier.height(4.dp))
 
-      item {
+      // Linear progress bar across questions in batch
+      LinearProgressIndicator(
+        progress = { (effectiveIndex + 1).toFloat() / displayedQuestions.size.coerceAtLeast(1) },
+        modifier = Modifier
+          .fillMaxWidth()
+          .height(3.dp)
+          .clip(RoundedCornerShape(2.dp)),
+        color = Color(0xFFEC4899),
+        trackColor = Color(0xFF1E293B)
+      )
+
+      Spacer(modifier = Modifier.height(10.dp))
+
+      // Central Question Content (Scrollable so explanation is always accessible without clutter)
+      val focusScrollState = rememberScrollState()
+      Column(
+        modifier = Modifier
+          .weight(1f)
+          .fillMaxWidth()
+          .verticalScroll(focusScrollState),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+      ) {
+        // Question Card
         Card(
           shape = RoundedCornerShape(16.dp),
           colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
           border = BorderStroke(
             1.5.dp,
-            if (!hasAnswered) Color(0xFF475569) else if (isCorrect) Color(0xFF22C55E) else Color(0xFFEF4444)
-          )
+            if (!hasAnswered) Color(0xFF334155) else if (isCorrect) Color(0xFF22C55E) else Color(0xFFEF4444)
+          ),
+          modifier = Modifier.fillMaxWidth().testTag("focus_question_card")
         ) {
           Column(modifier = Modifier.padding(16.dp)) {
-            // Top badges
+            // Unit Name & Question Number Badge
             Row(
               modifier = Modifier.fillMaxWidth(),
               horizontalArrangement = Arrangement.SpaceBetween,
@@ -2664,8 +2831,8 @@ fun TrueFalse500Content(initialSubject: TrueFalseSubject, onBack: () -> Unit) {
                 color = selectedSubject.primaryColor.copy(alpha = 0.2f)
               ) {
                 Text(
-                  text = "${selectedSubject.displayName} • ${activeQ.unitName}",
-                  fontSize = 10.sp,
+                  text = activeQ.unitName,
+                  fontSize = 11.sp,
                   fontWeight = FontWeight.Bold,
                   color = selectedSubject.primaryColor,
                   modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
@@ -2674,21 +2841,21 @@ fun TrueFalse500Content(initialSubject: TrueFalseSubject, onBack: () -> Unit) {
 
               Surface(
                 shape = RoundedCornerShape(6.dp),
-                color = Color(0xFF334155)
+                color = Color(0xFF0F172A)
               ) {
                 Text(
-                  text = "ප්‍රශ්න අංක ${effectiveIndex + 1} / ${displayedQuestions.size} (මුළු #${activeQ.number})",
+                  text = "ප්‍රශ්න ${effectiveIndex + 1} / ${displayedQuestions.size} (මුළු #${activeQ.number})",
                   fontSize = 10.sp,
                   fontWeight = FontWeight.Bold,
                   color = Color(0xFFCBD5E1),
-                  modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                  modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp)
                 )
               }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
-            // Statement with TTS button
+            // Statement with Voice / TTS button
             Row(
               modifier = Modifier.fillMaxWidth(),
               verticalAlignment = Alignment.Top
@@ -2700,13 +2867,13 @@ fun TrueFalse500Content(initialSubject: TrueFalseSubject, onBack: () -> Unit) {
                   fontWeight = FontWeight.SemiBold,
                   color = Color(0xFF94A3B8)
                 )
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(6.dp))
                 Text(
                   text = "\"${activeQ.statement}\"",
-                  fontSize = 14.5.sp,
+                  fontSize = 15.5.sp,
                   fontWeight = FontWeight.Bold,
                   color = Color.White,
-                  lineHeight = 22.sp
+                  lineHeight = 24.sp
                 )
               }
 
@@ -2717,23 +2884,24 @@ fun TrueFalse500Content(initialSubject: TrueFalseSubject, onBack: () -> Unit) {
                   } catch (_: Exception) {}
                 },
                 modifier = Modifier
-                  .padding(start = 4.dp)
-                  .testTag("tts_play_btn")
+                  .size(38.dp)
+                  .testTag("focus_tts_play_btn")
               ) {
                 Icon(
                   imageVector = Icons.Default.VolumeUp,
                   contentDescription = "Read Statement Aloud",
-                  tint = Color(0xFF38BDF8)
+                  tint = Color(0xFF38BDF8),
+                  modifier = Modifier.size(24.dp)
                 )
               }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-            // True / False Buttons
+            // Big, Comfortable True / False Answer Buttons
             Row(
               modifier = Modifier.fillMaxWidth(),
-              horizontalArrangement = Arrangement.spacedBy(10.dp)
+              horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
               // TRUE BUTTON
               Button(
@@ -2742,6 +2910,7 @@ fun TrueFalse500Content(initialSubject: TrueFalseSubject, onBack: () -> Unit) {
                 },
                 modifier = Modifier
                   .weight(1f)
+                  .height(54.dp)
                   .testTag("true_btn_${activeQ.id}"),
                 colors = ButtonDefaults.buttonColors(
                   containerColor = if (userAnswer == true) {
@@ -2749,14 +2918,14 @@ fun TrueFalse500Content(initialSubject: TrueFalseSubject, onBack: () -> Unit) {
                   } else Color(0xFF0F172A)
                 ),
                 border = BorderStroke(
-                  1.5.dp,
+                  if (userAnswer == true) 2.dp else 1.2.dp,
                   if (userAnswer == true) Color(0xFF4ADE80) else Color(0xFF475569)
                 ),
-                shape = RoundedCornerShape(10.dp)
+                shape = RoundedCornerShape(12.dp)
               ) {
                 Text(
                   text = "✔️ සත්‍ය වේ (True)",
-                  fontSize = 12.5.sp,
+                  fontSize = 13.5.sp,
                   fontWeight = FontWeight.Bold,
                   color = Color.White
                 )
@@ -2769,6 +2938,7 @@ fun TrueFalse500Content(initialSubject: TrueFalseSubject, onBack: () -> Unit) {
                 },
                 modifier = Modifier
                   .weight(1f)
+                  .height(54.dp)
                   .testTag("false_btn_${activeQ.id}"),
                 colors = ButtonDefaults.buttonColors(
                   containerColor = if (userAnswer == false) {
@@ -2776,14 +2946,14 @@ fun TrueFalse500Content(initialSubject: TrueFalseSubject, onBack: () -> Unit) {
                   } else Color(0xFF0F172A)
                 ),
                 border = BorderStroke(
-                  1.5.dp,
+                  if (userAnswer == false) 2.dp else 1.2.dp,
                   if (userAnswer == false) Color(0xFFF87171) else Color(0xFF475569)
                 ),
-                shape = RoundedCornerShape(10.dp)
+                shape = RoundedCornerShape(12.dp)
               ) {
                 Text(
                   text = "❌ අසත්‍ය වේ (False)",
-                  fontSize = 12.5.sp,
+                  fontSize = 13.5.sp,
                   fontWeight = FontWeight.Bold,
                   color = Color.White
                 )
@@ -2791,11 +2961,9 @@ fun TrueFalse500Content(initialSubject: TrueFalseSubject, onBack: () -> Unit) {
             }
           }
         }
-      }
 
-      // 6. Justification Explanation Box (Appears after answer)
-      if (hasAnswered) {
-        item {
+        // Justification Explanation Box (Appears after answer)
+        if (hasAnswered) {
           Card(
             shape = RoundedCornerShape(14.dp),
             colors = CardDefaults.cardColors(
@@ -2804,7 +2972,8 @@ fun TrueFalse500Content(initialSubject: TrueFalseSubject, onBack: () -> Unit) {
             border = BorderStroke(
               1.5.dp,
               if (isCorrect) Color(0xFF22C55E) else Color(0xFFEF4444)
-            )
+            ),
+            modifier = Modifier.fillMaxWidth().testTag("justification_explanation_card")
           ) {
             Column(modifier = Modifier.padding(14.dp)) {
               Row(
@@ -2839,7 +3008,7 @@ fun TrueFalse500Content(initialSubject: TrueFalseSubject, onBack: () -> Unit) {
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFFFBBF24)
               )
-              Spacer(modifier = Modifier.height(3.dp))
+              Spacer(modifier = Modifier.height(4.dp))
               Text(
                 text = activeQ.justification,
                 fontSize = 12.sp,
@@ -2859,104 +3028,147 @@ fun TrueFalse500Content(initialSubject: TrueFalseSubject, onBack: () -> Unit) {
         }
       }
 
-      // 7. Navigation Controls (Previous / Next)
-      item {
-        Row(
-          modifier = Modifier.fillMaxWidth(),
-          horizontalArrangement = Arrangement.SpaceBetween,
-          verticalAlignment = Alignment.CenterVertically
+      // Bottom Navigation Buttons (Fixed bar at bottom for comfortable one-by-one flow)
+      Row(
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(top = 8.dp, bottom = 6.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        verticalAlignment = Alignment.CenterVertically
+      ) {
+        OutlinedButton(
+          onClick = {
+            if (effectiveIndex > 0) {
+              questionIndexInBatch = effectiveIndex - 1
+            }
+          },
+          enabled = effectiveIndex > 0,
+          colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
+          border = BorderStroke(1.dp, if (effectiveIndex > 0) Color(0xFF475569) else Color(0xFF1E293B)),
+          shape = RoundedCornerShape(10.dp),
+          modifier = Modifier
+            .weight(1f)
+            .height(48.dp)
+            .testTag("prev_q_btn")
         ) {
-          OutlinedButton(
-            onClick = {
-              if (effectiveIndex > 0) {
-                questionIndexInBatch = effectiveIndex - 1
-              }
-            },
-            enabled = effectiveIndex > 0,
-            colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
-            border = BorderStroke(1.dp, Color(0xFF475569)),
-            shape = RoundedCornerShape(8.dp),
-            modifier = Modifier.testTag("prev_q_btn")
-          ) {
-            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Previous", modifier = Modifier.size(16.dp))
-            Spacer(modifier = Modifier.width(4.dp))
-            Text("පෙර ප්‍රශ්නය", fontSize = 11.sp)
-          }
+          Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Previous", modifier = Modifier.size(16.dp))
+          Spacer(modifier = Modifier.width(6.dp))
+          Text("පෙර ප්‍රශ්නය", fontSize = 11.5.sp, fontWeight = FontWeight.SemiBold)
+        }
 
-          Button(
-            onClick = {
-              if (effectiveIndex < displayedQuestions.size - 1) {
-                questionIndexInBatch = effectiveIndex + 1
-              } else if (selectedBatchIndex < TrueFalse500Repository.TOTAL_BATCHES - 1) {
-                selectedBatchIndex++
-                questionIndexInBatch = 0
-              }
-            },
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEC4899)),
-            shape = RoundedCornerShape(8.dp),
-            modifier = Modifier.testTag("next_q_btn")
-          ) {
-            Text(
-              text = if (effectiveIndex < displayedQuestions.size - 1) "මීළඟ ප්‍රශ්නය" else "ඊළඟ කාණ්ඩයට ➔",
-              fontSize = 11.sp,
-              fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.width(4.dp))
-            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Next", modifier = Modifier.size(16.dp))
-          }
+        Button(
+          onClick = {
+            if (effectiveIndex < displayedQuestions.size - 1) {
+              questionIndexInBatch = effectiveIndex + 1
+            } else if (selectedBatchIndex < TrueFalse500Repository.TOTAL_BATCHES - 1) {
+              selectedBatchIndex++
+              questionIndexInBatch = 0
+            }
+          },
+          colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEC4899)),
+          shape = RoundedCornerShape(10.dp),
+          modifier = Modifier
+            .weight(1f)
+            .height(48.dp)
+            .testTag("next_q_btn")
+        ) {
+          Text(
+            text = if (effectiveIndex < displayedQuestions.size - 1) "මීළඟ ප්‍රශ්නය" else "ඊළඟ කාණ්ඩයට ➔",
+            fontSize = 11.5.sp,
+            fontWeight = FontWeight.Bold
+          )
+          Spacer(modifier = Modifier.width(6.dp))
+          Icon(imageVector = Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Next", modifier = Modifier.size(16.dp))
         }
       }
-
-      // 8. Question Jump Grid (1 to 30 circle chips)
+    }
+  } else {
+    // =========================================================================
+    // MODE B: BATCH & GRADE OVERVIEW VIEW
+    // Accessible via "කාණ්ඩ වෙත" button. Allows switching subjects/batches/grades.
+    // Tapping on any question immediately enters Focus Full-Screen Mode!
+    // =========================================================================
+    LazyColumn(
+      modifier = Modifier
+        .fillMaxSize()
+        .testTag("true_false_master_section"),
+      contentPadding = PaddingValues(bottom = 80.dp),
+      verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+      // 1. Grade Selector Banner (9 / 10 / 11)
       item {
         Card(
           shape = RoundedCornerShape(14.dp),
           colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
-          border = BorderStroke(1.dp, Color(0xFF334155))
+          border = BorderStroke(1.dp, Color(0xFFEC4899).copy(alpha = 0.6f))
         ) {
           Column(modifier = Modifier.padding(12.dp)) {
-            Text(
-              text = "ප්‍රශ්න ලැයිස්තුව (කාණ්ඩය #${selectedBatchIndex + 1}):",
-              fontSize = 11.sp,
-              fontWeight = FontWeight.Bold,
-              color = Color(0xFF94A3B8)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-
-            FlowRow(
+            Row(
               modifier = Modifier.fillMaxWidth(),
-              horizontalArrangement = Arrangement.spacedBy(6.dp),
-              verticalArrangement = Arrangement.spacedBy(6.dp)
+              horizontalArrangement = Arrangement.SpaceBetween,
+              verticalAlignment = Alignment.CenterVertically
             ) {
-              displayedQuestions.forEachIndexed { idx, q ->
-                val ans = userAnswers[q.id]
-                val isCurrent = idx == effectiveIndex
-                val circleBg = when {
-                  ans == null -> Color(0xFF0F172A)
-                  ans == q.isTrue -> Color(0xFF16A34A)
-                  else -> Color(0xFFDC2626)
+              Row(verticalAlignment = Alignment.CenterVertically) {
+                IconButton(onClick = onBack, modifier = Modifier.size(32.dp)) {
+                  Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.White, modifier = Modifier.size(18.dp))
                 }
+                Spacer(modifier = Modifier.width(4.dp))
+                Text("⚖️", fontSize = 18.sp)
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(
+                  text = "සත්‍ය / අසත්‍ය • ප්‍රශ්න 500",
+                  fontSize = 13.sp,
+                  fontWeight = FontWeight.Bold,
+                  color = Color.White
+                )
+              }
+              Surface(
+                shape = RoundedCornerShape(6.dp),
+                color = Color(0xFFEC4899).copy(alpha = 0.25f)
+              ) {
+                Text(
+                  text = "Grade $selectedGrade",
+                  fontSize = 11.sp,
+                  fontWeight = FontWeight.ExtraBold,
+                  color = Color(0xFFF472B6),
+                  modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                )
+              }
+            }
 
-                Box(
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // Grade Selection Buttons (9, 10, 11)
+            Row(
+              modifier = Modifier.fillMaxWidth(),
+              horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+              listOf(9, 10, 11).forEach { grade ->
+                val isSelected = selectedGrade == grade
+                OutlinedButton(
+                  onClick = {
+                    selectedGrade = grade
+                    selectedBatchIndex = 0
+                    questionIndexInBatch = 0
+                  },
                   modifier = Modifier
-                    .size(32.dp)
-                    .clip(CircleShape)
-                    .background(circleBg)
-                    .border(
-                      width = if (isCurrent) 2.dp else 1.dp,
-                      color = if (isCurrent) Color(0xFFEC4899) else Color(0xFF475569),
-                      shape = CircleShape
-                    )
-                    .clickable {
-                      questionIndexInBatch = idx
-                    },
-                  contentAlignment = Alignment.Center
+                    .weight(1f)
+                    .testTag("grade_btn_$grade"),
+                  colors = ButtonDefaults.outlinedButtonColors(
+                    containerColor = if (isSelected) Color(0xFFEC4899) else Color(0xFF0F172A),
+                    contentColor = if (isSelected) Color.White else Color(0xFFE2E8F0)
+                  ),
+                  border = BorderStroke(
+                    1.5.dp,
+                    if (isSelected) Color(0xFFF472B6) else Color(0xFF334155)
+                  ),
+                  shape = RoundedCornerShape(10.dp),
+                  contentPadding = PaddingValues(vertical = 6.dp)
                 ) {
                   Text(
-                    text = "${idx + 1}",
-                    fontSize = 10.sp,
-                    fontWeight = if (isCurrent) FontWeight.ExtraBold else FontWeight.Normal,
-                    color = Color.White
+                    text = "$grade ශ්‍රේණිය",
+                    fontSize = 12.sp,
+                    fontWeight = if (isSelected) FontWeight.ExtraBold else FontWeight.Medium
                   )
                 }
               }
@@ -2964,36 +3176,751 @@ fun TrueFalse500Content(initialSubject: TrueFalseSubject, onBack: () -> Unit) {
           }
         }
       }
-    } else {
-      // Empty state if filtering mistakes
+
+      // 2. Subject Selection Chips
       item {
-        Card(
-          shape = RoundedCornerShape(14.dp),
-          colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
-          modifier = Modifier.fillMaxWidth().padding(vertical = 20.dp)
-        ) {
-          Column(
-            modifier = Modifier.padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+        Column {
+          Text(
+            text = "විෂය තෝරන්න (Select Subject):",
+            fontSize = 11.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF94A3B8),
+            modifier = Modifier.padding(bottom = 6.dp)
+          )
+          LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            contentPadding = PaddingValues(horizontal = 2.dp)
           ) {
-            Text("🎉", fontSize = 36.sp)
-            Spacer(modifier = Modifier.height(8.dp))
+            items(TrueFalseSubject.values()) { subject ->
+              val isSelected = selectedSubject == subject
+              Surface(
+                shape = RoundedCornerShape(10.dp),
+                color = if (isSelected) subject.primaryColor else Color(0xFF1E293B),
+                border = BorderStroke(
+                  1.dp,
+                  if (isSelected) Color.White else Color(0xFF334155)
+                ),
+                modifier = Modifier
+                  .clickable {
+                    selectedSubject = subject
+                    selectedBatchIndex = 0
+                    questionIndexInBatch = 0
+                  }
+                  .testTag("subject_chip_${subject.id}")
+              ) {
+                Row(
+                  modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                  verticalAlignment = Alignment.CenterVertically
+                ) {
+                  Text(subject.iconEmoji, fontSize = 14.sp)
+                  Spacer(modifier = Modifier.width(5.dp))
+                  Text(
+                    text = subject.displayName,
+                    fontSize = 11.sp,
+                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                    color = if (isSelected) Color.White else Color(0xFFCBD5E1)
+                  )
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // 3. Batch Selection Chips (17 Batches of 30 questions)
+      item {
+        Column {
+          Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+          ) {
             Text(
-              text = "මෙම කාණ්ඩයේ වැරදුණු ප්‍රශ්න කිසිවක් නැත!",
-              fontSize = 13.sp,
-              fontWeight = FontWeight.Bold,
-              color = Color.White
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-              text = "සියලු ප්‍රශ්න බැලීමට 'වැරදුණු ඒවා' ෆිල්ටරය අක්‍රිය කරන්න.",
+              text = "තිහේ කාණ්ඩය තෝරන්න (30 Questions Batch):",
               fontSize = 11.sp,
+              fontWeight = FontWeight.Bold,
               color = Color(0xFF94A3B8)
             )
+            Text(
+              text = "කාණ්ඩ 17 න් #${selectedBatchIndex + 1}",
+              fontSize = 10.5.sp,
+              fontWeight = FontWeight.Bold,
+              color = Color(0xFFF472B6)
+            )
+          }
+          Spacer(modifier = Modifier.height(6.dp))
+          LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            contentPadding = PaddingValues(horizontal = 2.dp)
+          ) {
+            items(TrueFalse500Repository.TOTAL_BATCHES) { batchIdx ->
+              val isSelected = selectedBatchIndex == batchIdx
+              val (start, end) = TrueFalse500Repository.getBatchRange(batchIdx)
+              val batchCount = (start..end).count { qNum ->
+                userAnswers.containsKey("tf_g${selectedGrade}_${selectedSubject.id}_q$qNum")
+              }
+              val isCompleted = batchCount == (end - start + 1)
+
+              Surface(
+                shape = RoundedCornerShape(10.dp),
+                color = if (isSelected) Color(0xFF831843) else Color(0xFF1E293B),
+                border = BorderStroke(
+                  1.5.dp,
+                  if (isSelected) Color(0xFFF472B6) else if (isCompleted) Color(0xFF10B981) else Color(0xFF334155)
+                ),
+                modifier = Modifier
+                  .clickable {
+                    selectedBatchIndex = batchIdx
+                    questionIndexInBatch = 0
+                  }
+                  .testTag("batch_chip_$batchIdx")
+              ) {
+                Column(
+                  modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                  horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                  Text(
+                    text = "කාණ්ඩය ${batchIdx + 1}",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = if (isSelected) Color.White else Color(0xFFE2E8F0)
+                  )
+                  Text(
+                    text = "ප්‍රශ්න $start - $end",
+                    fontSize = 9.sp,
+                    color = if (isSelected) Color(0xFFFCE7F3) else Color(0xFF94A3B8)
+                  )
+                  if (batchCount > 0) {
+                    Text(
+                      text = if (isCompleted) "සම්පූර්ණයි ✅" else "$batchCount/${end - start + 1}",
+                      fontSize = 8.5.sp,
+                      fontWeight = FontWeight.Bold,
+                      color = if (isCompleted) Color(0xFF4ADE80) else Color(0xFFFBBF24)
+                    )
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // 4. Batch Progress & Enter Focus Button Card
+      item {
+        Card(
+          shape = RoundedCornerShape(12.dp),
+          colors = CardDefaults.cardColors(containerColor = Color(0xFF0F172A)),
+          border = BorderStroke(1.dp, Color(0xFF334155))
+        ) {
+          Column(modifier = Modifier.padding(12.dp)) {
+            Row(
+              modifier = Modifier.fillMaxWidth(),
+              horizontalArrangement = Arrangement.SpaceBetween,
+              verticalAlignment = Alignment.CenterVertically
+            ) {
+              Column {
+                Text(
+                  text = "කාණ්ඩයේ ප්‍රගතිය: $answeredInBatch / ${batchQuestions.size} පිළිතුරු",
+                  fontSize = 10.5.sp,
+                  fontWeight = FontWeight.Bold,
+                  color = Color.White
+                )
+                Text(
+                  text = "ලකුණු: $correctInBatch • නිරවද්‍යතාව: ${if (answeredInBatch > 0) (correctInBatch * 100) / answeredInBatch else 0}%",
+                  fontSize = 9.5.sp,
+                  color = Color(0xFF38BDF8)
+                )
+              }
+
+              Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                // Filter mistakes
+                FilterChip(
+                  selected = filterOnlyMistakes,
+                  onClick = { filterOnlyMistakes = !filterOnlyMistakes },
+                  label = { Text("වැරදුණු ඒවා", fontSize = 9.5.sp) },
+                  colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = Color(0xFFEF4444),
+                    selectedLabelColor = Color.White
+                  ),
+                  modifier = Modifier.testTag("filter_mistakes_chip")
+                )
+
+                // Reset batch
+                IconButton(
+                  onClick = {
+                    val newAnswers = userAnswers.toMutableMap()
+                    batchQuestions.forEach { newAnswers.remove(it.id) }
+                    userAnswers = newAnswers
+                    questionIndexInBatch = 0
+                  },
+                  modifier = Modifier.size(32.dp).testTag("reset_batch_btn")
+                ) {
+                  Icon(
+                    imageVector = Icons.Default.Refresh,
+                    contentDescription = "Reset Batch",
+                    tint = Color(0xFF94A3B8),
+                    modifier = Modifier.size(18.dp)
+                  )
+                }
+              }
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // Prominent Full-Screen Focus Button
+            Button(
+              onClick = {
+                isFocusQuestionMode = true
+                onFullScreenToggle(true)
+              },
+              modifier = Modifier
+                .fillMaxWidth()
+                .height(44.dp)
+                .testTag("start_fullscreen_focus_btn"),
+              colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEC4899)),
+              shape = RoundedCornerShape(10.dp)
+            ) {
+              Icon(Icons.Default.Fullscreen, contentDescription = null, modifier = Modifier.size(18.dp))
+              Spacer(modifier = Modifier.width(6.dp))
+              Text(
+                text = "🎯 සම්පූර්ණ තිරයෙන් ප්‍රශ්න විසඳන්න (Focus Mode)",
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold
+              )
+            }
+          }
+        }
+      }
+
+      // 5. Active Question Card in Overview (Tapping it enters focus mode!)
+      if (activeQ != null) {
+        val userAnswer = userAnswers[activeQ.id]
+        val hasAnswered = userAnswer != null
+        val isCorrect = hasAnswered && userAnswer == activeQ.isTrue
+
+        item {
+          Card(
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
+            border = BorderStroke(
+              1.5.dp,
+              if (!hasAnswered) Color(0xFF475569) else if (isCorrect) Color(0xFF22C55E) else Color(0xFFEF4444)
+            ),
+            modifier = Modifier
+              .fillMaxWidth()
+              .clickable {
+                isFocusQuestionMode = true
+                onFullScreenToggle(true)
+              }
+          ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+              // Top badges
+              Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+              ) {
+                Surface(
+                  shape = RoundedCornerShape(6.dp),
+                  color = selectedSubject.primaryColor.copy(alpha = 0.2f)
+                ) {
+                  Text(
+                    text = "${selectedSubject.displayName} • ${activeQ.unitName}",
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = selectedSubject.primaryColor,
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                  )
+                }
+
+                Surface(
+                  shape = RoundedCornerShape(6.dp),
+                  color = Color(0xFF334155)
+                ) {
+                  Text(
+                    text = "අංක ${effectiveIndex + 1} / ${displayedQuestions.size} (මුළු #${activeQ.number})",
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFFCBD5E1),
+                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                  )
+                }
+              }
+
+              Spacer(modifier = Modifier.height(12.dp))
+
+              // Statement
+              Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.Top
+              ) {
+                Column(modifier = Modifier.weight(1f)) {
+                  Text(
+                    text = "ප්‍රකාශය (Statement):",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color(0xFF94A3B8)
+                  )
+                  Spacer(modifier = Modifier.height(4.dp))
+                  Text(
+                    text = "\"${activeQ.statement}\"",
+                    fontSize = 14.5.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                    lineHeight = 22.sp
+                  )
+                }
+
+                IconButton(
+                  onClick = {
+                    try {
+                      tts?.speak(activeQ.statement, TextToSpeech.QUEUE_FLUSH, null, "tf_tts")
+                    } catch (_: Exception) {}
+                  },
+                  modifier = Modifier
+                    .padding(start = 4.dp)
+                    .testTag("tts_play_btn")
+                ) {
+                  Icon(
+                    imageVector = Icons.Default.VolumeUp,
+                    contentDescription = "Read Statement Aloud",
+                    tint = Color(0xFF38BDF8)
+                  )
+                }
+              }
+
+              Spacer(modifier = Modifier.height(16.dp))
+
+              // True / False Buttons (tapping enters focus mode!)
+              Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+              ) {
+                Button(
+                  onClick = {
+                    userAnswers = userAnswers + (activeQ.id to true)
+                    isFocusQuestionMode = true
+                    onFullScreenToggle(true)
+                  },
+                  modifier = Modifier
+                    .weight(1f)
+                    .height(48.dp)
+                    .testTag("true_btn_${activeQ.id}"),
+                  colors = ButtonDefaults.buttonColors(
+                    containerColor = if (userAnswer == true) {
+                      if (activeQ.isTrue) Color(0xFF16A34A) else Color(0xFFDC2626)
+                    } else Color(0xFF0F172A)
+                  ),
+                  border = BorderStroke(
+                    1.5.dp,
+                    if (userAnswer == true) Color(0xFF4ADE80) else Color(0xFF475569)
+                  ),
+                  shape = RoundedCornerShape(10.dp)
+                ) {
+                  Text(
+                    text = "✔️ සත්‍ය වේ (True)",
+                    fontSize = 12.5.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                  )
+                }
+
+                Button(
+                  onClick = {
+                    userAnswers = userAnswers + (activeQ.id to false)
+                    isFocusQuestionMode = true
+                    onFullScreenToggle(true)
+                  },
+                  modifier = Modifier
+                    .weight(1f)
+                    .height(48.dp)
+                    .testTag("false_btn_${activeQ.id}"),
+                  colors = ButtonDefaults.buttonColors(
+                    containerColor = if (userAnswer == false) {
+                      if (!activeQ.isTrue) Color(0xFF16A34A) else Color(0xFFDC2626)
+                    } else Color(0xFF0F172A)
+                  ),
+                  border = BorderStroke(
+                    1.5.dp,
+                    if (userAnswer == false) Color(0xFFF87171) else Color(0xFF475569)
+                  ),
+                  shape = RoundedCornerShape(10.dp)
+                ) {
+                  Text(
+                    text = "❌ අසත්‍ය වේ (False)",
+                    fontSize = 12.5.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                  )
+                }
+              }
+            }
+          }
+        }
+
+        // Justification Box if answered
+        if (hasAnswered) {
+          item {
+            Card(
+              shape = RoundedCornerShape(14.dp),
+              colors = CardDefaults.cardColors(
+                containerColor = if (isCorrect) Color(0xFF064E3B) else Color(0xFF450A0A)
+              ),
+              border = BorderStroke(
+                1.5.dp,
+                if (isCorrect) Color(0xFF22C55E) else Color(0xFFEF4444)
+              )
+            ) {
+              Column(modifier = Modifier.padding(14.dp)) {
+                Text(
+                  text = if (isCorrect) "🎉 ඔබේ තීරණය 100% නිවැරදියි!" else "💡 ඔබේ තීරණය වැරදියි!",
+                  fontSize = 13.sp,
+                  fontWeight = FontWeight.ExtraBold,
+                  color = if (isCorrect) Color(0xFF86EFAC) else Color(0xFFFCA5A5)
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                  text = activeQ.justification,
+                  fontSize = 12.sp,
+                  color = Color(0xFFF1F5F9),
+                  lineHeight = 18.sp
+                )
+              }
+            }
+          }
+        }
+
+        // Navigation Controls
+        item {
+          Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+          ) {
+            OutlinedButton(
+              onClick = {
+                if (effectiveIndex > 0) {
+                  questionIndexInBatch = effectiveIndex - 1
+                }
+                isFocusQuestionMode = true
+                onFullScreenToggle(true)
+              },
+              enabled = effectiveIndex > 0,
+              colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
+              border = BorderStroke(1.dp, Color(0xFF475569)),
+              shape = RoundedCornerShape(8.dp)
+            ) {
+              Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Previous", modifier = Modifier.size(16.dp))
+              Spacer(modifier = Modifier.width(4.dp))
+              Text("පෙර ප්‍රශ්නය", fontSize = 11.sp)
+            }
+
+            Button(
+              onClick = {
+                if (effectiveIndex < displayedQuestions.size - 1) {
+                  questionIndexInBatch = effectiveIndex + 1
+                } else if (selectedBatchIndex < TrueFalse500Repository.TOTAL_BATCHES - 1) {
+                  selectedBatchIndex++
+                  questionIndexInBatch = 0
+                }
+                isFocusQuestionMode = true
+                onFullScreenToggle(true)
+              },
+              colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEC4899)),
+              shape = RoundedCornerShape(8.dp)
+            ) {
+              Text(
+                text = if (effectiveIndex < displayedQuestions.size - 1) "මීළඟ ප්‍රශ්නය" else "ඊළඟ කාණ්ඩයට ➔",
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold
+              )
+              Spacer(modifier = Modifier.width(4.dp))
+              Icon(imageVector = Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Next", modifier = Modifier.size(16.dp))
+            }
+          }
+        }
+
+        // 8. Question Jump Grid (Tapping any enters Focus Mode!)
+        item {
+          Card(
+            shape = RoundedCornerShape(14.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
+            border = BorderStroke(1.dp, Color(0xFF334155))
+          ) {
+            Column(modifier = Modifier.padding(12.dp)) {
+              Text(
+                text = "ප්‍රශ්න ලැයිස්තුව (කාණ්ඩය #${selectedBatchIndex + 1}):",
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF94A3B8)
+              )
+              Spacer(modifier = Modifier.height(8.dp))
+
+              FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp)
+              ) {
+                displayedQuestions.forEachIndexed { idx, q ->
+                  val ans = userAnswers[q.id]
+                  val isCurrent = idx == effectiveIndex
+                  val circleBg = when {
+                    ans == null -> Color(0xFF0F172A)
+                    ans == q.isTrue -> Color(0xFF16A34A)
+                    else -> Color(0xFFDC2626)
+                  }
+
+                  Box(
+                    modifier = Modifier
+                      .size(32.dp)
+                      .clip(CircleShape)
+                      .background(circleBg)
+                      .border(
+                        width = if (isCurrent) 2.dp else 1.dp,
+                        color = if (isCurrent) Color(0xFFEC4899) else Color(0xFF475569),
+                        shape = CircleShape
+                      )
+                      .clickable {
+                        questionIndexInBatch = idx
+                        isFocusQuestionMode = true
+                        onFullScreenToggle(true)
+                      },
+                    contentAlignment = Alignment.Center
+                  ) {
+                    Text(
+                      text = "${idx + 1}",
+                      fontSize = 10.sp,
+                      fontWeight = if (isCurrent) FontWeight.ExtraBold else FontWeight.Normal,
+                      color = Color.White
+                    )
+                  }
+                }
+              }
+            }
+          }
+        }
+      } else {
+        // Empty state if filtering mistakes
+        item {
+          Card(
+            shape = RoundedCornerShape(14.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
+            modifier = Modifier.fillMaxWidth().padding(vertical = 20.dp)
+          ) {
+            Column(
+              modifier = Modifier.padding(24.dp),
+              horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+              Text("🎉", fontSize = 36.sp)
+              Spacer(modifier = Modifier.height(8.dp))
+              Text(
+                text = "මෙම කාණ්ඩයේ වැරදුණු ප්‍රශ්න කිසිවක් නැත!",
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+              )
+              Spacer(modifier = Modifier.height(4.dp))
+              Text(
+                text = "සියලු ප්‍රශ්න බැලීමට 'වැරදුණු ඒවා' ෆිල්ටරය අක්‍රිය කරන්න.",
+                fontSize = 11.sp,
+                color = Color(0xFF94A3B8)
+              )
+            }
           }
         }
       }
     }
+  }
+
+  // Question Jump Sheet Dialog in Focus Mode
+  if (showQuestionSheet) {
+    AlertDialog(
+      onDismissRequest = { showQuestionSheet = false },
+      title = {
+        Text(
+          text = "ප්‍රශ්න ලැයිස්තුව (කාණ්ඩය #${selectedBatchIndex + 1})",
+          fontSize = 13.sp,
+          fontWeight = FontWeight.Bold,
+          color = Color.White
+        )
+      },
+      text = {
+        FlowRow(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.spacedBy(6.dp),
+          verticalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+          displayedQuestions.forEachIndexed { idx, q ->
+            val ans = userAnswers[q.id]
+            val isCurrent = idx == effectiveIndex
+            val circleBg = when {
+              ans == null -> Color(0xFF0F172A)
+              ans == q.isTrue -> Color(0xFF16A34A)
+              else -> Color(0xFFDC2626)
+            }
+
+            Box(
+              modifier = Modifier
+                .size(34.dp)
+                .clip(CircleShape)
+                .background(circleBg)
+                .border(
+                  width = if (isCurrent) 2.dp else 1.dp,
+                  color = if (isCurrent) Color(0xFFEC4899) else Color(0xFF475569),
+                  shape = CircleShape
+                )
+                .clickable {
+                  questionIndexInBatch = idx
+                  showQuestionSheet = false
+                },
+              contentAlignment = Alignment.Center
+            ) {
+              Text(
+                text = "${idx + 1}",
+                fontSize = 10.5.sp,
+                fontWeight = if (isCurrent) FontWeight.ExtraBold else FontWeight.Normal,
+                color = Color.White
+              )
+            }
+          }
+        }
+      },
+      confirmButton = {
+        TextButton(onClick = { showQuestionSheet = false }) {
+          Text("වසන්න", color = Color(0xFFEC4899), fontWeight = FontWeight.Bold)
+        }
+      },
+      containerColor = Color(0xFF1E293B)
+    )
+  }
+
+  // Quick Switch Subject / Grade / Batch Dialog from within Focus Mode
+  if (showSubjectBatchDialog) {
+    AlertDialog(
+      onDismissRequest = { showSubjectBatchDialog = false },
+      title = {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+          Text("⚙️", fontSize = 18.sp)
+          Spacer(modifier = Modifier.width(8.dp))
+          Text(
+            text = "විෂය හා කාණ්ඩය මාරු කිරීම",
+            fontSize = 13.5.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.White
+          )
+        }
+      },
+      text = {
+        Column(
+          modifier = Modifier
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState()),
+          verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+          // Grade Selector
+          Text("ශ්‍රේණිය (Grade):", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFF94A3B8))
+          Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+          ) {
+            listOf(9, 10, 11).forEach { g ->
+              val isSel = selectedGrade == g
+              Button(
+                onClick = {
+                  selectedGrade = g
+                  selectedBatchIndex = 0
+                  questionIndexInBatch = 0
+                },
+                modifier = Modifier.weight(1f).height(38.dp),
+                colors = ButtonDefaults.buttonColors(
+                  containerColor = if (isSel) Color(0xFFEC4899) else Color(0xFF0F172A)
+                ),
+                border = BorderStroke(1.dp, if (isSel) Color(0xFFF472B6) else Color(0xFF334155)),
+                shape = RoundedCornerShape(8.dp),
+                contentPadding = PaddingValues(0.dp)
+              ) {
+                Text("$g ශ්‍රේණිය", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.White)
+              }
+            }
+          }
+
+          // Subject Selector
+          Text("විෂය (Subject):", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFF94A3B8))
+          FlowRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
+          ) {
+            TrueFalseSubject.values().forEach { s ->
+              val isSel = selectedSubject == s
+              Surface(
+                onClick = {
+                  selectedSubject = s
+                  selectedBatchIndex = 0
+                  questionIndexInBatch = 0
+                },
+                shape = RoundedCornerShape(8.dp),
+                color = if (isSel) s.primaryColor else Color(0xFF0F172A),
+                border = BorderStroke(1.dp, if (isSel) Color.White else Color(0xFF334155))
+              ) {
+                Row(
+                  modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
+                  verticalAlignment = Alignment.CenterVertically
+                ) {
+                  Text(s.iconEmoji, fontSize = 13.sp)
+                  Spacer(modifier = Modifier.width(4.dp))
+                  Text(
+                    text = s.displayName,
+                    fontSize = 10.5.sp,
+                    fontWeight = if (isSel) FontWeight.Bold else FontWeight.Normal,
+                    color = Color.White
+                  )
+                }
+              }
+            }
+          }
+
+          // Batch Selector
+          Text("කාණ්ඩය (Batch 1-17):", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFF94A3B8))
+          LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            contentPadding = PaddingValues(horizontal = 2.dp)
+          ) {
+            items(TrueFalse500Repository.TOTAL_BATCHES) { bIdx ->
+              val isSel = selectedBatchIndex == bIdx
+              val (st, en) = TrueFalse500Repository.getBatchRange(bIdx)
+              Surface(
+                onClick = {
+                  selectedBatchIndex = bIdx
+                  questionIndexInBatch = 0
+                },
+                shape = RoundedCornerShape(8.dp),
+                color = if (isSel) Color(0xFF831843) else Color(0xFF0F172A),
+                border = BorderStroke(1.dp, if (isSel) Color(0xFFF472B6) else Color(0xFF334155))
+              ) {
+                Column(
+                  modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
+                  horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                  Text("කාණ්ඩය ${bIdx + 1}", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                  Text("$st-$en", fontSize = 8.5.sp, color = Color(0xFFCBD5E1))
+                }
+              }
+            }
+          }
+        }
+      },
+      confirmButton = {
+        Button(
+          onClick = { showSubjectBatchDialog = false },
+          colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEC4899)),
+          shape = RoundedCornerShape(8.dp)
+        ) {
+          Text("හරි (Done)", fontWeight = FontWeight.Bold, fontSize = 11.5.sp)
+        }
+      },
+      containerColor = Color(0xFF1E293B)
+    )
   }
 }
 

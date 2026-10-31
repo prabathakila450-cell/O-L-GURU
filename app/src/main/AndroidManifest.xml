@@ -52,13 +52,17 @@
             android:name="google_analytics_default_allow_ad_personalization_signals"
             android:value="false" />
 
-        <!-- Optimize AdMob SDK initialization -->
         <meta-data
             android:name="com.google.android.gms.ads.flag.OPTIMIZE_INITIALIZATION"
             android:value="true" />
         <meta-data
             android:name="com.google.android.gms.ads.flag.OPTIMIZE_AD_LOADING"
             android:value="true" />
+
+        <!-- Force disable adservices measurement binding attempt -->
+        <meta-data
+            android:name="com.google.android.gms.ads.AD_SERVICES_MEASUREMENT_ENABLED"
+            android:value="false" />
 
         <activity
             android:name="com.example.MainActivity"

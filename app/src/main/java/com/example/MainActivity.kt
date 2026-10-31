@@ -785,6 +785,7 @@ fun StudentPortalApp() {
   // Navigation Screen State: "HOME" (Grades list), "SUBJECTS" (Subject list for selected grade), "CONTENT" (Tabs for selected subject)
   var showAppLaunchSplash by remember { mutableStateOf(true) }
   var currentScreen by remember { mutableStateOf("HOME") }
+  var isHubFullScreen by remember { mutableStateOf(false) }
   var englishInitialSubTab by remember { mutableStateOf(0) }
   var selectedGrade by remember { mutableStateOf("11") } // Options: "11", "10", "09", "08", "07", "06"
   var selectedSubjectItem by remember { mutableStateOf<SubjectItem?>(null) }
@@ -1256,9 +1257,6 @@ fun StudentPortalApp() {
         currentScreen = if (selectedSubjectItem != null) "CONTENT" else "HOME"
         selectedTabNav = 0
       }
-      currentScreen == "OL_SUBJECT_TOOLS" -> {
-        currentScreen = "OL_SPECIAL_FEATURES"
-      }
       currentScreen == "GRADE_10_11_COMMERCE_SHORT_NOTES" -> {
         currentScreen = if (selectedSubjectItem != null) "CONTENT" else "HOME"
         selectedTabNav = 0
@@ -1274,7 +1272,6 @@ fun StudentPortalApp() {
   }
 
   MyApplicationTheme(eyeCareMode = activeEyeCareMode) {
-    ConditionalDisableSelection(disabled = !isAdminAuthenticated) {
       Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
           modifier = Modifier
@@ -1282,12 +1279,12 @@ fun StudentPortalApp() {
             .testTag("main_scaffold"),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-          if (currentScreen != "GRADE_10_TERM_TEST_PORTAL" && currentScreen != "GRADE_11_TERM_TEST_PORTAL") {
+          if (currentScreen != "GRADE_10_TERM_TEST_PORTAL" && currentScreen != "GRADE_11_TERM_TEST_PORTAL" && !isHubFullScreen) {
             TopBannerAdView()
           }
         },
         bottomBar = {
-          if (currentScreen != "GRADE_10_TERM_TEST_PORTAL" && currentScreen != "GRADE_11_TERM_TEST_PORTAL") {
+          if (currentScreen != "GRADE_10_TERM_TEST_PORTAL" && currentScreen != "GRADE_11_TERM_TEST_PORTAL" && !isHubFullScreen) {
             Column(modifier = Modifier.fillMaxWidth()) {
               PortalBottomNavigation(
                 selectedTab = selectedTabNav,
@@ -1409,8 +1406,10 @@ fun StudentPortalApp() {
         .fillMaxSize()
         .padding(innerPadding)
     ) {
-      // Background Subtle Text Accent
-      WatermarkBackground()
+      ConditionalDisableSelection(disabled = !isAdminAuthenticated) {
+        Box(modifier = Modifier.fillMaxSize()) {
+          // Background Subtle Text Accent
+          WatermarkBackground()
 
       // CRITICAL 100% SECURITY BARRIER:
       // If 12 hours free trial has expired and user is not an approved student or admin,
@@ -1811,19 +1810,6 @@ fun StudentPortalApp() {
             iframeModalPdfTitle = title
             iframeModalPdfUrl = url
             showIframePdfModal = true
-          },
-          onOpenTools100 = {
-            currentScreen = "OL_SUBJECT_TOOLS"
-          }
-        )
-      } else if (effectiveScreen == "OL_SUBJECT_TOOLS") {
-        // 🛠️ FEATURE: 100 Tools Per Subject (10x10 Group System)
-        OlSubjectToolsScreen(
-          initialSubject = selectedSubjectItem?.nameSinhala ?: "විද්‍යාව",
-          lockSubject = selectedSubjectItem != null,
-          showInnerTopBar = true,
-          onBack = {
-            currentScreen = "OL_SPECIAL_FEATURES"
           }
         )
       } else if (effectiveScreen == "GRADE_10_TERM_TEST_PORTAL") {
@@ -1891,9 +1877,12 @@ fun StudentPortalApp() {
         // 🎯 INTERACTIVE Q&A MASTER HUB (6 Q&A Modes)
         InteractiveQaMasterHubScreen(
           onBack = {
+            isHubFullScreen = false
             currentScreen = if (selectedSubjectItem != null) "CONTENT" else "HOME"
           },
-          initialTab = selectedQaHubTab
+          initialTab = selectedQaHubTab,
+          isFullScreen = isHubFullScreen,
+          onFullScreenToggle = { isHubFullScreen = it }
         )
       } else if (effectiveScreen == "VOICE_DOUBT_SOLVER") {
         // 🎙️ FEATURE: AI VOICE DOUBT SOLVER & STEP-BY-STEP EXPLAINER
@@ -2404,8 +2393,10 @@ fun StudentPortalApp() {
           }
         }
       }
+    }
+  }
 
-      // Add Content Live Modal Dialog
+  // Add Content Live Modal Dialog
       if (showAddContentDialog) {
         AlertDialog(
           onDismissRequest = {
@@ -3973,7 +3964,6 @@ fun StudentPortalApp() {
       }
     }
   }
-}
 
 @Composable
 fun LiveCloudSyncHeaderBanner(

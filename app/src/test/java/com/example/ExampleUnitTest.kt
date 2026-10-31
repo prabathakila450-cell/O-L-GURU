@@ -42,4 +42,30 @@ class ExampleUnitTest {
     val msg = "Total duplicates: ${duplicates.size}. Unique: $uniqueCount/2000. Example: ${firstDup?.key} in sets ${firstDup?.value?.map { it.setNumber }}"
     assertEquals(msg, 2000, uniqueCount)
   }
+
+  @Test
+  fun testMatchingBankIntegrity() {
+    val sets = InteractiveMatchingAndTimelineBank.matchSets
+    assertEquals("Should have exactly 150 sets (15 subjects x 10 sets)", 150, sets.size)
+
+    val subjects = sets.map { it.subject }.distinct()
+    assertEquals("Should have exactly 15 subjects", 15, subjects.size)
+
+    for (subject in subjects) {
+      val subjectSets = sets.filter { it.subject == subject }
+      assertEquals("Subject $subject must have exactly 10 sets", 10, subjectSets.size)
+
+      val allItems = subjectSets.flatMap { it.items }
+      assertEquals("Subject $subject must have exactly 100 items", 100, allItems.size)
+
+      val uniqueQuestions = allItems.map { it.leftText }.distinct()
+      assertEquals("Subject $subject must have 100 unique questions", 100, uniqueQuestions.size)
+
+      for (item in allItems) {
+        assertTrue("Question cannot be blank in $subject", item.leftText.isNotBlank())
+        assertTrue("Answer cannot be blank in $subject", item.rightCorrectText.isNotBlank())
+      }
+    }
+  }
 }
+

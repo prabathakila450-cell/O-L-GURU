@@ -564,7 +564,7 @@ fun GradesHomeScreen(
           )
         }
 
-        // Row 4: Live Mock Exam Hall & O/L Tools
+        // Row 4: Live Mock Exam Hall & Formula Solver
         Row(
           modifier = Modifier.fillMaxWidth(),
           horizontalArrangement = Arrangement.spacedBy(6.dp)
@@ -580,23 +580,7 @@ fun GradesHomeScreen(
           )
 
           FeatureSubCardWithBg(
-            title = "8. O/L මෙවලම්",
-            subtitle = "සියලු විෂයන් Tools",
-            emoji = "🌟",
-            badgeText = "TOOLS",
-            badgeColor = Color(0xFF8B5CF6),
-            modifier = Modifier.weight(1f),
-            onClick = { onOpenSpecialMasterFeatures(null) }
-          )
-        }
-
-        // Row 5: Formula Solver & Trilingual Glossary
-        Row(
-          modifier = Modifier.fillMaxWidth(),
-          horizontalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
-          FeatureSubCardWithBg(
-            title = "9. සූත්‍ර විසඳුම්කරු",
+            title = "8. සූත්‍ර විසඳුම්කරු",
             subtitle = "පියවරෙන් පියවර Solver",
             emoji = "🧮",
             badgeText = "SOLVER",
@@ -604,9 +588,15 @@ fun GradesHomeScreen(
             modifier = Modifier.weight(1f),
             onClick = onOpenFormulaSolver
           )
+        }
 
+        // Row 5: Trilingual Glossary & Past Paper Simulator
+        Row(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
           FeatureSubCardWithBg(
-            title = "10. ත්‍රිභාෂා ශබ්දකෝෂය",
+            title = "9. ත්‍රිභාෂා ශබ්දකෝෂය",
             subtitle = "විද්‍යාව/ගණිතය/ICT",
             emoji = "📖",
             badgeText = "GLOSSARY",
@@ -614,15 +604,9 @@ fun GradesHomeScreen(
             modifier = Modifier.weight(1f),
             onClick = onOpenTriLingualGlossary
           )
-        }
 
-        // Row 6: Past Paper Simulator & Short Answer Evaluation
-        Row(
-          modifier = Modifier.fillMaxWidth(),
-          horizontalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
           FeatureSubCardWithBg(
-            title = "11. Past Paper Simulator",
+            title = "10. Past Paper Simulator",
             subtitle = "වසර අනුව Timed Exam",
             emoji = "⏱️",
             badgeText = "EXAM",
@@ -630,9 +614,15 @@ fun GradesHomeScreen(
             modifier = Modifier.weight(1f),
             onClick = onOpenTimedPastPaperSimulator
           )
+        }
 
+        // Row 6: Short Answer Evaluation & Daily 10 Challenge
+        Row(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
           FeatureSubCardWithBg(
-            title = "12. කෙටි පිළිතුරු ඇගයීම",
+            title = "11. කෙටි පිළිතුරු ඇගයීම",
             subtitle = "Marking Scheme පරීක්ෂාව",
             emoji = "✍️",
             badgeText = "Q&A SUITE",
@@ -640,15 +630,9 @@ fun GradesHomeScreen(
             modifier = Modifier.weight(1f),
             onClick = { onOpenInteractiveQaHub(QaHubTab.SHORT_ANSWER) }
           )
-        }
 
-        // Row 7: Daily 10 Challenge & Matching / Timeline
-        Row(
-          modifier = Modifier.fillMaxWidth(),
-          horizontalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
           FeatureSubCardWithBg(
-            title = "13. දිනපතා මිශ්‍ර ප්‍රශ්න 10",
+            title = "12. දිනපතා මිශ්‍ර ප්‍රශ්න 10",
             subtitle = "Streak & Score පරීක්ෂණය",
             emoji = "🎯",
             badgeText = "DAILY 10",
@@ -656,9 +640,15 @@ fun GradesHomeScreen(
             modifier = Modifier.weight(1f),
             onClick = { onOpenInteractiveQaHub(QaHubTab.DAILY_CHALLENGE) }
           )
+        }
 
+        // Row 7: Matching / Timeline & True/False 500
+        Row(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
           FeatureSubCardWithBg(
-            title = "14. ගැලපීම් & කාලරේඛා",
+            title = "13. ගැලපීම් & කාලරේඛා",
             subtitle = "Matching & Timeline",
             emoji = "🧩",
             badgeText = "MATCHING",
@@ -666,19 +656,14 @@ fun GradesHomeScreen(
             modifier = Modifier.weight(1f),
             onClick = { onOpenInteractiveQaHub(QaHubTab.MATCHING) }
           )
-        }
 
-        // Row 8: True/False & 500 Questions Quiz
-        Row(
-          modifier = Modifier.fillMaxWidth()
-        ) {
           FeatureSubCardWithBg(
-            title = "15. 09/10/11 සත්‍ය/අසත්‍ය & Quiz",
+            title = "14. 09/10/11 සත්‍ය/අසත්‍ය & Quiz",
             subtitle = "විෂයකට ප්‍රශ්න 500 • කාණ්ඩ 30",
             emoji = "⚖️",
             badgeText = "500 Qs",
             badgeColor = Color(0xFFEC4899),
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.weight(1f),
             onClick = { onOpenInteractiveQaHub(QaHubTab.TRUE_FALSE) }
           )
         }
@@ -2940,7 +2925,7 @@ fun SubjectContentScreen(
         subject.nameSinhala.contains("පුරවැසි") || subject.name.contains("Civic", ignoreCase = true) ->
           SubjectSpecialInfo(SpecialFeatureSection.OFFICIAL_MARKING_SCHEME, "පුරවැසි අධ්‍යාපනය නිල කරුණු බැංකුව (කාණ්ඩ 20 • කරුණු 400)", "ප්‍රජාතන්ත්‍රවාදය, ආණ්ඩුක්‍රම, මානව හිමිකම්, නීතිය සහ යහපාලනය කරුණු 400", "⚖️", Color(0xFF0D9488))
         subject.nameSinhala.contains("තොරතුරු") || subject.name.contains("ICT", ignoreCase = true) ->
-          SubjectSpecialInfo(SpecialFeatureSection.OL_100_SUBJECT_TOOLS, "ICT දෘඩාංග, ජාලකරණය & කරුණු බැංකුව (කාණ්ඩ 20 • කරුණු 400)", "දත්ත නිරූපණය, Pascal/Python, Boolean Logic & වෙබ් නිර්මාණ කරුණු 400", "💻", Color(0xFF0EA5E9))
+          SubjectSpecialInfo(SpecialFeatureSection.OFFICIAL_MARKING_SCHEME, "ICT නිල කරුණු බැංකුව (කාණ්ඩ 20 • කරුණු 400)", "දත්ත නිරූපණය, Pascal/Python, Boolean Logic & වෙබ් නිර්මාණ කරුණු 400", "💻", Color(0xFF0EA5E9))
         else ->
           SubjectSpecialInfo(SpecialFeatureSection.OFFICIAL_MARKING_SCHEME, "${subject.nameSinhala} නිල කරුණු බැංකුව (කාණ්ඩ 20 • කරුණු 400)", "O/L නිල විෂය නිර්දේශයේ කරුණු 400 සහ Marking Schemes", "📋", Color(0xFF2563EB))
       }
