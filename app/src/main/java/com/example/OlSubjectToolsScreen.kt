@@ -10,7 +10,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.items as lazyItems
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items as gridItems
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -117,12 +121,18 @@ fun OlSubjectToolMiniCard(
           modifier = Modifier.weight(1f)
         )
         Spacer(modifier = Modifier.width(4.dp))
-        Text(
-          text = "විවෘත කරන්න →",
-          fontSize = 9.sp,
-          fontWeight = FontWeight.Bold,
-          color = category.color
-        )
+        Surface(
+          shape = RoundedCornerShape(6.dp),
+          color = category.color.copy(alpha = 0.2f)
+        ) {
+          Text(
+            text = "විවෘත කරන්න →",
+            fontSize = 9.sp,
+            fontWeight = FontWeight.Bold,
+            color = category.color,
+            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+          )
+        }
       }
     }
   }
@@ -136,6 +146,8 @@ fun OlSubjectToolsScreen(
   showInnerTopBar: Boolean = false,
   isFullScreenMode: Boolean = false,
   onToggleFullScreen: (() -> Unit)? = null,
+  onSelectSection: ((SpecialFeatureSection) -> Unit)? = null,
+  activeSection: SpecialFeatureSection = SpecialFeatureSection.OL_100_SUBJECT_TOOLS,
   onBack: () -> Unit
 ) {
   val context = LocalContext.current
@@ -214,23 +226,25 @@ fun OlSubjectToolsScreen(
   ) {
     // Single, fully scrollable LazyColumn containing ALL components from top to bottom
     // so the user can freely scroll the headers, search, and category chips up and down!
-    LazyColumn(
+    LazyVerticalGrid(
+      columns = GridCells.Fixed(2),
       modifier = Modifier
         .fillMaxSize()
-        .testTag("ol_subject_tools_lazy_column"),
+        .testTag("ol_subject_tools_grid"),
       contentPadding = PaddingValues(
-        top = if (effectiveFullScreen) 8.dp else 4.dp,
-        bottom = 88.dp,
+        top = if (effectiveFullScreen) 8.dp else 6.dp,
+        bottom = 80.dp,
         start = 10.dp,
         end = 10.dp
       ),
-      verticalArrangement = Arrangement.spacedBy(8.dp)
+      verticalArrangement = Arrangement.spacedBy(8.dp),
+      horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
       if (activeSubject == null) {
         // ================================================================
         // 🌟 INITIAL SCREEN: SUBJECT SELECTION ONLY (NO CONTENT ITEMS SHOWN)
         // ================================================================
-        item(key = "subject_selection_header") {
+        item(key = "subject_selection_header", span = { GridItemSpan(maxLineSpan) }) {
           Surface(
             color = Color(0xFF0F172A),
             shape = RoundedCornerShape(12.dp),
@@ -286,8 +300,44 @@ fun OlSubjectToolsScreen(
           }
         }
 
+        // Section Tabs Row inside LazyColumn (Scrolls with the whole screen!)
+        if (onSelectSection != null) {
+          item(key = "section_tabs_row_inside_column", span = { GridItemSpan(maxLineSpan) }) {
+            ScrollableTabRow(
+              selectedTabIndex = SpecialFeatureSection.values().indexOf(activeSection).coerceAtLeast(0),
+              containerColor = Color(0xFF0F172A),
+              contentColor = Color.White,
+              edgePadding = 6.dp,
+              divider = { HorizontalDivider(color = Color(0xFF334155)) },
+              modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(10.dp))
+            ) {
+              SpecialFeatureSection.values().forEach { section ->
+                val isSelected = activeSection == section
+                Tab(
+                  selected = isSelected,
+                  onClick = { onSelectSection(section) },
+                  text = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                      Text(section.icon, fontSize = 13.sp)
+                      Spacer(modifier = Modifier.width(5.dp))
+                      Text(
+                        text = section.titleSinhala,
+                        fontSize = 11.5.sp,
+                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                        color = if (isSelected) section.color else Color(0xFF94A3B8)
+                      )
+                    }
+                  }
+                )
+              }
+            }
+          }
+        }
+
         // Search Bar for Subjects
-        item(key = "subject_search_bar") {
+        item(key = "subject_search_bar", span = { GridItemSpan(maxLineSpan) }) {
           OutlinedTextField(
             value = subjectSearchQuery,
             onValueChange = { subjectSearchQuery = it },
@@ -319,7 +369,7 @@ fun OlSubjectToolsScreen(
         }
 
         // Title Row for subjects
-        item(key = "subject_section_label") {
+        item(key = "subject_section_label", span = { GridItemSpan(maxLineSpan) }) {
           Row(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 2.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -346,36 +396,23 @@ fun OlSubjectToolsScreen(
               subj.subjectName.contains(subjectSearchQuery, ignoreCase = true) ||
               subj.subjectEnglish.contains(subjectSearchQuery, ignoreCase = true)
         }
-        val chunkedSubjects = displayedSubjects.chunked(2)
-        items(chunkedSubjects) { rowItems ->
-          Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-          ) {
-            rowItems.forEach { subj ->
-              Box(modifier = Modifier.weight(1f)) {
-                OlSubjectToolMiniCard(
-                  category = subj,
-                  onClick = {
-                    activeSubject = subj.subjectName
-                    selectedGroupNumber = 0
-                    searchQuery = ""
-                    expandedToolId = null
-                  }
-                )
-              }
+        gridItems(displayedSubjects) { subj ->
+          OlSubjectToolMiniCard(
+            category = subj,
+            onClick = {
+              activeSubject = subj.subjectName
+              selectedGroupNumber = 0
+              searchQuery = ""
+              expandedToolId = null
             }
-            if (rowItems.size == 1) {
-              Spacer(modifier = Modifier.weight(1f))
-            }
-          }
+          )
         }
       } else {
         // ================================================================
         // 🌟 SUBJECT CONTENT SCREEN (SHOWN ONLY WHEN A SUBJECT IS CLICKED)
         // ================================================================
         // 1. Top Header for active subject
-        item(key = "content_top_header") {
+        item(key = "content_top_header", span = { GridItemSpan(maxLineSpan) }) {
           Surface(
             color = Color(0xFF0F172A),
             shape = RoundedCornerShape(12.dp),
@@ -430,7 +467,7 @@ fun OlSubjectToolsScreen(
 
         // 2. Horizontal Subject Selector Bar (User requested: "මේ අනු කොටසේ විෂය තෝරාගන්න තීරුවක් දෙන්න")
         if (!lockSubject) {
-          item(key = "subject_horizontal_selector_bar") {
+          item(key = "subject_horizontal_selector_bar", span = { GridItemSpan(maxLineSpan) }) {
             Surface(
               shape = RoundedCornerShape(12.dp),
               color = Color(0xFF0F172A),
@@ -479,7 +516,7 @@ fun OlSubjectToolsScreen(
                 }
 
                 // Chips for each of the 10 subjects
-                items(subjects) { category ->
+                lazyItems(subjects) { category ->
                   val isSelected = activeSubject == category.subjectName
                   Surface(
                     onClick = {
@@ -528,7 +565,7 @@ fun OlSubjectToolsScreen(
         }
 
       // 3. Search & Category 10x10 Selector (Scrolls up and down with the screen)
-      item(key = "search_and_category_header") {
+      item(key = "search_and_category_header", span = { GridItemSpan(maxLineSpan) }) {
         Surface(
           color = Color(0xFF1E293B),
           shape = RoundedCornerShape(14.dp),
@@ -671,7 +708,7 @@ fun OlSubjectToolsScreen(
                 )
               }
 
-              items((1..10).toList()) { grp ->
+              lazyItems((1..10).toList()) { grp ->
                 val isSelected = selectedGroupNumber == grp
                 FilterChip(
                   selected = isSelected,
@@ -697,7 +734,7 @@ fun OlSubjectToolsScreen(
 
       // 4. Group Header Info Banner (Scrolls up and down with the screen)
       if (selectedGroupNumber in 1..10) {
-        item(key = "active_group_info_banner") {
+        item(key = "active_group_info_banner", span = { GridItemSpan(maxLineSpan) }) {
           Surface(
             color = Color(0xFF0F172A),
             shape = RoundedCornerShape(10.dp),
@@ -783,7 +820,7 @@ fun OlSubjectToolsScreen(
       }
 
       // 6. Tools Cards (100 items)
-      items(filteredTools, key = { it.id }) { tool ->
+      gridItems(filteredTools, key = { it.id }, span = { GridItemSpan(maxLineSpan) }) { tool ->
         val isExpanded = expandedToolId == tool.id
 
         Card(
@@ -1424,7 +1461,7 @@ fun OlSubjectToolsScreen(
               contentPadding = PaddingValues(vertical = 12.dp),
               verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-              items(groupTools, key = { it.id }) { tool ->
+              lazyItems(groupTools, key = { it.id }) { tool ->
                 Card(
                   shape = RoundedCornerShape(12.dp),
                   colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),

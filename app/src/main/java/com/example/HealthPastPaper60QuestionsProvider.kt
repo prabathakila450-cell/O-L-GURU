@@ -16,9 +16,9 @@ object HealthPastPaper60QuestionsProvider {
 
     fun buildHealthQuestion(year: Int, qNum: Int, yearStr: String, subjectTitle: String): PastPaperQuestion {
         val q = qNum.coerceIn(1, 60)
-        val v = (year + q) % 3
+        val yearInt = yearStr.toIntOrNull() ?: year
         
-        val data = getQuestionData(q, v, yearStr)
+        val data = getQuestionData(q, yearInt, yearStr)
         
         return PastPaperQuestion(
             id = qNum,
@@ -32,7 +32,7 @@ object HealthPastPaper60QuestionsProvider {
         )
     }
 
-    private fun getQuestionData(q: Int, v: Int, yearStr: String): QuestionData {
+    private fun getQuestionData(q: Int, yearInt: Int, yearStr: String): QuestionData {
         val questions = listOf(
             // 1-10: Physical Health & Nutrition
             QuestionData("පෝෂණය", "ශරීරයට ශක්තිය ලබා දෙන ප්‍රධාන පෝෂකය කුමක්ද?", listOf("කාබෝහයිඩ්‍රේට්", "ප්‍රෝටීන", "විටමින්", "ඛනිජ ලවණ"), 0, "පිෂ්ඨය හා සීනි බහුල ආහාර මගින් ශරීරයට අවශ්‍ය ශක්තිය ලැබේ."),
@@ -107,7 +107,8 @@ object HealthPastPaper60QuestionsProvider {
             QuestionData("ජීවන නිපුණතා", "ලෝක සෞඛ්‍ය දිනය යෙදෙන්නේ කවදාද?", listOf("අප්‍රේල් 7", "ජුනි 5", "දෙසැම්බර් 1", "මැයි 1"), 0, "සෞඛ්‍ය පිළිබඳව ලෝකය දැනුවත් කිරීමට මෙම දිනය වෙන් කර ඇත.")
         )
 
-        val idx = (q - 1).coerceIn(0, 59)
+        val yOffset = Math.abs(yearInt - 2015)
+        val idx = ((q - 1) + yOffset * 13) % questions.size
         val baseData = questions[idx]
         val finalTitle = "[$yearStr O/L - Q$q] " + baseData.text
 

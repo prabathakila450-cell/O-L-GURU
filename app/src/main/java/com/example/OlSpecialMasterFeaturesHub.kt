@@ -26,6 +26,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -105,9 +106,15 @@ fun OlSpecialMasterFeaturesHubScreen(
   // Fallback for general unconstrained access
   var selectedSection by remember { mutableStateOf(initialSection ?: SpecialFeatureSection.OL_100_SUBJECT_TOOLS) }
 
+  val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+
+  // Suppress static outer top bar & tab row for OL_100_SUBJECT_TOOLS view so its internal LazyColumn can scroll full screen!
+  val showOuterBars = !isToolsFullScreen && selectedSection != SpecialFeatureSection.OL_100_SUBJECT_TOOLS
+
   Scaffold(
+    modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
     topBar = {
-      if (!isToolsFullScreen) {
+      if (showOuterBars) {
         TopAppBar(
           title = {
             Column {
@@ -156,7 +163,8 @@ fun OlSpecialMasterFeaturesHubScreen(
           },
           colors = TopAppBarDefaults.topAppBarColors(
             containerColor = Color(0xFF0F172A)
-          )
+          ),
+          scrollBehavior = scrollBehavior
         )
       }
     },
@@ -165,9 +173,9 @@ fun OlSpecialMasterFeaturesHubScreen(
     Column(
       modifier = Modifier
         .fillMaxSize()
-        .padding(if (isToolsFullScreen) PaddingValues(0.dp) else padding)
+        .padding(if (!showOuterBars) PaddingValues(0.dp) else padding)
     ) {
-      if (!isToolsFullScreen) {
+      if (showOuterBars) {
         if (currentSubject != null && subjectCategories.isNotEmpty()) {
           // STRICT SUBJECT ISOLATION: The tab bar contains ONLY the active subject's tool & 20 categories!
           // All other subjects are completely removed.
@@ -351,7 +359,9 @@ fun OlSpecialMasterFeaturesHubScreen(
               showInnerTopBar = false,
               isFullScreenMode = isToolsFullScreen,
               onToggleFullScreen = { isToolsFullScreen = !isToolsFullScreen },
-              onBack = { selectedSection = SpecialFeatureSection.SCIENCE_DIAGRAMS }
+              onSelectSection = { selectedSection = it },
+              activeSection = selectedSection,
+              onBack = onBack
             )
             SpecialFeatureSection.SCIENCE_DIAGRAMS -> ScienceDiagramsAndFormulaFeatureView()
             SpecialFeatureSection.ENGLISH_WRITING_VAULT -> EnglishWritingVaultAndVerbsFeatureView()
@@ -712,7 +722,8 @@ fun ScienceDiagramsAndFormulaFeatureView(
   LazyColumn(
     modifier = Modifier
       .fillMaxSize()
-      .padding(16.dp),
+      .padding(horizontal = 16.dp),
+    contentPadding = PaddingValues(top = 12.dp, bottom = 160.dp),
     verticalArrangement = Arrangement.spacedBy(14.dp)
   ) {
     // Jump to 20 Categories Banner

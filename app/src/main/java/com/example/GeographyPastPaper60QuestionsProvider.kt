@@ -16,9 +16,9 @@ object GeographyPastPaper60QuestionsProvider {
 
     fun buildGeographyQuestion(year: Int, qNum: Int, yearStr: String, subjectTitle: String): PastPaperQuestion {
         val q = qNum.coerceIn(1, 60)
-        val v = (year + q) % 3
+        val yearInt = yearStr.toIntOrNull() ?: year
         
-        val data = getQuestionData(q, v, yearStr)
+        val data = getQuestionData(q, yearInt, yearStr)
         
         return PastPaperQuestion(
             id = qNum,
@@ -32,7 +32,7 @@ object GeographyPastPaper60QuestionsProvider {
         )
     }
 
-    private fun getQuestionData(q: Int, v: Int, yearStr: String): QuestionData {
+    private fun getQuestionData(q: Int, yearInt: Int, yearStr: String): QuestionData {
         val questions = listOf(
             // 1-10: Physical Geography & Earth
             QuestionData("භූගෝල විද්‍යාව - පෘථිවිය", "පෘථිවියේ සැබෑ හැඩය විද්‍යාත්මකව හඳුන්වනු ලබන්නේ කෙසේද?", listOf("භූ-ගෝලීය හැඩය (Geoid)", "පරිපූර්ණ ගෝලය", "ඉලිප්සාකාර හැඩය", "පැතලි හැඩය"), 0, "පෘථිවිය ධ්‍රැවවලින් මඳක් පැතලි වී සමකය අසලින් පිම්බී ඇති බැවින් එය Geoid ලෙස හැඳින්වේ."),
@@ -107,12 +107,10 @@ object GeographyPastPaper60QuestionsProvider {
             QuestionData("භූගෝල විද්‍යාව", "පෘථිවියේ ජීවය පවත්වා ගැනීමට පිරිසිදු වාතය ලබා දෙන 'පෘථිවියේ පෙනහලු' ලෙස හඳුන්වන්නේ කුමක්ද?", listOf("වැසි වනාන්තර (ඇමේසන් වැනි)", "සාගර", "කාන්තාර", "කඳු"), 0, "වැසි වනාන්තර විශාල වශයෙන් ඔක්සිජන් මුදාහරින බැවින් එසේ හැඳින්වේ.")
         )
 
-        val idx = (q - 1).coerceIn(0, 59)
+        val yOffset = Math.abs(yearInt - 2015)
+        val idx = ((q - 1) + yOffset * 13) % questions.size
         val baseData = questions[idx]
 
-        // Add variety based on v (variants) if needed, or just return the unique question
-        // To ensure 100% distinctness for each q in a year, we ignore v for the primary text
-        // but can use it to slightly modify the phrasing if the user wants variety across years too.
         val finalTitle = "[$yearStr O/L - Q$q] " + baseData.text
 
         return QuestionData(baseData.topic, finalTitle, baseData.options, baseData.correctIdx, baseData.explanation)

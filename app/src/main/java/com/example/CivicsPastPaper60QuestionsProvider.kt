@@ -16,9 +16,9 @@ object CivicsPastPaper60QuestionsProvider {
 
     fun buildCivicsQuestion(year: Int, qNum: Int, yearStr: String, subjectTitle: String): PastPaperQuestion {
         val q = qNum.coerceIn(1, 60)
-        val v = (year + q) % 3
+        val yearInt = yearStr.toIntOrNull() ?: year
         
-        val data = getQuestionData(q, v, yearStr)
+        val data = getQuestionData(q, yearInt, yearStr)
         
         return PastPaperQuestion(
             id = qNum,
@@ -32,7 +32,7 @@ object CivicsPastPaper60QuestionsProvider {
         )
     }
 
-    private fun getQuestionData(q: Int, v: Int, yearStr: String): QuestionData {
+    private fun getQuestionData(q: Int, yearInt: Int, yearStr: String): QuestionData {
         val questions = listOf(
             // 1-10: Democracy & Governance
             QuestionData("පාලන ක්‍රමය", "ශ්‍රී ලංකාවේ ව්‍යවස්ථාදායක බලය හිමි ප්‍රධාන ආයතනය කුමක්ද?", listOf("පාර්ලිමේන්තුව", "අධිකරණය", "කැබිනට් මණ්ඩලය", "පළාත් සභාව"), 0, "රටට අවශ්‍ය නීති සම්පාදනය කරන්නේ පාර්ලිමේන්තුව මගිනි."),
@@ -107,7 +107,8 @@ object CivicsPastPaper60QuestionsProvider {
             QuestionData("ජාත්‍යන්තරය", "ලෝක වෙළඳ සංවිධානය (WTO) වැදගත් වන්නේ ඇයි?", listOf("ජාත්‍යන්තර වෙළඳාම විධිමත් කිරීමට", "පරිසරය සුරැකීමට", "සිනමා කර්මාන්තයට", "සොළොස්මස්ථාන වැඳීමට"), 0, "රටවල් අතර වෙළඳ ගිවිසුම් හා ගැටලු මෙහිදී සාකච්ඡා වේ.")
         )
 
-        val idx = (q - 1).coerceIn(0, 59)
+        val yOffset = Math.abs(yearInt - 2015)
+        val idx = ((q - 1) + yOffset * 13) % questions.size
         val baseData = questions[idx]
         val finalTitle = "[$yearStr O/L - Q$q] " + baseData.text
 

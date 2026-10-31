@@ -16,9 +16,9 @@ object CommercePastPaper60QuestionsProvider {
 
     fun buildCommerceQuestion(year: Int, qNum: Int, yearStr: String, subjectTitle: String): PastPaperQuestion {
         val q = qNum.coerceIn(1, 60)
-        val v = (year + q) % 3
+        val yearInt = yearStr.toIntOrNull() ?: year
         
-        val data = getQuestionData(q, v, yearStr)
+        val data = getQuestionData(q, yearInt, yearStr)
         
         return PastPaperQuestion(
             id = qNum,
@@ -32,7 +32,7 @@ object CommercePastPaper60QuestionsProvider {
         )
     }
 
-    private fun getQuestionData(q: Int, v: Int, yearStr: String): QuestionData {
+    private fun getQuestionData(q: Int, yearInt: Int, yearStr: String): QuestionData {
         val questions = listOf(
             // 1-10: Business Background
             QuestionData("ව්‍යාපාර පසුබිම", "ව්‍යාපාරයක ප්‍රධාන අරමුණ කුමක්ද?", listOf("ලාභ ලැබීම", "සමාජ සේවය", "විනෝදය", "පුණ්‍ය කටයුතු"), 0, "ලාභ ඉපයීම ඕනෑම පෞද්ගලික ව්‍යාපාරයක මූලික අරමුණයි."),
@@ -107,7 +107,8 @@ object CommercePastPaper60QuestionsProvider {
             QuestionData("වෙළඳාම", "ඊ-වාණිජ්‍යය (E-Commerce) යනු කුමක්ද?", listOf("අන්තර්ජාලය හරහා භාණ්ඩ හා සේවා මිලදී ගැනීම හා විකිණීම", "පැරණි වෙළඳාම", "කඩේට ගොස් බඩු ගැනීම", "නොමිලේ බඩු බෙදීම"), 0, "වර්තමානයේ ඉතා ජනප්‍රිය වෙළඳ ක්‍රමයකි (උදා: Amazon, Daraz).")
         )
 
-        val idx = (q - 1).coerceIn(0, 59)
+        val yOffset = Math.abs(yearInt - 2015)
+        val idx = ((q - 1) + yOffset * 13) % questions.size
         val baseData = questions[idx]
         val finalTitle = "[$yearStr O/L - Q$q] " + baseData.text
 

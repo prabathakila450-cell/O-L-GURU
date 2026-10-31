@@ -18,7 +18,7 @@ object SinhalaPastPaper60QuestionsProvider {
         val q = qNum.coerceIn(1, 60)
         val v = (year + q) % 3
         
-        val data = getQuestionData(q, v, yearStr)
+        val data = getQuestionData(q, v, yearStr, year)
         
         return PastPaperQuestion(
             id = qNum,
@@ -32,7 +32,7 @@ object SinhalaPastPaper60QuestionsProvider {
         )
     }
 
-    private fun getQuestionData(q: Int, v: Int, yearStr: String): QuestionData {
+    private fun getQuestionData(q: Int, v: Int, yearStr: String, yearInt: Int): QuestionData {
         val questions = listOf(
             // 1-10: Vocabulary (සමාන පද / විරුද්ධ පද)
             QuestionData("සිංහල - වචන මාලාව", "'මිහිකත' යන වචනයට සමාන පදයක් තෝරන්න.", listOf("පොළොව", "අහස", "හිරු", "හඳ"), 0, "මිහිකත යනු පෘථිවිය හෙවත් පොළොවට යෙදෙන නමකි."),
@@ -107,7 +107,8 @@ object SinhalaPastPaper60QuestionsProvider {
             QuestionData("සිංහල - භාෂාව", "ගුණාත්මක අගයක් පෙන්වන වචන හඳුන්වන්නේ,", listOf("විශේෂණ", "නාම පද", "ක්‍රියා පද", "නිපාත"), 0, "ලස්සන, උස, හොඳ වැනි පද නාම විශේෂණ වේ.")
         )
 
-        val idx = (q - 1).coerceIn(0, 59)
+        val yOffset = Math.abs(yearInt - 2015)
+        val idx = ((q - 1) + yOffset * 13) % questions.size
         val baseData = questions[idx]
         val finalTitle = "[$yearStr O/L - Q$q] " + baseData.text
 

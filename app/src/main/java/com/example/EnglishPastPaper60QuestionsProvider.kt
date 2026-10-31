@@ -18,7 +18,7 @@ object EnglishPastPaper60QuestionsProvider {
         val q = qNum.coerceIn(1, 60)
         val v = (year + q) % 3
         
-        val data = getQuestionData(q, v, yearStr)
+        val data = getQuestionData(q, v, yearStr, year)
         
         return PastPaperQuestion(
             id = qNum,
@@ -32,7 +32,7 @@ object EnglishPastPaper60QuestionsProvider {
         )
     }
 
-    private fun getQuestionData(q: Int, v: Int, yearStr: String): QuestionData {
+    private fun getQuestionData(q: Int, v: Int, yearStr: String, yearInt: Int): QuestionData {
         val questions = listOf(
             // 1-10: Grammar (Tenses & Articles)
             QuestionData("Grammar", "Choose the correct verb form: 'She ___ to school every day.'", listOf("go", "goes", "going", "gone"), 1, "Simple Present Tense for habitual actions."),
@@ -107,7 +107,8 @@ object EnglishPastPaper60QuestionsProvider {
             QuestionData("Skills", "Complete the proverb: 'Health is ___.'", listOf("Wealth", "Money", "Gold", "Life"), 0, "A well-known English saying.")
         )
 
-        val idx = (q - 1).coerceIn(0, 59)
+        val yOffset = Math.abs(yearInt - 2015)
+        val idx = ((q - 1) + yOffset * 13) % questions.size
         val baseData = questions[idx]
         val finalTitle = "[$yearStr O/L - Q$q] " + baseData.text
 

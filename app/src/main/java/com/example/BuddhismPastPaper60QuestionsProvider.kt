@@ -18,7 +18,7 @@ object BuddhismPastPaper60QuestionsProvider {
         val q = qNum.coerceIn(1, 60)
         val v = (year + q) % 3
         
-        val data = getQuestionData(q, v, yearStr)
+        val data = getQuestionData(q, v, yearStr, year)
         
         return PastPaperQuestion(
             id = qNum,
@@ -32,7 +32,7 @@ object BuddhismPastPaper60QuestionsProvider {
         )
     }
 
-    private fun getQuestionData(q: Int, v: Int, yearStr: String): QuestionData {
+    private fun getQuestionData(q: Int, v: Int, yearStr: String, yearInt: Int): QuestionData {
         val questions = listOf(
             // 1-10: Life of the Buddha
             QuestionData("බුද්ධ චරිතය", "සිද්ධාර්ථ කුමාරයා උපත ලැබූ ස්ථානය කුමක්ද?", listOf("ලුම්බිණි සල් උයන", "කපිලවස්තු පුරය", "බුද්ධගයාව", "කුසිනාරාව"), 0, "සිද්ධාර්ථ කුමාරයා උපත ලැබුවේ දඹදිව ලුම්බිණි සල් උයනේදීය."),
@@ -107,7 +107,8 @@ object BuddhismPastPaper60QuestionsProvider {
             QuestionData("බුද්ධ ධර්මය", "නිවන් මගෙහි අවසාන ඵලය කුමක්ද?", listOf("අර්හත් ඵලය (රහත් වීම)", "සෝවාන් වීම", "සකෘදාගාමී වීම", "අනාගාමී වීම"), 0, "සසර ගමන අවසන් වන්නේ රහත් වීමෙනි.")
         )
 
-        val idx = (q - 1).coerceIn(0, 59)
+        val yOffset = Math.abs(yearInt - 2015)
+        val idx = ((q - 1) + yOffset * 13) % questions.size
         val baseData = questions[idx]
         val finalTitle = "[$yearStr O/L - Q$q] " + baseData.text
 
