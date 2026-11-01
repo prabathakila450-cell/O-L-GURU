@@ -17,14 +17,13 @@ object SubjectMasterRepository {
       subjectName.contains("පුරවැසි") || lower.contains("civic") -> SubjectMasterCivics20x20.getCategories()
       subjectName.contains("තොරතුරු") || lower.contains("ict") -> SubjectMasterOtherSubjects20x20.getIctCategories()
       subjectName.contains("නර්තන") || lower.contains("dance") -> SubjectMasterOtherSubjects20x20.getDancingCategories()
+      subjectName.contains("කෘෂි") || lower.contains("agri") -> SubjectMasterAgriculture20x20.getCategories()
+      subjectName.contains("සෞඛ්‍ය") || lower.contains("health") -> SubjectMasterHealth20x20.getCategories()
       else -> getGeographyCategories()
     }
   }
 
   fun getGeographyCategories(): List<SubjectMasterCategory> {
-    return SubjectMasterGeography20x20.getCategories() +
-        SubjectMasterGeographyPart2.getCategories() +
-        SubjectMasterGeographyPart3.getCategories() +
-        SubjectMasterGeographyPart4.getCategories()
+    return SubjectMasterGeography20x20.getCategories()
   }
 }

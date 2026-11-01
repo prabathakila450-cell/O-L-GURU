@@ -1121,6 +1121,34 @@ private fun getSampleAgriLessons(): List<AgriLessonUnit> {
       examTips = "N, P, K ඌණතා ලක්ෂණ පත්‍රවල පෙන්නුම් කරන ආකාරය O/L වලට නිතර ඇසේ."
     ),
     AgriLessonUnit(
+      id = "agri_10_4",
+      grade = "10",
+      unitNumber = 4,
+      titleSin = "කෘෂිකාර්මික යන්ත්‍ර සූත්‍ර හා උපකරණ",
+      category = AgriSectionCategory.LESSONS,
+      summarySin = "මෝල්ඩ්බෝඩ් නගුල, රොටවේටර්, බිංදු ජලසම්පාදන පද්ධති සහ ආරක්ෂක උපකරණ.",
+      keyPoints = listOf(
+        "ප්‍රාථමික සහ ද්විතීයික බිම් සැකසුම් යන්ත්‍ර සූත්‍ර.",
+        "බිංදු සහ ස්ප්‍රින්ක්ලර් ජලසම්පාදන ක්‍රම.",
+        "කෘමිනාශක ඉසීමේදී අනුගමනය කළ යුතු ආරක්ෂක ක්‍රම."
+      ),
+      examTips = "නගුල් කොටස් සහ ජලසම්පාදන ක්‍රමවල වාසි විභාගයට අසයි."
+    ),
+    AgriLessonUnit(
+      id = "agri_10_5",
+      grade = "10",
+      unitNumber = 5,
+      titleSin = "බෝග ප්‍රචාරණ ක්‍රම හා තවාන් කළමනාකරණය",
+      category = AgriSectionCategory.LESSONS,
+      summarySin = "ලිංගික හා අලිංගික ප්‍රචාරණය, බද්ධ කිරීම (Grafting) සහ තවාන් පාලනය.",
+      keyPoints = listOf(
+        "බීජ මඟින් සහ දඩු/අංකුර මඟින් ප්‍රචාරණය.",
+        "මව් ශාකයේ ගුණ ආරක්ෂා කරමින් බද්ධ කිරීම.",
+        "පැළ හැඩගැස්වීම (Hardening off)."
+      ),
+      examTips = "බද්ධ කිරීමේ ක්‍රම සහ තවාන් රෝග පාලනය."
+    ),
+    AgriLessonUnit(
       id = "agri_11_1",
       grade = "11",
       unitNumber = 1,
@@ -1147,6 +1175,48 @@ private fun getSampleAgriLessons(): List<AgriLessonUnit> {
         "බ්‍රොයිලර් සහ ලේයර් කුකුළු පාලනය."
       ),
       examTips = "කිරි මුදවීම හා පැස්ටරීකරණ උෂ්ණත්ව සටහන් කරගන්න."
+    ),
+    AgriLessonUnit(
+      id = "agri_11_3",
+      grade = "11",
+      unitNumber = 3,
+      titleSin = "පලිබෝධ කළමනාකරණය හා කාබනික ගොවිතැන (IPM)",
+      category = AgriSectionCategory.LESSONS,
+      summarySin = "ඒකාබද්ධ පලිබෝධ පාලනය, ජෛව පාලන ක්‍රම, හයිඩ්‍රොපොනික්ස් සහ ඇක්වාපොනික්ස්.",
+      keyPoints = listOf(
+        "යාන්ත්‍රික, භෞතික සහ ජෛව පාලන ක්‍රම.",
+        "පස් රහිත හයිඩ්‍රොපොනික්ස් වගාව.",
+        "මාළු ඇතිකිරීම හා වගාව සම්බන්ධ කරන ඇක්වාපොනික්ස්."
+      ),
+      examTips = "IPM හි ප්‍රධාන අංග සහ හයිඩ්‍රොපොනික්ස් පෝෂක ද්‍රාවණ."
+    ),
+    AgriLessonUnit(
+      id = "agri_11_4",
+      grade = "11",
+      unitNumber = 4,
+      titleSin = "පසු අස්වනු තාක්ෂණය හා අගය එකතු කිරීම",
+      category = AgriSectionCategory.LESSONS,
+      summarySin = "අස්වනු හානි අවම කිරීම, ප්ලාස්ටික් කූඩ, ජෑම්/කෝඩියල් නිෂ්පාදන හා අලෙවිකරණය.",
+      keyPoints = listOf(
+        "පසු අස්වනු හානි 30-40% දක්වා අවම කරගැනීම.",
+        "ප්ලාස්ටික් කූඩ සහ ශීතාගාර භාවිතය.",
+        "අගය එකතු කළ නිෂ්පාදන (Value addition)."
+      ),
+      examTips = "පසු අස්වනු හානිවලට හේතු සහ පාලන ක්‍රම විභාග රචනා ප්‍රශ්නයකි."
+    ),
+    AgriLessonUnit(
+      id = "agri_11_5",
+      grade = "11",
+      unitNumber = 5,
+      titleSin = "O/L කෘෂිකර්මය විභාග මාස්ටර් මාර්ගෝපදේශය",
+      category = AgriSectionCategory.LESSONS,
+      summarySin = "ප්‍රශ්න පත්‍ර ව්‍යුහය, පොහොර ප්‍රතිශත මතක තබාගැනීමේ ක්‍රම සහ ප්‍රායෝගික සටහන්.",
+      keyPoints = listOf(
+        "యූරියා 46% N, TSP 46% P2O5, MOP 60% K2O.",
+        "pH මැනීම සහ කොම්පෝස්ට් පරීක්ෂණ.",
+        "රචනා ප්‍රශ්න පිළිතුරු ලියන නිවැරදි ක්‍රමවේදය."
+      ),
+      examTips = "පොහොර ප්‍රතිශත සහ ප්‍රායෝගික පියවර නිවැරදිව ලිවීමෙන් A+ ලබාගත හැක."
     )
   )
 }
@@ -1176,6 +1246,22 @@ private fun getSampleAgriMcqs(): List<AgriMcqItem> {
       options = listOf("ගෝනි මලු භාවිතය", "ප්ලාස්ටික් කූඩ (Rigid Plastic Crates)", "පොලිතීන් බෑග්", "ලී පෙට්ටි"),
       correctIndex = 1,
       explanationSin = "තද ප්ලාස්ටික් කූඩ මඟින් තෙරපීමෙන් වන හානිය වළක්වා වාතාශ්‍රය ලබා දෙයි."
+    ),
+    AgriMcqItem(
+      id = 4,
+      grade = "10",
+      questionSin = "යූරියා පොහොරෙහි අඩංගු නයිට්‍රජන් (N) ප්‍රතිශතය කොපමණද?",
+      options = listOf("20%", "30%", "46%", "60%"),
+      correctIndex = 2,
+      explanationSin = "යූරියා වල 46% ක් ද, TSP වල 46% P2O5 ද, MOP වල 60% K2O ද අඩංගු වේ."
+    ),
+    AgriMcqItem(
+      id = 5,
+      grade = "11",
+      questionSin = "පස් රහිතව පෝෂක ද්‍රාවණ තුළ ජලයේ එළවළු වගා කිරීම හැඳින්වෙන්නේ කුමන නමකින්ද?",
+      options = listOf("හයිඩ්‍රොපොනික්ස් (Hydroponics)", "ඇක්වාපොනික්ස් (Aquaponics)", "කොම්පෝස්ට් වගාව", "මුල් මඟින් වගාව"),
+      correctIndex = 0,
+      explanationSin = "හයිඩ්‍රොපොනික්ස් යනු පස් රහිතව පෝෂක ද්‍රාවණ මඟින් ශාක පෝෂණය කරමින් කරන වගාවකි."
     )
   )
 }
@@ -1205,6 +1291,18 @@ private fun getSampleAgriEssays(): List<AgriEssayQuestion> {
         "වාණිජමය වශයෙන් බෙල්පෙපර්, ස්ට්‍රෝබෙරි වගාවේ වාසි."
       ),
       markingSchemeSin = "හරිතාගාර වාසි ලකුණු 4, NFT සටහන ලකුණු 3, වාණිජ බෝග ලකුණු 3. මුළු ලකුණු 10."
+    ),
+    AgriEssayQuestion(
+      id = 3,
+      grade = "11",
+      titleSin = "පසු අස්වනු තාක්ෂණය සහ අගය එකතු කිරීමේ වැදගත්කම",
+      scenarioSin = "අස්වනු නෙළීමේ සිට පාරිභෝගිකයාට ළඟා වන තෙක් 30% කට වැඩි අස්වනු ප්‍රමාණයක් අපතේ යයි.",
+      pointsToInclude = listOf(
+        "පසු අස්වනු හානි වීමට බලපාන හේතු (නුසුදුසු ඇසුරුම්, ප්‍රවාහනය).",
+        "ප්ලාස්ටික් කූඩ සහ ශීතාගාර භාවිතයේ වාසි.",
+        "ජෑම්, කෝඩියල් සහ පලතුරු යුෂ සැකසීමෙන් ලැබෙන ආර්ථික ප්‍රතිලාභ."
+      ),
+      markingSchemeSin = "හානි හේතු ලකුණු 3, ඇසුරුම් හා ශීතාගාර ලකුණු 4, අගය එකතු කිරීම ලකුණු 3. මුළු ලකුණු 10."
     )
   )
 }

@@ -4101,7 +4101,7 @@ fun SubjectContentScreen(
             }
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-              text = "ඒකක 7 ට අදාළ ආදර්ශ විචාර 23 • උපුටා දැක්වීම් • ලකුණු දීමේ නිර්ණායක • සැකසුම: හසිත හෙට්ටිආරච්චි",
+              text = "ඒකක 7 ට අදාළ ආදර්ශ විචාර 23 • උපුටා දැක්වීම් • ලකුණු දීමේ නිර්ණායක",
               fontSize = 11.sp,
               color = Color(0xFFFECACA),
               maxLines = 2,

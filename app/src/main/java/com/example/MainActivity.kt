@@ -7037,18 +7037,6 @@ fun getNotesForGrade(grade: String): List<ShortNoteItem> {
       isPasswordProtected = false,
       password = null
     )
-    val sinhalaNoteGr10Custom = ShortNoteItem(
-      id = "sinhala_note_gr10_custom_pdf",
-      subject = "සිංහල",
-      title = "10 ශ්‍රේණිය - සිංහල සාහිත්‍යය කෙටි සටහන් හා විචාර සංග්‍රහය",
-      topicSinhala = "10 ශ්‍රේණිය සිංහල සාහිත්‍යය කෙටි සටහන් (හසිත හෙට්ටිආරච්චි)",
-      readTime = "🔒 ආරක්ෂිත PDF • Google Drive",
-      isPopular = true,
-      pdfUri = "https://drive.google.com/file/d/17jFpMgfgojJgdAT0K4Ja9dfDocoBAnsl/preview",
-      fileName = "Sinhala_Grade10_Short_Notes.pdf",
-      isPasswordProtected = false,
-      password = null
-    )
     val artNoteGr10Custom = ShortNoteItem(
       id = "art_note_gr10_custom_pdf",
       subject = "චිත්‍ර කලාව",
@@ -7062,7 +7050,7 @@ fun getNotesForGrade(grade: String): List<ShortNoteItem> {
       password = null
     )
     return listOf(
-      sinhalaVicharaDharaFullPdfNote, sinhalaGrammarNote, sinhalaLitNoteGr10_11, sinhalaWritingNoteGr10_11, sinhalaNoteGr10Custom,
+      sinhalaVicharaDharaFullPdfNote, sinhalaGrammarNote, sinhalaLitNoteGr10_11, sinhalaWritingNoteGr10_11,
       englishShortNoteAllGrades, englishWritingNoteGr10_11, englishShortNoteGr09_11,
       mathSanduTheoryMasterNotes, mathGeometryNote, mathNoteGr10Custom,
       scienceNoteGr10, scienceNoteGr10Custom, scienceDiagramsNotesGr10_11,

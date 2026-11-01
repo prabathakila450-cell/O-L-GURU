@@ -970,24 +970,21 @@ fun GeographyQuickOverviewGrid(
     onSelectModule: (Int) -> Unit
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        for (i in categories.indices step 2) {
+        for (i in categories.indices step 4) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                GeographyFeatureButton(
-                    category = categories[i],
-                    modifier = Modifier.weight(1f),
-                    onClick = { onSelectModule(categories[i].categoryNumber) }
-                )
-                if (i + 1 < categories.size) {
-                    GeographyFeatureButton(
-                        category = categories[i + 1],
-                        modifier = Modifier.weight(1f),
-                        onClick = { onSelectModule(categories[i + 1].categoryNumber) }
-                    )
-                } else {
-                    Spacer(modifier = Modifier.weight(1f))
+                for (j in 0 until 4) {
+                    if (i + j < categories.size) {
+                        GeographyFeatureButton(
+                            category = categories[i + j],
+                            modifier = Modifier.weight(1f),
+                            onClick = { onSelectModule(categories[i + j].categoryNumber) }
+                        )
+                    } else {
+                        Spacer(modifier = Modifier.weight(1f))
+                    }
                 }
             }
         }
@@ -1001,45 +998,54 @@ fun GeographyFeatureButton(
     onClick: () -> Unit
 ) {
     val catColor = category?.color ?: Color(0xFF059669)
+    val shortTitle = when (category?.categoryNumber) {
+        1 -> "1:50k සිතියම්"
+        2 -> "සමෝච්ච රේඛා"
+        3 -> "ජලාපවහන"
+        4 -> "දේශගුණය"
+        5 -> "මෝසම් වැසි"
+        6 -> "වෘක්ෂලතා"
+        7 -> "පස් වර්ග"
+        8 -> "ඛනිජ සම්පත්"
+        9 -> "ජනගහනය"
+        10 -> "කෘෂිකර්මය"
+        else -> category?.titleSinhala ?: ""
+    }
+
     Surface(
         onClick = onClick,
         shape = RoundedCornerShape(10.dp),
         color = Color(0xFF1E293B),
-        border = BorderStroke(1.dp, catColor.copy(alpha = 0.6f)),
-        modifier = modifier.height(72.dp)
+        border = BorderStroke(1.dp, catColor.copy(alpha = 0.7f)),
+        modifier = modifier.height(98.dp)
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .padding(6.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
             Surface(
                 shape = CircleShape,
-                color = catColor.copy(alpha = 0.25f),
-                modifier = Modifier.size(36.dp)
+                color = catColor.copy(alpha = 0.3f),
+                modifier = Modifier.size(32.dp)
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Text(category?.icon ?: "🌍", fontSize = 16.sp)
+                    Text(category?.icon ?: "🌍", fontSize = 14.sp)
                 }
             }
-            Spacer(modifier = Modifier.width(8.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = category?.titleSinhala ?: "",
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = "කාණ්ඩය ${category?.categoryNumber} • කරුණු 20",
-                    fontSize = 9.5.sp,
-                    color = Color(0xFF94A3B8)
-                )
-            }
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "${category?.categoryNumber}. $shortTitle",
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Center,
+                lineHeight = 12.sp
+            )
         }
     }
 }

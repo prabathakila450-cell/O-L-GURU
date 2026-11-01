@@ -131,7 +131,7 @@ fun SinhalaLiteratureFeatureView() {
         }
         Spacer(modifier = Modifier.height(4.dp))
         Text(
-          text = "සාහිත්‍ය සංග්‍රහයේ ඒකක 7 ට අදාළ ආදර්ශ විචාර 23 • උපුටා දැක්වීම් • ලකුණු ලබාදීමේ නිර්ණායක • සැකසුම: හසිත හෙට්ටිආරච්චි",
+          text = "සාහිත්‍ය සංග්‍රහයේ ඒකක 7 ට අදාළ ආදර්ශ විචාර 23 • උපුටා දැක්වීම් • ලකුණු ලබාදීමේ නිර්ණායක",
           fontSize = 11.sp,
           color = Color(0xFFFECACA),
           lineHeight = 15.sp

@@ -612,16 +612,7 @@ object SyllabusRepository {
         )
       ),
       defaultDrivePdfUrl = "https://drive.google.com/file/d/17jFpMgfgojJgdAT0K4Ja9dfDocoBAnsl/preview",
-      attachedDrivePdfs = mutableListOf(
-        AttachedGoogleDrivePdf(
-          id = "sin_lit_g10_pdf_custom",
-          title = "10 ශ්‍රේණිය සිංහල සාහිත්‍යය කෙටි සටහන් හා විචාර සංග්‍රහය (හසිත හෙට්ටිආරච්චි)",
-          driveUrl = "https://drive.google.com/file/d/17jFpMgfgojJgdAT0K4Ja9dfDocoBAnsl/preview",
-          uploadDate = "2026-08-31",
-          fileSize = "3.8 MB",
-          type = "NOTE"
-        )
-      )
+      attachedDrivePdfs = mutableListOf()
     ),
     // --------------------------------------------------------------------------
     // GRADE 06-11 - SINHALA GRAMMAR (06-11 ශ්‍රේණි සිංහල ව්‍යාකරණ කෙටි සටහන්)
