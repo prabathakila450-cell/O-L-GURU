@@ -29,7 +29,8 @@ object MockExamDistinct60Provider {
     qNum: Int
   ): MockExamQuestion {
     val normSubject = when {
-      subject.contains("විද්‍යාව") -> "science"
+      subject.contains("භූගෝල") -> "geography"
+      subject.contains("විද්‍යාව") && !subject.contains("භූගෝල") -> "science"
       subject.contains("ගණිතය") -> "math"
       subject.contains("ඉතිහාසය") -> "history"
       subject.contains("සිංහල") -> "sinhala"
@@ -39,7 +40,6 @@ object MockExamDistinct60Provider {
       subject.contains("වාණිජ") || subject.contains("ගිණුම්") -> "commerce"
       subject.contains("පුරවැසි") -> "civics"
       subject.contains("සෞඛ්‍ය") || subject.contains("health", ignoreCase = true) -> "health"
-      subject.contains("භූගෝල") -> "geography"
       else -> "science"
     }
 

@@ -356,13 +356,6 @@ fun StructuredEssayAssessmentHub(onBack: () -> Unit) {
                 val q = selectedQuestion!!
                 LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     item {
-                        Surface(
-                            shape = RoundedCornerShape(6.dp),
-                            color = Color(0xFFE0F2FE)
-                        ) {
-                            Text(q.subject, fontSize = 11.sp, color = Color(0xFF0284C7), fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp))
-                        }
-                        Spacer(modifier = Modifier.height(6.dp))
                         Text(q.title, fontSize = 17.sp, fontWeight = FontWeight.Bold, color = Color(0xFF0F172A))
                         Spacer(modifier = Modifier.height(8.dp))
                         Card(
@@ -373,7 +366,7 @@ fun StructuredEssayAssessmentHub(onBack: () -> Unit) {
                         }
                     }
                     item {
-                        Text("ඔබේ පිළිතුර මෙහි සටහන් කරන්න (Student Scratchpad):", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Color(0xFF334155))
+                        Text("ඔබේ පිළිතුර මෙහි ලියන්න (Submit after writing):", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Color(0xFF334155))
                         Spacer(modifier = Modifier.height(6.dp))
                         OutlinedTextField(
                             value = studentAnswer,
@@ -385,14 +378,15 @@ fun StructuredEssayAssessmentHub(onBack: () -> Unit) {
                     }
                     item {
                         Button(
-                            onClick = { showMarkingScheme = true },
+                            onClick = { if (studentAnswer.isNotBlank()) showMarkingScheme = true },
                             modifier = Modifier.fillMaxWidth().height(48.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0284C7)),
-                            shape = RoundedCornerShape(10.dp)
+                            colors = ButtonDefaults.buttonColors(containerColor = if (studentAnswer.isNotBlank()) Color(0xFF0284C7) else Color(0xFF94A3B8)),
+                            shape = RoundedCornerShape(10.dp),
+                            enabled = studentAnswer.isNotBlank()
                         ) {
                             Icon(Icons.Default.RateReview, contentDescription = null, tint = Color.White)
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("නිල ලකුණු දීමේ ක්‍රියාපටිපාටිය සහ ආදර්ශ පිළිතුර බලන්න", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                            Text("පිළිතුර ඉදිරිපත් කර ලකුණු බලන්න", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color.White)
                         }
                     }
                     if (showMarkingScheme) {
@@ -405,7 +399,7 @@ fun StructuredEssayAssessmentHub(onBack: () -> Unit) {
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Icon(Icons.Default.CheckCircle, contentDescription = null, tint = Color(0xFF16A34A), modifier = Modifier.size(20.dp))
                                         Spacer(modifier = Modifier.width(8.dp))
-                                        Text("ලකුණු ලබා දීමේ ක්‍රියාපටිපාටිය (Marking Scheme & Rubric):", fontWeight = FontWeight.Bold, fontSize = 13.5.sp, color = Color(0xFF166534))
+                                        Text("ලකුණු ලබා දීමේ ක්‍රියාපටිපාටිය සහ ආදර්ශ පිළිතුර:", fontWeight = FontWeight.Bold, fontSize = 13.5.sp, color = Color(0xFF166534))
                                     }
                                     Spacer(modifier = Modifier.height(8.dp))
                                     q.markingScheme.forEach { rule ->
@@ -414,8 +408,6 @@ fun StructuredEssayAssessmentHub(onBack: () -> Unit) {
                                     Spacer(modifier = Modifier.height(14.dp))
                                     HorizontalDivider(color = Color(0xFFBBF7D0))
                                     Spacer(modifier = Modifier.height(10.dp))
-                                    Text("ආදර්ශ පිළිතුර (Model Answer):", fontWeight = FontWeight.Bold, fontSize = 13.5.sp, color = Color(0xFF166534))
-                                    Spacer(modifier = Modifier.height(4.dp))
                                     Text(q.modelAnswer, fontSize = 13.sp, color = Color(0xFF14532D), lineHeight = 19.sp)
                                 }
                             }

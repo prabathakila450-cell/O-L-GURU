@@ -168,6 +168,8 @@ fun VoiceQuizScreen(
     val totalKeywords = currentQuestion.expectedKeywords.size
     val matchRatio = if (totalKeywords > 0) matched.size.toFloat() / totalKeywords else 0f
 
+    showModelAnswer = true
+
     if (matched.isEmpty()) {
       // User did not provide any of the correct expected keywords!
       scoreEarned = 0
@@ -467,12 +469,17 @@ fun VoiceQuizScreen(
       // 4. Question Card with Audio Speak
       item {
         Card(
-          shape = RoundedCornerShape(20.dp),
+          shape = RoundedCornerShape(22.dp),
           colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
           border = BorderStroke(1.dp, Color(0xFF334155)),
           modifier = Modifier.fillMaxWidth()
         ) {
-          Column(modifier = Modifier.padding(18.dp)) {
+          Column(
+            modifier = Modifier
+              .fillMaxWidth()
+              .padding(16.dp)
+          ) {
+            // Header Row: Subject & Set Badge + Audio Listen Button
             Row(
               modifier = Modifier.fillMaxWidth(),
               horizontalArrangement = Arrangement.SpaceBetween,
@@ -484,7 +491,7 @@ fun VoiceQuizScreen(
               ) {
                 Text(
                   text = if (selectedSetNumber != null) {
-                    "${currentQuestion.subject} • කාණ්ඩය $selectedSetNumber • ප්‍රශ්න ${currentQuestion.questionIndexInSet}/20 (සමස්ත ${currentQuestion.globalIndex}/200)"
+                    "${currentQuestion.subject} • කාණ්ඩය $selectedSetNumber • ප්‍රශ්න ${currentQuestion.questionIndexInSet}/20"
                   } else {
                     "${currentQuestion.subject} • ප්‍රශ්න ${currentQuestion.globalIndex}/200"
                   },
@@ -512,8 +519,8 @@ fun VoiceQuizScreen(
                 },
                 shape = RoundedCornerShape(10.dp),
                 colors = ButtonDefaults.filledTonalButtonColors(
-                  containerColor = if (isSpeakingQuestion) Color(0xFF22C55E) else Color(0xFF334155),
-                  contentColor = Color.White
+                  containerColor = if (isSpeakingQuestion) Color(0xFF22C55E) else Color(0xFF38BDF8).copy(alpha = 0.15f),
+                  contentColor = if (isSpeakingQuestion) Color.White else Color(0xFF38BDF8)
                 ),
                 contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp)
               ) {
@@ -524,40 +531,86 @@ fun VoiceQuizScreen(
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                  text = if (isSpeakingQuestion) "කියවමින්..." else "ප්‍රශ්නය අසන්න",
+                  text = if (isSpeakingQuestion) "කියවමින්..." else "හඬින් අසන්න",
                   fontSize = 11.sp,
                   fontWeight = FontWeight.Bold
                 )
               }
             }
 
+            // Unit / Topic Chip
             if (currentQuestion.unitCategory.isNotBlank()) {
-              Spacer(modifier = Modifier.height(8.dp))
-              Text(
-                text = "📌 ඒකකය: ${currentQuestion.unitCategory}",
-                fontSize = 11.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = Color(0xFF38BDF8)
-              )
+              Spacer(modifier = Modifier.height(10.dp))
+              Surface(
+                shape = RoundedCornerShape(8.dp),
+                color = Color(0xFF0F172A),
+                border = BorderStroke(1.dp, Color(0xFF0284C7).copy(alpha = 0.35f)),
+                modifier = Modifier.fillMaxWidth()
+              ) {
+                Row(
+                  modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                  verticalAlignment = Alignment.CenterVertically
+                ) {
+                  Text(
+                    text = "📌 ඒකකය:",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF38BDF8)
+                  )
+                  Spacer(modifier = Modifier.width(6.dp))
+                  Text(
+                    text = currentQuestion.unitCategory,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color(0xFFE2E8F0),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                  )
+                }
+              }
             }
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Text(
-              text = currentQuestion.questionSinhala,
-              fontSize = 16.sp,
-              fontWeight = FontWeight.Bold,
-              color = Color.White,
-              lineHeight = 23.sp
-            )
+            // Dedicated High-Visibility Question Box (Separate from outer card, bold & prominent)
+            Surface(
+              shape = RoundedCornerShape(14.dp),
+              color = Color(0xFF0B132B),
+              border = BorderStroke(1.5.dp, Color(0xFF38BDF8).copy(alpha = 0.5f)),
+              modifier = Modifier.fillMaxWidth()
+            ) {
+              Column(
+                modifier = Modifier
+                  .fillMaxWidth()
+                  .padding(16.dp)
+              ) {
+                Row(
+                  verticalAlignment = Alignment.CenterVertically,
+                  modifier = Modifier.padding(bottom = 8.dp)
+                ) {
+                  Surface(
+                    shape = RoundedCornerShape(6.dp),
+                    color = Color(0xFFF59E0B).copy(alpha = 0.2f),
+                    border = BorderStroke(1.dp, Color(0xFFF59E0B).copy(alpha = 0.5f))
+                  ) {
+                    Text(
+                      text = "❓ කෙටි ප්‍රශ්නය (Short Question)",
+                      fontSize = 11.sp,
+                      fontWeight = FontWeight.Bold,
+                      color = Color(0xFFFBBF24),
+                      modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                    )
+                  }
+                }
 
-            if (currentQuestion.hint.isNotBlank()) {
-              Spacer(modifier = Modifier.height(8.dp))
-              Text(
-                text = "💡 ඉඟිය: ${currentQuestion.hint}",
-                fontSize = 11.sp,
-                color = Color(0xFF94A3B8)
-              )
+                Text(
+                  text = currentQuestion.questionSinhala,
+                  fontSize = 18.sp,
+                  fontWeight = FontWeight.Bold,
+                  color = Color.White,
+                  lineHeight = 26.sp
+                )
+              }
             }
           }
         }

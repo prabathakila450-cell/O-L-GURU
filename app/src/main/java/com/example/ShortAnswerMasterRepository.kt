@@ -28,7 +28,8 @@ object ShortAnswerMasterRepository {
 
     fun getSubjectIcon(subject: String): String {
         return when {
-            subject.contains("විද්‍යාව") -> "🔬"
+            subject.contains("භූගෝල") -> "🌍"
+            subject.contains("විද්‍යාව") && !subject.contains("භූගෝල") -> "🔬"
             subject.contains("ගණිත") -> "📐"
             subject.contains("ඉතිහාස") -> "🏛️"
             subject.contains("බුද්ධ") -> "🪷"
@@ -36,7 +37,6 @@ object ShortAnswerMasterRepository {
             subject.contains("English") || subject.contains("ඉංග්‍රීසි") -> "🇬🇧"
             subject.contains("ICT") || subject.contains("තොරතුරු") -> "💻"
             subject.contains("ව්‍යාපාර") || subject.contains("ගිණුම්") -> "📊"
-            subject.contains("භූගෝල") -> "🌍"
             subject.contains("පුරවැසි") -> "⚖️"
             subject.contains("සෞඛ්‍ය") -> "🏃"
             subject.contains("කෘෂි") -> "🌾"

@@ -668,32 +668,6 @@ fun ShortAnswerEvaluationSection() {
             border = BorderStroke(1.dp, Color(0xFF334155))
           ) {
             Column(modifier = Modifier.padding(14.dp)) {
-              Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-              ) {
-                Surface(
-                  shape = RoundedCornerShape(6.dp),
-                  color = Color(0xFF38BDF8).copy(alpha = 0.15f)
-                ) {
-                  Text(
-                    text = "${currentQ.subject} • ${currentQ.grade} ශ්‍රේණිය • කාණ්ඩය ${String.format("%02d", selectedSetNumber)}",
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF38BDF8),
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
-                  )
-                }
-                Text(
-                  text = "ලකුණු: ${currentQ.maxMarks}",
-                  fontSize = 11.sp,
-                  fontWeight = FontWeight.Bold,
-                  color = Color(0xFFFBBF24)
-                )
-              }
-
-              Spacer(modifier = Modifier.height(10.dp))
               Text(
                 text = currentQ.question,
                 fontSize = 14.sp,
@@ -701,7 +675,6 @@ fun ShortAnswerEvaluationSection() {
                 color = Color.White,
                 lineHeight = 22.sp
               )
-
               Spacer(modifier = Modifier.height(16.dp))
               OutlinedTextField(
                 value = studentAnswer,
@@ -729,10 +702,10 @@ fun ShortAnswerEvaluationSection() {
                 },
                 enabled = studentAnswer.isNotBlank(),
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0284C7)),
+                colors = ButtonDefaults.buttonColors(containerColor = if (studentAnswer.isNotBlank()) Color(0xFF0284C7) else Color(0xFF94A3B8)),
                 shape = RoundedCornerShape(10.dp)
               ) {
-                Text("🔍 පිළිතුර ඇගයීම (Evaluate)", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                Text("පිළිතුර ඉදිරිපත් කර ලකුණු බලන්න", fontSize = 12.sp, fontWeight = FontWeight.Bold)
               }
             }
           }

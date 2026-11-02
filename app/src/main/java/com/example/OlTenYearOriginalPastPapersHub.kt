@@ -213,6 +213,7 @@ object OlTenYearPastPapersRepository {
 
   private fun getSubjectTopics(subject: String): List<String> {
     return when {
+      subject.contains("භූගෝල විද්‍යාව") -> listOf("ලෝක ගෝලය", "සිතියම් විද්‍යාව", "වායුගෝලීය සංසිද්ධි", "ජනාවාස හා නගර", "ස්වාභාවික සම්පත්", "ආර්ථික ක්‍රියාකාරකම්", "සංචාරක ව්‍යාපාරය", "පරිසර දූෂණය")
       subject.contains("විද්‍යාව") -> listOf("ජීවයේ රසායනික පදනම", "පදාර්ථයේ ව්‍යුහය", "චලිත සමීකරණ", "ප්‍රභාසංස්ලේෂණය", "විද්‍යුතය හා චුම්භකත්වය", "රසායනික බන්ධන", "ආලෝකය හා වර්තනය", "ජාන විද්‍යාව")
       subject.contains("ගණිත") -> listOf("වීජ ගණිතය හා සමීකරණ", "ජ්‍යාමිතිය ප්‍රමේය", "ත්‍රිකෝණමිතිය", "ප්‍රතිශත හා පොලිය", "වර්ගජ සමීකරණ", "සම්භාවිතාව හා සංඛ්‍යානය", "පරිමාව හා වර්ගඵලය", "කුලක")
       subject.contains("ඉතිහාස") -> listOf("ඓතිහාසික මූලාශ්‍ර", "අනුරාධපුර ශිෂ්ටාචාරය", "පොළොන්නරු යුගය", "වාරි කර්මාන්තය", "යුරෝපීය ආක්‍රමණ", "1818 හා 1848 නිදහස් අරගල", "ලෝක යුද්ධ හා විප්ලව", "ආණ්ඩුක්‍රම ප්‍රතිසංස්කරණ")
@@ -232,7 +233,16 @@ object OlTenYearPastPapersRepository {
     year: Int
   ): Quadruple<String, List<String>, Int, String> {
     return when {
-      subject.contains("විද්‍යාව") -> {
+      subject.contains("භූගෝල විද්‍යාව") -> {
+        // Handle Geography content
+        when ((qNum - 1) % 4) {
+          0 -> Quadruple("$year O/L ප්‍රශ්නය $qNum: සිතියමක පරිමාණය 1:50000 යනු බිමෙහි 1 km දුරක් සිතියමේ කෙසේ දැක්වේද?", listOf("1 cm", "2 cm", "5 cm", "10 cm"), 1, "1:50000 පරිමාණයේදී 1 km බිමෙහි දුරක් සිතියමේ 2 cm ලෙස දැක්වේ.")
+          1 -> Quadruple("$year O/L ප්‍රශ්නය $qNum: වායුගෝලයේ පීඩනය මැනීමට භාවිත කරන උපකරණය කුමක්ද?", listOf("හයිග්‍රෝමීටරය", "බැරෝමීටරය", "ඇනිමෝමීටරය", "තාපමානය"), 1, "වායුගෝලීය පීඩනය මැනීමට බැරෝමීටරය භාවිත කරයි.")
+          2 -> Quadruple("$year O/L ප්‍රශ්නය $qNum: පෘථිවියේ ප්‍රධාන ස්වාභාවික වෘක්ෂලතා කලාපයක් නම් කරන්න.", listOf("නගරය", "නිවර්තන වැසි වනාන්තර", "මහාමාර්ගය", "කර්මාන්ත ශාලාව"), 1, "නිවර්තන වැසි වනාන්තර යනු පෘථිවියේ ස්වාභාවික වෘක්ෂලතා කලාපයකි.")
+          else -> Quadruple("$year O/L ප්‍රශ්නය $qNum: ශ්‍රී ලංකාවේ ප්‍රධාන සංචාරක කලාපයක් නම් කරන්න.", listOf("කාර්මික කලාපය", "පළමු බෞද්ධ සංස්කෘතික කලාපය", "දුම්රිය ස්ථානය", "ගබඩාව"), 1, "සංස්කෘතික ත්‍රිකෝණය වැනි ප්‍රදේශ ප්‍රධාන සංචාරක කලාප වේ.")
+        }
+      }
+      subject.contains("විද්‍යාව") && !subject.contains("භූගෝල") -> {
         when ((qNum - 1) % 5) {
           0 -> Quadruple(
             "$year O/L ප්‍රශ්නය $qNum: ශාක සෛලයක සෙලියුලෝස් සෛල බිත්තියක් පවතින නමුත් සත්ත්ව සෛලවල එය නොපවතී. පහත දැක්වෙන ඉන්ද්‍රයිකාවන් අතුරින් ශාක සෛලවල පමණක් හමුවන්නේ කුමක්ද?",
@@ -383,6 +393,7 @@ fun OlTenYearOriginalPastPapersHubScreen(
   var isExamFinished by remember { mutableStateOf(false) }
   var remainingSeconds by remember { mutableIntStateOf(60 * 60) } // 60 minutes countdown
   val studentAnswers = remember { mutableStateMapOf<Int, Int>() } // questionNumber -> selectedOptionIndex
+  val submittedAnswers = remember { mutableStateMapOf<Int, Boolean>() }
   var activeReviewFilter by remember { mutableStateOf("ALL") } // ALL, WRONG, CORRECT
 
   val currentPaper = remember(selectedSubjectName, selectedYear) {
@@ -407,6 +418,7 @@ fun OlTenYearOriginalPastPapersHubScreen(
     isExamFinished = false
     remainingSeconds = 60 * 60
     studentAnswers.clear()
+    submittedAnswers.clear()
   }
 
   BackHandler {
@@ -947,34 +959,39 @@ fun OlTenYearOriginalPastPapersHubScreen(
                 }
               }
 
-              // Detailed Explanation (Visible when finished or option selected)
-              if (isExamFinished || selectedOpt != null) {
+              // Submit Button for MCQ
+              if (!isExamFinished && selectedOpt != null && submittedAnswers[question.questionNumber] != true) {
+                Button(
+                  onClick = { submittedAnswers[question.questionNumber] = true },
+                  colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0284C7)),
+                  modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+                ) {
+                  Text("පිළිතුර සනාථ කරන්න (Submit)", fontSize = 11.sp)
+                }
+              }
+
+              // Detailed Explanation & Feedback (Visible when finished or question submitted)
+              if (isExamFinished || submittedAnswers[question.questionNumber] == true) {
                 Spacer(modifier = Modifier.height(6.dp))
                 Surface(
                   color = Color(0xFF0F172A),
                   shape = RoundedCornerShape(6.dp),
                   modifier = Modifier.fillMaxWidth()
                 ) {
-                  Row(
-                    modifier = Modifier.padding(8.dp),
-                    verticalAlignment = Alignment.Top
-                  ) {
-                    Text("💡", fontSize = 12.sp)
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Column {
-                      Text(
-                        text = "විභාග විවරණය (Explanation):",
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF34D399)
-                      )
-                      Text(
-                        text = question.explanationSinhala,
-                        fontSize = 10.sp,
-                        color = Color(0xFFCBD5E1),
-                        lineHeight = 14.sp
-                      )
-                    }
+                  Column(modifier = Modifier.padding(8.dp)) {
+                    Text(
+                      text = if (isCorrect) "✅ නිවැරදියි!" else "❌ වැරදියි! නිවැරදි පිළිතුර: ${question.options[question.correctOptionIndex]}",
+                      fontSize = 12.sp,
+                      fontWeight = FontWeight.Bold,
+                      color = if (isCorrect) Color(0xFF34D399) else Color(0xFFF87171)
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                      text = "💡 විවරණය: ${question.explanationSinhala}",
+                      fontSize = 10.sp,
+                      color = Color(0xFFCBD5E1),
+                      lineHeight = 14.sp
+                    )
                   }
                 }
               }

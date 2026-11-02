@@ -13,7 +13,8 @@ object TimedPastPaperYearProvider {
   fun getYearSpecificQuestions(subject: String, year: String): List<PastPaperQuestion> {
     val yearInt = year.filter { it.isDigit() }.toIntOrNull() ?: 2024
     val normSubject = when {
-      subject.contains("විද්‍යා") -> "science"
+      subject.contains("භූගෝල") -> "geography"
+      subject.contains("විද්‍යා") && !subject.contains("භූගෝල") -> "science"
       subject.contains("ගණිත") -> "math"
       subject.contains("ඉතිහාස") -> "history"
       subject.contains("සිංහල") -> "sinhala"
@@ -22,7 +23,6 @@ object TimedPastPaperYearProvider {
       subject.contains("ICT") || subject.contains("තොරතුරු") -> "ict"
       subject.contains("වාණිජ") || subject.contains("ගිණුම්") -> "commerce"
       subject.contains("පුරවැසි") -> "civics"
-      subject.contains("භූගෝල") -> "geography"
       subject.contains("සෞඛ්‍ය") -> "health"
       else -> "science"
     }

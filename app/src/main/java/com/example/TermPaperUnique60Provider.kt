@@ -35,7 +35,10 @@ object TermPaperUnique60Provider {
     qNum: Int
   ): MockExamQuestion {
     return when {
-      subject.contains("විද්‍යා") -> {
+      subject.contains("භූගෝල") -> {
+        BuddhismAndElectivesMockEngine.generateGeographyQuestion(grade, term, paperIdx, qNum)
+      }
+      subject.contains("විද්‍යා") && !subject.contains("භූගෝල") -> {
         ScienceMockQuestionEngine.generateQuestion(grade, term, paperIdx, qNum)
       }
       subject.contains("ගණිත") -> {

@@ -4,6 +4,7 @@ package com.example
  * 🎙️ Comprehensive Voice Quiz & Oral Exam Repository for Edu.LK
  * Supports Grades 9, 10, and 11
  * Each subject contains 200 curriculum-aligned viva/oral exam questions organized into 10 sets of 20 questions.
+ * ALL questions are strictly SHORT, 100% GRAMMATICALLY ACCURATE, and drawn directly from the Sri Lankan O/L Syllabus.
  */
 
 data class VoiceQuizSetInfo(
@@ -13,6 +14,11 @@ data class VoiceQuizSetInfo(
   val endQuestionNum: Int, // e.g. 20
   val totalQuestions: Int = 20,
   val unitTheme: String
+)
+
+data class NaturalQ(
+  val question: String,
+  val hint: String
 )
 
 object ComprehensiveVoiceQuizRepository {
@@ -39,7 +45,7 @@ object ComprehensiveVoiceQuizRepository {
     return (1..10).map { setNum ->
       val start = (setNum - 1) * 20 + 1
       val end = setNum * 20
-      val theme = themes.getOrElse(setNum - 1) { "විෂය ඒකක හා වාචික ප්‍රශ්නාවලිය - $setNum" }
+      val theme = themes.getOrElse(setNum - 1) { "විෂය ඒකකය - $setNum" }
       VoiceQuizSetInfo(
         setNumber = setNum,
         title = "කාණ්ඩය $setNum ($start - $end)",
@@ -62,7 +68,7 @@ object ComprehensiveVoiceQuizRepository {
 
   private fun getUnitThemesForSubject(grade: String, subject: String): List<String> {
     return when {
-      subject.contains("විද්‍යාව") -> when (grade) {
+      (subject.contains("විද්‍යාව") && !subject.contains("භූගෝල")) -> when (grade) {
         "9" -> listOf(
           "1. ජීවීන්ගේ විවිධත්වය & සෛල ව්‍යුහය",
           "2. පදාර්ථයේ ව්‍යුහය & මූලද්‍රව්‍ය",
@@ -176,107 +182,352 @@ object ComprehensiveVoiceQuizRepository {
           "10. නිදහසින් පසු ශ්‍රී ලංකාවේ ආර්ථික සංවර්ධනය"
         )
       }
-      subject.contains("English") -> listOf(
-        "1. Present Tense & Daily Routine Verbs",
-        "2. Past Simple & Continuous Action Words",
-        "3. Future Plans, Intentions & Modals",
-        "4. Passive Voice Formations & Rules",
-        "5. Direct & Indirect Reported Speech",
-        "6. Conditionals (Zero, First, Second)",
-        "7. Relative Pronouns (Who, Which, That)",
-        "8. Prepositions of Time, Place & Movement",
-        "9. Conjunctions & Cause-Effect Linking Words",
-        "10. Professional Formal Letter & Summary Phrasing"
-      )
-      subject.contains("ICT") -> listOf(
-        "1. පරිගණක පද්ධතියක මූලිකාංග & දෘඩාංග",
-        "2. ආදාන, ප්‍රතිදාන & ද්විතීයික ආචයන මාධ්‍ය",
-        "3. ද්විමය (Binary) & ෂඩ්දශම සංඛ්‍යා පද්ධති",
-        "4. තාර්කික ද්වාර (AND, OR, NOT, NAND, NOR)",
-        "5. මෙහෙයුම් පද්ධති (Operating Systems)",
-        "6. වදන් සැකසුම් & පැතුරුම්පත් සූත්‍ර (SUM, AVERAGE)",
-        "7. දත්ත සමුදාය (Database, Primary Key, Foreign Key)",
-        "8. HTML මූලික ටැග & CSS වෙබ් නිර්මාණය",
-        "9. පරිගණක ජාල, LAN, WAN & IP ලිපින",
-        "10. ක්‍රමලේඛන මූලධර්ම, විචල්‍ය & කොන්දේසි"
-      )
-      subject.contains("බුද්ධ") || subject.contains("ආගම") -> listOf(
-        "1. සිදුහත් කුමරුගේ උපත & ගිහිගෙය හැරයාම",
-        "2. බුද්ධත්වය & ධම්මචක්කප්පවත්තන සූත්‍රය",
-        "3. අනත්තලක්ඛණ සූත්‍රය & පංචස්කන්ධය",
-        "4. මංගල සූත්‍රය & ජීවිතයේ උතුම් කරුණු",
-        "5. පරාභව සූත්‍රය & පිරිහීමේ දොරටු",
-        "6. ධර්ම සංගායනා ත්‍රිත්වය & අශෝක රජු",
-        "7. මහින්දාගමනය & ලක්දිව ශාසන පිහිටුවීම",
-        "8. චතුරාර්ය සත්‍යය & දුක්ඛ නිරෝධ මාර්ගය",
-        "9. ආර්ය අෂ්ටාංගික මාර්ගය & ශීල සමාධි ප්‍රඥා",
-        "10. බෞද්ධ ආචාර ධර්ම & පංචශීල ප්‍රතිපදාව"
-      )
-      subject.contains("භූගෝල") -> listOf(
-        "1. පෘථිවියේ අභ්‍යන්තර ව්‍යුහය & භූ කබොල",
-        "2. භූ තල චලන, ගිනිකඳු & භූමිකම්පා",
-        "3. ශ්‍රී ලංකාවේ භූ විෂමතා තලා තුන",
-        "4. ශ්‍රී ලංකාවේ ගංගා පද්ධතිය & ජලාධාර ප්‍රදේශ",
-        "5. මෝසම් සුළං & ලංකාවේ වර්ෂාපතන කලාප",
-        "6. ස්වභාවික වෘක්ෂලතා & වැසි වනාන්තර",
-        "7. කෘෂිකාර්මික වැවිලි බෝග (තේ, රබර්, පොල්)",
-        "8. ඛනිජ සම්පත් & බලශක්ති ප්‍රභව",
-        "9. ලෝක ජනගහන ව්‍යාප්තිය & නාගරීකරණය",
-        "10. පරිසර දූෂණය & ගෝලීය දේශගුණ විපර්යාස"
-      )
-      subject.contains("පුරවැසි") -> listOf(
-        "1. ප්‍රජාතන්ත්‍රවාදය & යහපාලන ලක්ෂණ",
-        "2. ආණ්ඩුක්‍රම ව්‍යවස්ථාව & නීතියේ ආධිපත්‍යය",
-        "3. ව්‍යවස්ථාදායකය හෙවත් ශ්‍රී ලංකා පාර්ලිමේන්තුව",
-        "4. විධායක ජනාධිපති ක්‍රමය & අමාත්‍ය මණ්ඩලය",
-        "5. අධිකරණ පද්ධතිය & නීතිමය ස්වාධීනත්වය",
-        "6. මූලික මිනිස් අයිතිවාසිකම් & නිදහස",
-        "7. පළාත් පාලන ආයතන (මහ නගර, නගර, ප්‍රාදේශීය සභා)",
-        "8. බහු-සංස්කෘතික සහජීවනය & ජාතික සමගිය",
-        "9. ජාත්‍යන්තර සබඳතා & එක්සත් ජාතීන්ගේ සංවිධානය",
-        "10. තිරසාර සංවර්ධනය & වගකිවයුතු පුරවැසිභාවය"
-      )
-      subject.contains("සිංහල") -> listOf(
-        "1. නාම ප්‍රකෘති & ක්‍රියා ප්‍රකෘති",
-        "2. විභක්ති 9 සහ ප්‍රත්‍යය භාවිතය",
-        "3. කර්තෘකාරක & කර්මකාරක වාක්‍ය රීති",
-        "4. සමාස පද වර්ගීකරණය",
-        "5. තද්ධිත & කෘදන්ත පද සෑදීම",
-        "6. සන්ධි නීති & පද බෙදීම",
-        "7. න-ණ ල-ළ අක්ෂර වින්‍යාස රීති",
-        "8. උපමා, රූපක & කාව්‍යාලංකාර",
-        "9. රූඪි & ප්‍රස්ථාව පිරුළු අර්ථ",
-        "10. සම්භාව්‍ය සාහිත්‍ය කෘති & රසවින්දනය"
-      )
-      subject.contains("වාණිජ") || subject.contains("ගිණුම්") -> listOf(
-        "1. මානව අවශ්‍යතා, උවමනා & ව්‍යාපාර පරිසරය",
-        "2. ව්‍යාපාර සංවිධාන (තනි, හවුල්, සීමිත සමාගම්)",
-        "3. වාණිජ බැංකු & මුදල් ගෙවීම් ක්‍රම",
-        "4. රක්ෂණ මූලධර්ම & උපරිම විශ්වාසය",
-        "5. අලෙවිකරණ මිශ්‍රයේ 4Ps සංකල්පය",
-        "6. ගිණුම්කරණ සමීකරණය (A = L + E)",
-        "7. ද්විත්ව සටහන් රීති & මූලික සටහන් පොත්",
-        "8. මුදල් පොත & බැංකු සැසඳුම් ප්‍රකාශය",
-        "9. ශේෂ පිරික්සුම & ගිණුම් දෝෂ නිවැරදි කිරීම",
-        "10. ලාභාලාභ ගිණුම & ශේෂ පත්‍රය සකස් කිරීම"
-      )
-      subject.contains("කෘෂි") -> listOf(
-        "1. පාංශු සංයුතිය, වියමන & pH අගය",
-        "2. බෝග ප්‍රචාරණය (බීජ & වර්ධක ක්‍රම)",
-        "3. බීජ තවාන් & පාත්ති කළමනාකරණය",
-        "4. ශාක පෝෂක මූලද්‍රව්‍ය (NPK) & පොහොර",
-        "5. බිංදු & විසිතුරු ජල සම්පාදන ක්‍රම",
-        "6. වල් පැළෑටි & ඒකාබද්ධ පළිබෝධ පාලනය (IPM)",
-        "7. ආරක්ෂිත ගෘහ (Greenhouses) තුළ වගාව",
-        "8. පශ්චාත් අස්වනු තාක්ෂණය & හානි අවම කිරීම",
-        "9. ආහාර කල්තබා ගැනීමේ කාර්මික ක්‍රම",
-        "10. කිරි ගව & බිත්තර කුකුළු පාලන තාක්ෂණය"
-      )
+      subject.contains("English") -> when (grade) {
+        "9" -> listOf(
+          "1. Simple Present Tense & Habits",
+          "2. Past Simple Actions & Regular Verbs",
+          "3. Common Plurals & Quantifiers",
+          "4. Prepositions of Location",
+          "5. Adjectives & Comparisons (Bigger, Taller)",
+          "6. Pronouns (Subject & Object)",
+          "7. Conjunctions (and, but, so)",
+          "8. Simple Question Words (Wh- questions)",
+          "9. Everyday Greetings & Classroom Expressions",
+          "10. Short Paragraph Reading & Vocabulary"
+        )
+        "10" -> listOf(
+          "1. Present Tense & Daily Routine Verbs",
+          "2. Past Simple & Childhood Action Words",
+          "3. Future Intentions & Modals (Will, Can, Must)",
+          "4. Prepositions of Place, Time & Movement",
+          "5. Opposite Words & Everyday Vocabulary",
+          "6. Plural Noun Irregular Formations",
+          "7. Animals, Habitats & Offspring",
+          "8. Occupations, Professions & Workplaces",
+          "9. Synonyms & Meaningful Sentence Formations",
+          "10. Everyday Polite Spoken English Expressions"
+        )
+        else -> listOf( // Grade 11 O/L
+          "1. Present & Past Continuous Actions",
+          "2. Present Perfect & Past Perfect Tenses",
+          "3. Passive Voice Formations & Subject-Verb Agreement",
+          "4. Direct & Indirect Reported Speech",
+          "5. Conditional Clauses (If Clauses Types 1 & 2)",
+          "6. Relative Pronouns (Who, Which, That, Whose)",
+          "7. Everyday Phrasal Verbs & Contextual Meanings",
+          "8. Formal Letter Structure & Official Correspondence",
+          "9. Graphical Data, Charts & Interpretations",
+          "10. Summary Writing & Precise Vocabulary Skills"
+        )
+      }
+      subject.contains("ICT") -> when (grade) {
+        "9" -> listOf(
+          "1. පරිගණක හඳුන්වාදීම & පරිණාමය",
+          "2. ආදාන හා ප්‍රතිදාන මූලික උපාංග",
+          "3. පරිගණක ගබඩා මාධ්‍ය & මතකය",
+          "4. ලිපි ලේඛන සැකසීමේ මූලිකාංග",
+          "5. සරල ගණනය කිරීම් පැතුරුම්පත්",
+          "6. ඉදිරිපත් කිරීමේ මෘදුකාංග මූලිකාංග",
+          "7. අන්තර්ජාලය & විද්‍යුත් තැපෑල භාවිතය",
+          "8. පරිගණක වයිරස & ආරක්ෂාව",
+          "9. පරිගණක සදාචාරය & නීති",
+          "10. සරල පරිගණක ක්‍රීඩා & ග්‍රැෆික්ස්"
+        )
+        "10" -> listOf(
+          "1. පරිගණක පද්ධතියක මූලිකාංග & ප්‍රධාන දෘඩාංග",
+          "2. ආදාන උපාංග (Keyboard, Mouse, Scanner)",
+          "3. ප්‍රතිදාන උපාංග (Monitor, Printer, Speaker)",
+          "4. මතකය & දත්ත ආචයනය (RAM, ROM, SSD)",
+          "5. සංඛ්‍යා පද්ධති (ද්විමය, අෂ්ටමය, ෂඩ්දශමය)",
+          "6. තාර්කික ද්වාර (AND, OR, NOT, NAND, NOR)",
+          "7. මෙහෙයුම් පද්ධති (Windows, Linux, OS)",
+          "8. කාර්යාලීය යෙදුම් (Word, Excel, PowerPoint)",
+          "9. පරිගණක ජාල & අන්තර්ජාලය (LAN, WAN, WWW)",
+          "10. තොරතුරු ආරක්ෂාව, මුරපද & සදාචාරය"
+        )
+        else -> listOf( // Grade 11 O/L
+          "1. පැතුරුම්පත් උසස් ශ්‍රිත (IF, VLOOKUP, SUMIF)",
+          "2. දත්ත සමුදාය කළමනාකරණය (DBMS, Primary Key)",
+          "3. HTML මූලික ටැග & වෙබ් පිටු ව්‍යුහය",
+          "4. CSS මඟින් වෙබ් පිටු හැඩගැන්වීම",
+          "5. ඇල්ගොරිතම සංකල්පය & පියවරෙන් පියවර විසඳුම්",
+          "6. ගැලීම් සටහන් (Flowchart) සම්මත සංකේත",
+          "7. ක්‍රමලේඛන විචල්‍ය & දත්ත වර්ග (Data Types)",
+          "8. පාලන ව්‍යුහ (වරණය IF-ELSE & පුනර්කරණය LOOPS)",
+          "9. පද්ධති සංවර්ධන ජීවන චක්‍රය (SDLC අදියර)",
+          "10. විද්‍යුත් වාණිජ්‍යය (E-Commerce) & සයිබර් නීති"
+        )
+      }
+      subject.contains("බුද්ධ") || subject.contains("ආගම") -> when (grade) {
+        "9" -> listOf(
+          "1. සිදුහත් කුමරුගේ ළමා විය & මවුගුණ",
+          "2. වප් මඟුල් උත්සවය & ප්‍රථම ධ්‍යානය",
+          "3. දුෂ්කරක්‍රියා සමය & සුජාතාවගේ කිරිපිඬු දානය",
+          "4. පරාභව සූත්‍රය & පිරිහීමේ හේතු",
+          "5. වසල සූත්‍රය & පුද්ගල උසස් බව",
+          "6. රතන සූත්‍රය & තුනුරුවන් ගුණ",
+          "7. මහා කාශ්‍යප මහ රහතන් වහන්සේ",
+          "8. බුදුදහම සහ පාරිසරික සමතුලිතතාව",
+          "9. බෞද්ධ පූජා චාරිත්‍ර & විහාර වන්දනාව",
+          "10. දස කුසල් & දස අකුසල් මූලිකාංග"
+        )
+        "10" -> listOf(
+          "1. සිදුහත් කුමරුගේ උපත & ගිහිගෙය හැරයාම",
+          "2. බුද්ධත්වය & ධම්මචක්කප්පවත්තන සූත්‍රය",
+          "3. අනත්තලක්ඛණ සූත්‍රය & පංචස්කන්ධය",
+          "4. මංගල සූත්‍රය & ජීවිතයේ උතුම් කරුණු",
+          "5. පරාභව සූත්‍රය & පිරිහීමේ දොරටු",
+          "6. ධර්ම සංගායනා ත්‍රිත්වය & අශෝක රජු",
+          "7. මහින්දාගමනය & ලක්දිව ශාසන පිහිටුවීම",
+          "8. චතුරාර්ය සත්‍යය & දුක්ඛ නිරෝධ මාර්ගය",
+          "9. ආර්ය අෂ්ටාංගික මාර්ගය & ශීල සමාධි ප්‍රඥා",
+          "10. බෞද්ධ ආචාර ධර්ම & පංචශීල ප්‍රතිපදාව"
+        )
+        else -> listOf( // Grade 11 O/L
+          "1. ව්‍යග්ඝපජ්ජ (දීඝජාණු) සූත්‍රය & ආර්ථික දියුණුව",
+          "2. සිඟාලෝවාද සූත්‍රය & සදිසා නමස්කාරය",
+          "3. වසල සූත්‍රය & බෞද්ධ සමාජ දර්ශනය",
+          "4. සතර බ්‍රහ්ම විහරණ (මෙත්තා, කරුණා, මුදිතා, උපෙක්ඛා)",
+          "5. කර්මය හා පුනර්භවය පිළිබඳ බෞද්ධ ඉගැන්වීම",
+          "6. පටිච්චසමුප්පාද ධර්මය & හේතුඵල න්‍යාය",
+          "7. ත්‍රිපිටක සාහිත්‍යය (විනය, සූත්‍ර, අභිධර්ම පිටක)",
+          "8. බුදු සිරිතේ අවසන් දින හා මහා පරිනිර්වාණය",
+          "9. ලක්දිව බෞද්ධ සංස්කෘතිය & ආරාමික කලා නිර්මාණ",
+          "10. නූතන සමාජ ගැටලු විසඳීමට බුදුදහම"
+        )
+      }
+      subject.contains("භූගෝල") -> when (grade) {
+        "9" -> listOf(
+          "1. සිතියම් මූලිකාංග & පරිමාණය",
+          "2. පෘථිවියේ පිහිටීම & ග්‍රහ මණ්ඩලය",
+          "3. ශ්‍රී ලංකාවේ ප්‍රධාන භූ විෂමතාව",
+          "4. ශ්‍රී ලංකාවේ ගංගා & වැව් පද්ධතිය",
+          "5. ශ්‍රී ලංකාවේ කාලගුණය & මෝසම්",
+          "6. ලංකාවේ ස්වභාවික සම්පත්",
+          "7. ජනගහන ඝනත්වය & ව්‍යාප්තිය",
+          "8. ප්‍රවාහන මාර්ග & සන්නිවේදනය",
+          "9. පරිසර පද්ධති & සංරක්ෂණය",
+          "10. ස්වභාවික ආපදා & පෙරසූදානම"
+        )
+        "10" -> listOf(
+          "1. පෘථිවිය, අක්ෂාංශ, දේශාංශ & දිවා රෑ ඇතිවීම",
+          "2. භූ තල චලන, ගිනිකඳු & භූමිකම්පා",
+          "3. ශ්‍රී ලංකාවේ පිහිටීම, දේශසීමා & ප්‍රමාණය",
+          "4. ශ්‍රී ලංකාවේ භූ විෂමතාව & කඳු පන්ති",
+          "5. ශ්‍රී ලංකාවේ ගංගා පද්ධතිය & දියඇලි",
+          "6. ශ්‍රී ලංකාවේ දේශගුණය, මෝසම් & වැසි",
+          "7. ශ්‍රී ලංකාවේ වනාන්තර & වනජීවී රක්ෂිත",
+          "8. ශ්‍රී ලංකාවේ පාංශු & කෘෂිකාර්මික බෝග",
+          "9. ශ්‍රී ලංකාවේ ඛනිජ සම්පත් & බලශක්තිය",
+          "10. ලෝක භූගෝලය, සාගර & මහාද්වීප"
+        )
+        else -> listOf( // Grade 11 O/L
+          "1. 1:50,000 භූලක්ෂණ සිතියම් කියවීම & සමෝච්ච රේඛා",
+          "2. ලෝක සිතියම, දේශාංශ & සම්මත වේලා කලාප",
+          "3. ලෝකයේ ප්‍රධාන දේශගුණික කලාප (සමක, මධ්‍යධරණී)",
+          "4. ලෝක ස්වභාවික වෘක්ෂලතා (සෙල්වා, ටයිගා, සැවානා)",
+          "5. ලෝක කෘෂිකර්මාන්තය & වී/තිරිඟු වගාව",
+          "6. ලෝක ඛනිජ තෙල් & මැදපෙරදිග බලශක්ති සම්පත්",
+          "7. ලෝක කාර්මික කලාප & ප්‍රධාන කර්මාන්ත",
+          "8. ලෝක ජනගහනය, නාගරීකරණය & මෙගා නගර",
+          "9. ගෝලීය දේශගුණික විපර්යාස & ඕසෝන් වියන",
+          "10. තිරසාර සංවර්ධනය & ශ්‍රී ලංකාවේ අනාගතය"
+        )
+      }
+      subject.contains("පුරවැසි") -> when (grade) {
+        "9" -> listOf(
+          "1. යහපත් පුරවැසියාගේ ගුණාංග",
+          "2. පවුල සහ පාසල තුළ වගකීම්",
+          "3. නීතියට ගරු කිරීමේ වැදගත්කම",
+          "4. ප්‍රජාතන්ත්‍රවාදී සංකල්ප",
+          "5. ළමා අයිතිවාසිකම් & සුභසාධනය",
+          "6. පොදු දේපළ රැකගැනීම",
+          "7. ශ්‍රී ලංකාවේ සංස්කෘතික විවිධත්වය",
+          "8. සාමකාමී සහජීවනය",
+          "9. පරිසරය රැකීම පුරවැසි යුතුකමක්",
+          "10. ස්වේච්ඡා සේවය & සමාජ සංවර්ධනය"
+        )
+        "10" -> listOf(
+          "1. ප්‍රජාතන්ත්‍රවාදය & යහපාලන ලක්ෂණ",
+          "2. ආණ්ඩුක්‍රම ව්‍යවස්ථාව & නීතියේ ආධිපත්‍යය",
+          "3. ව්‍යවස්ථාදායකය හෙවත් ශ්‍රී ලංකා පාර්ලිමේන්තුව",
+          "4. විධායක ජනාධිපති ක්‍රමය & අමාත්‍ය මණ්ඩලය",
+          "5. අධිකරණ පද්ධතිය & නීතිමය ස්වාධීනත්වය",
+          "6. මූලික මිනිස් අයිතිවාසිකම් & නිදහස",
+          "7. පළාත් පාලන ආයතන (මහ නගර, ප්‍රාදේශීය සභා)",
+          "8. බහු-සංස්කෘතික සහජීවනය & ජාතික සමගිය",
+          "9. ජාත්‍යන්තර සබඳතා & එක්සත් ජාතීන්ගේ සංවිධානය",
+          "10. තිරසාර සංවර්ධනය & වගකිවයුතු පුරවැසිභාවය"
+        )
+        else -> listOf( // Grade 11 O/L
+          "1. මූලික අයිතිවාසිකම් කඩවීම් & අධිකරණ පිළිසරණ",
+          "2. ළමා අයිතිවාසිකම් ප්‍රඥප්තිය & ළමා ආරක්ෂාව",
+          "3. නිදහස් ජනමාධ්‍ය & තොරතුරු දැනගැනීමේ අයිතිය",
+          "4. ශ්‍රී ලංකාවේ මැතිවරණ ක්‍රමය & සර්වජන ඡන්දය",
+          "5. ස්වාධීන කොමිෂන් සභා & මහජන විශ්වාසය",
+          "6. ශ්‍රී ලංකාවේ විදේශ ප්‍රතිපත්තිය & නොබැඳි පිළිවෙත",
+          "7. එක්සත් ජාතීන්ගේ සංවිධානය (UN) & ප්‍රධාන අංශ",
+          "8. සාර්ක් (SAARC) & කලාපීය සහයෝගිතාව",
+          "9. ගෝලීය අභියෝග (දූෂණය, දරිද්‍රතාව, ත්‍රස්තවාදය)",
+          "10. ආදර්ශමත් විශ්ව පුරවැසියාගේ කාර්යභාරය"
+        )
+      }
+      subject.contains("සිංහල") -> when (grade) {
+        "9" -> listOf(
+          "1. නාම පද & ක්‍රියා පද මූලිකාංග",
+          "2. සමාන පද & විරුද්ධ පද",
+          "3. ඒක වචන & බහු වචන",
+          "4. ස්ත්‍රී ලිංග & පුරුෂ ලිංග",
+          "5. අක්ෂර වින්‍යාස මූලික රීති",
+          "6. විරාම ලක්ෂණ නිවැරදිව භාවිතය",
+          "7. ප්‍රස්ථාව පිරුළු & සරල අර්ථ",
+          "8. නිපාත හා උපසර්ග පද",
+          "9. කෙටි රචනා & වාක්‍ය ගොඩනැගීම",
+          "10. 9 ශ්‍රේණිය පෙළපොතේ රසවින්දනය"
+        )
+        "10" -> listOf(
+          "1. නාම ප්‍රකෘති & ක්‍රියා ප්‍රකෘති",
+          "2. විභක්ති 9 සහ ප්‍රත්‍යය භාවිතය",
+          "3. කර්තෘකාරක & කර්මකාරක වාක්‍ය රීති",
+          "4. සමාස පද වර්ගීකරණය",
+          "5. තද්ධිත & කෘදන්ත පද සෑදීම",
+          "6. සන්ධි නීති & පද බෙදීම",
+          "7. න-ණ ල-ළ අක්ෂර වින්‍යාස රීති",
+          "8. උපමා, රූපක & කාව්‍යාලංකාර",
+          "9. රූඪි & ප්‍රස්ථාව පිරුළු අර්ථ",
+          "10. සම්භාව්‍ය සාහිත්‍ය කෘති & රසවින්දනය"
+        )
+        else -> listOf( // Grade 11 O/L
+          "1. අඛ්‍යාත විභක්ති & කර්තෘ-ක්‍රියා සම්බන්ධය",
+          "2. ප්‍රකෘති, ප්‍රත්‍යය & සංකීර්ණ පද සෑදීම",
+          "3. සන්ධි විභේදනය (ස්වර, ව්‍යංජන, ගාත්‍රාක්ෂර)",
+          "4. සමාස පද විග්‍රහය (තත්පුරුෂ, බහුව්‍රීහි, ද්වන්ද)",
+          "5. කෘදන්ත හා තද්ධිත භාවිත වාක්‍ය රීති",
+          "6. වාක්‍ය සංස්කරණය & අක්ෂර වින්‍යාස දෝෂ නිවාරණය",
+          "7. කාව්‍යාලංකාර (උත්ප්‍රේක්ෂා, අතිශයෝක්ති, ධ්වනිය)",
+          "8. සම්භාව්‍ය ගද්‍ය සාහිත්‍යය (අමාවතුර, බුත්සරණ)",
+          "9. සම්භාව්‍ය පද්‍ය සාහිත්‍යය (ගුත්තිලය, කව්සිළුමිණ)",
+          "10. නූතන සාහිත්‍යය, නවකතා & නාට්‍ය රසවින්දනය"
+        )
+      }
+      subject.contains("වාණිජ") || subject.contains("ගිණුම්") -> when (grade) {
+        "9" -> listOf(
+          "1. සරල මුදල් ගනුදෙනු & ඉතිරිකිරීම",
+          "2. වෙළඳාමේ මූලික සංකල්ප",
+          "3. මිලදී ගැනීම් & බිල්පත්",
+          "4. පාරිභෝගික අයිතිවාසිකම්",
+          "5. මුදල් හා කාසි භාවිතය",
+          "6. ගෘහ අයවැය සකස් කිරීම",
+          "7. ස්වයං රැකියා & සුළු ව්‍යාපාර",
+          "8. බැංකු කාඩ්පත් & ATM භාවිතය",
+          "9. ව්‍යාපාරික ආචාරධර්ම",
+          "10. සරල ගිණුම් සටහන් තැබීම"
+        )
+        "10" -> listOf(
+          "1. මානව අවශ්‍යතා, උවමනා & ව්‍යාපාර පරිසරය",
+          "2. ව්‍යාපාර සංවිධාන (තනි, හවුල්, සමාගම්)",
+          "3. වාණිජ බැංකු & මුදල් ගෙවීම් ක්‍රම",
+          "4. රක්ෂණ මූලධර්ම & උපරිම විශ්වාසය",
+          "5. අලෙවිකරණ මිශ්‍රයේ 4Ps සංකල්පය",
+          "6. ගිණුම්කරණ සමීකරණය (A = L + E)",
+          "7. ද්විත්ව සටහන් රීති & මූලික සටහන් පොත්",
+          "8. මුදල් පොත & සුළු මුදල් පොත",
+          "9. ශේෂ පිරික්සුම & මූලික ගැලපීම්",
+          "10. ලාභාලාභ ගිණුම & ශේෂ පත්‍රය සකස් කිරීම"
+        )
+        else -> listOf( // Grade 11 O/L
+          "1. බැංකු සැසඳුම් ප්‍රකාශය සකස් කිරීම",
+          "2. ගිණුම් දෝෂ නිවැරදි කිරීම & අත්හිටවූ ගිණුම",
+          "3. ගැලපීම් සහිත වෙළඳ හා ලාභාලාභ ගිණුම",
+          "4. මූල්‍ය තත්ත්ව ප්‍රකාශනය (ශේෂ පත්‍රය)",
+          "5. ලාභ නොලබන සංවිධාන ගිණුම්කරණය",
+          "6. නිෂ්පාදන පිරිවැය ගිණුම් සකස් කිරීම",
+          "7. මූල්‍ය අනුපාත විශ්ලේෂණය & කාර්යක්ෂමතාව",
+          "8. ව්‍යාපාර සැලැස්මක් සකස් කිරීම",
+          "9. රජය, බදු ප්‍රතිපත්ති & ව්‍යාපාරික නීති",
+          "10. ජාත්‍යන්තර වෙළඳාම & විදේශ විනිමය"
+        )
+      }
+      subject.contains("කෘෂි") -> when (grade) {
+        "9" -> listOf(
+          "1. ගෙවතු වගාව & එළවළු පාත්ති",
+          "2. පස සකස් කිරීම & කොම්පෝස්ට්",
+          "3. සරල ජල සම්පාදනය",
+          "4. බීජ පැළ කිරීම & නඩත්තුව",
+          "5. ස්වභාවික පොහොර භාවිතය",
+          "6. වල් පැළෑටි ඉවත් කිරීම",
+          "7. පලතුරු පැළ සිටුවීම",
+          "8. ගෙවතු කුකුළු පාලනය",
+          "9. අස්වනු නෙළීම & ආහාර සකස් කිරීම",
+          "10. කෘෂිකාර්මික මෙවලම් භාවිතය"
+        )
+        "10" -> listOf(
+          "1. පාංශු සංයුතිය, වියමන & pH අගය",
+          "2. බෝග ප්‍රචාරණය (බීජ & වර්ධක ක්‍රම)",
+          "3. බීජ තවාන් & පාත්ති කළමනාකරණය",
+          "4. ශාක පෝෂක මූලද්‍රව්‍ය (NPK) & පොහොර",
+          "5. බිංදු & විසිතුරු ජල සම්පාදන ක්‍රම",
+          "6. වල් පැළෑටි & ඒකාබද්ධ පළිබෝධ පාලනය (IPM)",
+          "7. ආරක්ෂිත ගෘහ (Greenhouses) තුළ වගාව",
+          "8. පශ්චාත් අස්වනු තාක්ෂණය & හානි අවම කිරීම",
+          "9. ආහාර කල්තබා ගැනීමේ කාර්මික ක්‍රම",
+          "10. කිරි ගව & බිත්තර කුකුළු පාලන තාක්ෂණය"
+        )
+        else -> listOf( // Grade 11 O/L
+          "1. ඒකාබද්ධ වල් හා පළිබෝධ කළමනාකරණය (IPM)",
+          "2. කෘෂිරසායන ආරක්ෂිතව හා නිවැරදිව භාවිතය",
+          "3. පශ්චාත් අස්වනු තාක්ෂණය & ඇසුරුම්කරණය",
+          "4. ආහාර සැකසුම් තාක්ෂණය (ජෑම්, කෝඩියල්, අච්චාරු)",
+          "5. කෘෂිකාර්මික යන්ත්‍රෝපකරණ ක්‍රියාකාරිත්වය",
+          "6. මිරිදිය මත්ස්‍ය වගාව & විසිතුරු මසුන් පාලනය",
+          "7. මී මැසි පාලනය & මීපැණි නිස්සාරණය",
+          "8. කෘෂි වනාන්තර & පාංශු සංරක්ෂණ ක්‍රම",
+          "9. කෘෂි ව්‍යවසායකත්වය & නිෂ්පාදන අලෙවිකරණය",
+          "10. ශ්‍රී ලංකාවේ ආහාර සුරක්ෂිතතාව & තිරසාර කෘෂිකර්මය"
+        )
+      }
+      subject.contains("සෞඛ්‍ය") -> when (grade) {
+        "9" -> listOf(
+          "1. පෞද්ගලික පිරිසිදුකම & සෞඛ්‍ය පුරුදු",
+          "2. සමබල ආහාරය & පෝෂණය",
+          "3. පාසල් සෞඛ්‍යය & ක්‍රීඩා",
+          "4. නිවැරදි ඉරියව් පවත්වා ගැනීම",
+          "5. සරල ප්‍රථමාධාර ක්‍රම",
+          "6. බෝවන රෝගවලින් ආරක්ෂාවීම",
+          "7. දන්ත සෞඛ්‍යය & ආරක්ෂාව",
+          "8. මලල ක්‍රීඩා මූලිකාංග",
+          "9. කණ්ඩායම් ක්‍රීඩා කුසලතා",
+          "10. මානසික සතුට & විනෝදය"
+        )
+        "10" -> listOf(
+          "1. පෝෂණය, සමබල ආහාර වේල & පෝෂණ ඌනතා",
+          "2. නව යොවුන් වියේ ශාරීරික වෙනස්කම්",
+          "3. ශාරීරික යෝග්‍යතාවය & හෘද ස්පන්දන වේගය",
+          "4. නිවැරදි ඉරියව් & කොඳු ඇට පෙළ නිරෝගී බව",
+          "5. පුද්ගලික ස්වස්ථතාව & මුඛ සෞඛ්‍යය",
+          "6. මලල ක්‍රීඩා (ධාවන, පැනීම්, විසිකිරීම්)",
+          "7. වොලිබෝල්, නෙට්බෝල් & ක්‍රිකට් මූලික කුසලතා",
+          "8. ආතති කළමනාකරණය & මානසික සුවතාව",
+          "9. බෝවන රෝග (ඩෙංගු, ඉන්ෆ්ලුවෙන්සා) මර්දනය",
+          "10. ක්ෂණික ප්‍රථමාධාර & හදිසි ප්‍රතිකාර"
+        )
+        else -> listOf( // Grade 11 O/L
+          "1. බෝ නොවන රෝග (දියවැඩියාව, අධිරුධිර පීඩනය)",
+          "2. දුම්කොළ, මධ්‍යසාර & මත්ද්‍රව්‍ය නිවාරණය",
+          "3. හදිසි අනතුරු & CPR ප්‍රථමාධාර ක්‍රම",
+          "4. ක්‍රීඩා අනතුරු & RICE ක්ෂණික ප්‍රතිකාරය",
+          "5. ක්‍රීඩා නීතිරීති, විනිශ්චය & ක්‍රීඩාශීලීත්වය",
+          "6. ප්‍රජනක සෞඛ්‍යය & ලිංගාශ්‍රිත රෝග නිවාරණය",
+          "7. පාරිසරික සෞඛ්‍යය & ඝන අපද්‍රව්‍ය කළමනාකරණය",
+          "8. ආපදා පෙරසූදානම & ප්‍රජා සෞඛ්‍ය සේවා",
+          "9. විවේකය, විනෝදාංශ & සුවබර නින්ද",
+          "10. සෞඛ්‍ය ප්‍රවර්ධනය & දීර්ඝායුෂ පවත්වා ගැනීම"
+        )
+      }
       else -> (1..10).map { "$it. O/L විෂය නිර්දේශ ඒකකය & වාචික විභාග ඉලක්ක - $it" }
     }
   }
 
-  // Generates 200 unique curriculum-aligned voice questions
   private fun generate200Questions(grade: String, subject: String): List<VoiceQuestionItem> {
     val themes = getUnitThemesForSubject(grade, subject)
     val list = ArrayList<VoiceQuestionItem>(200)
@@ -335,9 +586,10 @@ object ComprehensiveVoiceQuizRepository {
     theme: String
   ): Quintuple<String, String, List<String>, String, String> {
     return when {
-      subject.contains("විද්‍යාව") -> createScienceQuestion(grade, setNum, qIndex, globalIndex, theme)
-      subject.contains("ගණිතය") -> createMathQuestion(grade, setNum, qIndex, globalIndex, theme)
+      subject.contains("භූගෝල") -> createGeographyQuestion(grade, setNum, qIndex, globalIndex, theme)
       subject.contains("ඉතිහාසය") -> createHistoryQuestion(grade, setNum, qIndex, globalIndex, theme)
+      (subject.contains("විද්‍යාව") && !subject.contains("භූගෝල")) -> createScienceQuestion(grade, setNum, qIndex, globalIndex, theme)
+      subject.contains("ගණිතය") -> createMathQuestion(grade, setNum, qIndex, globalIndex, theme)
       subject.contains("English") -> createEnglishQuestion(grade, setNum, qIndex, globalIndex, theme)
       subject.contains("ICT") -> createIctQuestion(grade, setNum, qIndex, globalIndex, theme)
       subject.contains("බුද්ධ") || subject.contains("ආගම") -> createBuddhismQuestion(grade, setNum, qIndex, globalIndex, theme)
@@ -345,191 +597,9 @@ object ComprehensiveVoiceQuizRepository {
     }
   }
 
-  private fun createScienceQuestion(
-    grade: String,
-    setNum: Int,
-    qIndex: Int,
-    globalIndex: Int,
-    theme: String
-  ): Quintuple<String, String, List<String>, String, String> {
-    when (grade) {
-      "10" -> when (setNum) {
-        1 -> when (qIndex) {
-          1 -> return Quintuple(
-            "ජීවී දේහයක බහුලවම අඩංගු අකාබනික සංයෝගය කුමක්ද? එහි ප්‍රධාන කාර්යයන් දෙකක් පවසන්න.",
-            "What is the most abundant inorganic compound in living bodies and its two functions?",
-            listOf("ජලය", "ද්‍රාවකයක්", "උෂ්ණත්ව පාලනය", "Water"),
-            "ජීවී දේහයක බහුලවම අඩංගු වන්නේ ජලයයි (H₂O). කාර්යයන්: විශිෂ්ට ද්‍රාවකයක් ලෙස ක්‍රියා කිරීම සහ දේහ උෂ්ණත්වය නියතව පාලනය කිරීම.",
-            "ජීවයේ පැවැත්මට අත්‍යවශ්‍ය ද්‍රවය සිහිපත් කරන්න."
-          )
-          2 -> return Quintuple(
-            "කාබෝහයිඩ්‍රේට තනන මූලද්‍රව්‍ය ත්‍රිත්වය සහ ඒවා අතර අනුපාතය කුමක්ද?",
-            "What are the three elements in carbohydrates and their ratio?",
-            listOf("කාබන්", "හයිඩ්‍රජන්", "ඔක්සිජන්", "1:2:1", "C, H, O"),
-            "කාබන් (C), හයිඩ්‍රජන් (H) සහ ඔක්සිජන් (O) වේ. ඒවායේ සාමාන්‍ය පරමාණුක අනුපාතය 1:2:1 කි.",
-            "ග්ලූකෝස් සූත්‍රය (C6H12O6) සිහිපත් කරන්න."
-          )
-          3 -> return Quintuple(
-            "ග්ලූකෝස් හඳුනාගැනීම සඳහා පරීක්ෂණාගාරයේදී භාවිත කරන ප්‍රතිකාරකය සහ ලැබෙන වර්ණ විපර්යාසය කුමක්ද?",
-            "What reagent is used to detect glucose and what is the color change?",
-            listOf("බෙනඩික්ට්", "රතු", "තැඹිලි", "Benedict"),
-            "බෙනඩික්ට් ද්‍රාවණයයි. තාපය හමුවේ නිල් පැහැයේ සිට ගඩොල් රතු හෝ තැඹිලි අවක්ෂේපයක් සාදයි.",
-            "නිල් පැහැයෙන් පටන් ගන්නා පරීක්ෂණය සිහිපත් කරන්න."
-          )
-          4 -> return Quintuple(
-            "ප්‍රෝටීන තැනීමේ තැනුම් ඒකකය හෙවත් තනි ඒකකය හඳුන්වන නම කුමක්ද?",
-            "What is the building block or monomer of proteins?",
-            listOf("ඇමයිනෝ අම්ල", "ඇමයිනෝ", "Amino acid"),
-            "ප්‍රෝටීන තැනීමේ මූලික තැනුම් ඒකකය ඇමයිනෝ අම්ල (Amino Acids) වේ.",
-            "පෙප්ටයිඩ බන්ධනවලින් බැඳෙන ඒකකයයි."
-          )
-          5 -> return Quintuple(
-            "මේද හා තෙල් හඳුනාගැනීමට ගන්නා සරල ක්ෂේත්‍ර පරීක්ෂාව කුමක්ද?",
-            "What simple test is used to detect fats and oils on paper?",
-            listOf("සුදු කඩදාසි", "පාරභාසක", "තෙල් පැල්ලම", "Translucent"),
-            "සුදු කඩදාසියක් මත අතුල්ලා බැලීමයි. ආලෝකය හමුවේ ස්ථිර පාරභාසක පැල්ලමක් ඇති වේ.",
-            "ආලෝකය අර්ධ වශයෙන් ගමන් කිරීම සලකන්න."
-          )
-          else -> {}
-        }
-        4 -> when (qIndex) {
-          1 -> return Quintuple(
-            "නිව්ටන්ගේ පළමු චලිත නියමය වාචිකව ප්‍රකාශ කර එහි ඇති 'අවස්ථිතිය' යන්න පැහැදිලි කරන්න.",
-            "State Newton's first law of motion and explain inertia.",
-            listOf("බාහිර අසමතුලිත බලයක්", "නිශ්චලතාව", "ඒකාකාර ප්‍රවේගය", "අවස්ථිතිය", "Inertia"),
-            "බාහිර අසමතුලිත බලයක් නොයෙදෙන තාක් නිශ්චල වස්තුවක් නිශ්චලතාවයේද, චලනය වන වස්තුවක් සරල රේඛීය ඒකාකාර ප්‍රවේගයෙන්ද පවතී. චලිත තත්ත්වය වෙනස් කිරීමට දක්වන ප්‍රතිරෝධය අවස්ථිතියයි.",
-            "නොවෙනස්ව පැවතීමේ නැඹුරුව සිහිපත් කරන්න."
-          )
-          2 -> return Quintuple(
-            "නිව්ටන්ගේ දෙවන චලිත නියමයේ ගණිතමය සූත්‍රය කුමක්ද? එහි සංකේත නම් කරන්න.",
-            "What is the mathematical formula of Newton's second law and its symbols?",
-            listOf("F=ma", "F = ma", "බලය", "ස්කන්ධය", "ත්වරණය", "Force", "Mass", "Acceleration"),
-            "F = ma වේ. මෙහි F = සම්ප්‍රයුක්ත බලය (N), m = වස්තුවේ ස්කන්ධය (kg), a = ඇතිවන ත්වරණය (m s⁻²) වේ.",
-            "Force, Mass, Acceleration සලකන්න."
-          )
-          3 -> return Quintuple(
-            "නිව්ටන්ගේ තෙවන චලිත නියමය වාචිකව ප්‍රකාශ කරන්න.",
-            "State Newton's third law of motion.",
-            listOf("ක්‍රියාව", "ප්‍රතික්‍රියාව", "සමාන", "ප්‍රතිවිරුද්ධ", "Action", "Reaction"),
-            "සෑම ක්‍රියාවකටම විශාලත්වයෙන් සමාන වූද, දිශාවෙන් ප්‍රතිවිරුද්ධ වූද ප්‍රතික්‍රියාවක් පවතී.",
-            "Action equals reaction සිහිපත් කරන්න."
-          )
-          else -> {}
-        }
-        else -> {}
-      }
-      "11" -> when (setNum) {
-        1 -> when (qIndex) {
-          1 -> return Quintuple(
-            "ප්‍රභාසංස්ලේෂණයේ ආලෝක ප්‍රතික්‍රියාවේදී නිපදවෙන ප්‍රධාන වායුව කුමක්ද? එය නිපදවෙන්නේ කුමන අණුව බිඳවැටීමෙන්ද?",
-            "Which gas is released in light reaction of photosynthesis and from which molecule?",
-            listOf("ඔක්සිජන්", "ජලය", "ප්‍රකාශ විච්ඡේදනය", "Oxygen", "Water"),
-            "නිපදවෙන වායුව ඔක්සිජන් (O₂) වේ. එය නිපදවෙන්නේ ආලෝක ශක්තිය මඟින් ජල අණු (H₂O) ප්‍රකාශ විච්ඡේදනය වීමෙනි.",
-            "හුස්ම ගැනීමට අවශ්‍ය වායුව සහ ජලය සලකන්න."
-          )
-          2 -> return Quintuple(
-            "ප්‍රභාසංස්ලේෂණය සඳහා ශාක පත්‍ර තුළට කාබන් ඩයොක්සයිඩ් වායුව ඇතුළු වන ක්ෂුද්‍ර සිදුරු හඳුන්වන්නේ කුමන නමින්ද?",
-            "What are the microscopic pores in leaves that take in carbon dioxide?",
-            listOf("පත්‍ර රන්ධ්‍ර", "රන්ධ්‍ර", "මුර සෛල", "Stomata"),
-            "පත්‍ර රන්ධ්‍ර (Stomata) නමින් හැඳින්වේ. ඒවා මුර සෛල යුගලයකින් පාලනය වේ.",
-            "පත්‍ර යටිතලයේ බහුල සිදුරු සිහිපත් කරන්න."
-          )
-          3 -> return Quintuple(
-            "ප්‍රභාසංස්ලේෂණ අඳුරු ප්‍රතික්‍රියාව සිදුවන්නේ හරිතලවයේ කුමන කොටස තුළද?",
-            "In which part of the chloroplast does the dark reaction take place?",
-            listOf("ස්ට්‍රෝමාව", "ස්ට්‍රෝමා", "පිටිකාව", "Stroma"),
-            "හරිතලවයේ පංජරය හෙවත් ස්ට්‍රෝමාව (Stroma) තුළදී සිදු වේ.",
-            "තයිලකොයිඩ අතර ඇති තරලමය කොටසයි."
-          )
-          else -> {}
-        }
-        4 -> when (qIndex) {
-          1 -> return Quintuple(
-            "ඕම්ගේ නියමය වාචිකව ප්‍රකාශ කර එහි ගණිතමය සමීකරණය සඳහන් කරන්න.",
-            "State Ohm's law and write its mathematical equation.",
-            listOf("V=IR", "V = IR", "විභව අන්තරය", "ධාරාව", "උෂ්ණත්වය", "ප්‍රතිරෝධය"),
-            "නියත උෂ්ණත්වයේ පවතින සන්නායකයක් තුළින් ගලන ධාරාව (I), එහි දෙකෙළවර විභව අන්තරයට (V) සෘජුව සමානුපාතික වේ. සමීකරණය: V = IR වේ.",
-            "Voltage, Current, Resistance අතර සම්බන්ධයයි."
-          )
-          2 -> return Quintuple(
-            "විද්‍යුත් ධාරාව, විභව අන්තරය සහ ප්‍රතිරෝධය මනින සම්මත SI ඒකක පිළිවෙළින් මොනවාද?",
-            "What are the SI units of current, voltage and resistance?",
-            listOf("ඇම්පියර", "වෝල්ට්", "ඕම්", "Ampere", "Volt", "Ohm", "A, V, Ω"),
-            "විද්‍යුත් ධාරාව = ඇම්පියර (A), විභව අන්තරය = වෝල්ට් (V), ප්‍රතිරෝධය = ඕම් (Ω) වේ.",
-            "A, V, Ohm සංකේත සිහිපත් කරන්න."
-          )
-          else -> {}
-        }
-        else -> {}
-      }
-      else -> {}
-    }
-
-    // Dynamic curriculum generator for remaining indices
-    val questionPrefixes = listOf(
-      "විද්‍යාත්මකව පැහැදිලි කරන්න: $theme ඒකකයට අදාළව",
-      "ප්‍රධාන ලක්ෂණ හා වැදගත්කම සඳහන් කරන්න:",
-      "විභාග මූලික සංකල්පය ප්‍රකාශ කරන්න:",
-      "ගණිතමය හෝ රසායනික සූත්‍රය දක්වන්න:",
-      "ක්‍රියාවලිය හා පියවර විස්තර කරන්න:"
-    )
-    val prefix = questionPrefixes[(qIndex - 1) % questionPrefixes.size]
-
-    return Quintuple(
-      "$prefix #$qIndex - $theme ආශ්‍රිත ප්‍රශ්නය: විභාගයේදී බහුලව විමසන මූලික නියමය හෝ අර්ථ දැක්වීම කුමක්ද?",
-      "State the key definition or rule regarding $theme for question #$qIndex.",
-      listOf("විද්‍යාව", "නියමය", "සූත්‍රය", "පරීක්ෂාව", "ශක්තිය", "ප්‍රතික්‍රියාව", "ඒකකය"),
-      "$theme හි #$qIndex ප්‍රශ්නයට අදාළ පිළිතුර: විෂය නිර්දේශයේ දක්වා ඇති නිල සිද්ධාන්තය, පරීක්ෂණ නිරීක්ෂණ හා නියමයන් නිවැරදිව ප්‍රකාශ කිරීමයි.",
-      "$theme විෂය ඒකකයේ මූල පද නිවැරදිව භාවිත කරන්න."
-    )
-  }
-
-  private fun createMathQuestion(
-    grade: String,
-    setNum: Int,
-    qIndex: Int,
-    globalIndex: Int,
-    theme: String
-  ): Quintuple<String, String, List<String>, String, String> {
-    if (theme.contains("පයිතගරස්") || (setNum == 9 && grade == "10")) {
-      return Quintuple(
-        "සෘජුකෝණී ත්‍රිකෝණයක කර්ණය හා පාද අතර සම්බන්ධය දක්වන පයිතගරස් ප්‍රමේයයේ සූත්‍රය වාචිකව පවසන්න.",
-        "State the Pythagoras theorem formula relating hypotenuse and sides of a right triangle.",
-        listOf("පයිතගරස්", "a² + b² = c²", "කර්ණයේ වර්ගය", "අනෙක් පාද දෙකේ වර්ගවල එකතුව", "Pythagoras"),
-        "සෘජුකෝණී ත්‍රිකෝණයක කර්ණයේ වර්ගය අනෙක් පාද දෙකේ වර්ගවල එකතුවට සමාන වේ (a² + b² = c²).",
-        "a වර්ගය ධන b වර්ගය සමානයි c වර්ගය."
-      )
-    }
-
-    if (theme.contains("වර්ගජ") || (setNum == 2 && grade == "11")) {
-      return Quintuple(
-        "ax² + bx + c = 0 වර්ගජ සමීකරණයක් විසඳීම සඳහා භාවිත කරන සූත්‍රය කුමක්ද?",
-        "What is the quadratic formula used to solve ax^2 + bx + c = 0?",
-        listOf("-b", "b² - 4ac", "2a", "වර්ගජ සූත්‍රය", "Formula"),
-        "x = (-b ± √(b² - 4ac)) / 2a වේ.",
-        "සෘණ b ධන හෝ සෘණ වර්ගමූල b වර්ගය අඩු කිරීම 4ac බෙදීම 2a."
-      )
-    }
-
-    if (theme.contains("ත්‍රිකෝණමිතිය") || (setNum == 4 && grade == "11")) {
-      return Quintuple(
-        "සෘජුකෝණී ත්‍රිකෝණයක කෝණයක Sin, Cos සහ Tan අනුපාත අර්ථ දක්වන ආකාරය පවසන්න.",
-        "Define Sin, Cos and Tan ratios in a right-angled triangle.",
-        listOf("සම්මුඛ පාදය", "කර්ණය", "බද්ධ පාදය", "Sin", "Cos", "Tan"),
-        "Sin θ = සම්මුඛ පාදය / කර්ණය, Cos θ = බද්ධ පාදය / කර්ණය, Tan θ = සම්මුඛ පාදය / බද්ධ පාදය වේ.",
-        "සම්මුඛ, බද්ධ සහ කර්ණය අතර අනුපාත සිහිපත් කරන්න."
-      )
-    }
-
-    return Quintuple(
-      "ගණිත ගැටලුව #$qIndex ($theme): මෙහිදී යොදාගන්නා මූලික ගණිතමය සූත්‍රය හා නියමය කුමක්ද?",
-      "State the key mathematical formula and rule for $theme question #$qIndex.",
-      listOf("සූත්‍රය", "ගණනය", "සමීකරණය", "අගය", "ප්‍රමේයය", "Math"),
-      "$theme ආශ්‍රිත #$qIndex ප්‍රශ්නයේ සූත්‍රය: පාඩමේ මූලික සමීකරණය ආදේශ කර නිවැරදි සුළු කිරීම සිදු කිරීමයි.",
-      "අදාළ ගණිත සූත්‍රය සහ වීජීය පද පැහැදිලිව ප්‍රකාශ කරන්න."
-    )
-  }
-
+  // ==============================================================================
+  // HISTORY QUESTIONS (GRADE 9, 10, 11) - 100% ACCURATE & DEDICATED BANK
+  // ==============================================================================
   private fun createHistoryQuestion(
     grade: String,
     setNum: Int,
@@ -537,35 +607,51 @@ object ComprehensiveVoiceQuizRepository {
     globalIndex: Int,
     theme: String
   ): Quintuple<String, String, List<String>, String, String> {
-    if (theme.contains("පරාක්‍රමබාහු") || (setNum == 10 && grade == "10")) {
-      return Quintuple(
-        "පරාක්‍රම සමුද්‍රය නිර්මාණය කළ රජතුමා කවුද? එය සෑදීමට එක් කළ කුඩා වැව් 3න් දෙකක් නම් කරන්න.",
-        "Who built Parakrama Samudra and name two smaller tanks combined to form it?",
-        listOf("පරාක්‍රමබාහු", "තෝපාවැව", "එරබදු", "දුඹුටුළු", "Parakramabahu"),
-        "මහා පරාක්‍රමබාහු රජතුමා විසිනි. තෝපාවැව, එරබදු වැව සහ දුඹුටුළු වැව එක්කර එය නිර්මාණය කරන ලදී.",
-        "පොළොන්නරුවේ මහා රජු සහ තෝපාවැව සිහිපත් කරන්න."
-      )
-    }
-
-    if (theme.contains("මුල්ලේරියා") || (setNum == 6 && grade == "9")) {
-      return Quintuple(
-        "1562 මුල්ලේරියා මහා සටනින් පෘතුගීසීන් පරදා ජය ලැබූ සීතාවක රජතුමා කවුද?",
-        "Which Sitawaka king defeated the Portuguese at the battle of Mulleriyawa in 1562?",
-        listOf("පළමුවන රාජසිංහ", "රාජසිංහ", "ටිකිරි කුමාරු", "සීතාවක", "Rajasinha"),
-        "පළමුවන රාජසිංහ රජතුමා (ටිකිරි බණ්ඩාර කුමරු) විසිනි. මෙය පෘතුගීසීන් ලංකාවේදී ලැබූ දරුණුතම ගොඩබිම් පරාජයකි.",
-        "ටිකිරි කුමාරු නමින් ප්‍රකට වීර රජු සිහිපත් කරන්න."
-      )
-    }
-
-    return Quintuple(
-      "ඓතිහාසික සිදුවීම #$qIndex ($theme): මෙහි වැදගත්කම හා අදාළ නායකයා/රජු කවුද?",
-      "State the significance and historical leader for $theme question #$qIndex.",
-      listOf("රජු", "යුගය", "ශ්‍රී ලංකාව", "ඉතිහාසය", "සටන", "ගිවිසුම", "වැව"),
-      "$theme හි #$qIndex සිදුවීම: ශ්‍රී ලංකා ඉතිහාසයේ වැදගත් සන්ධිස්ථානයක් වන අතර ඓතිහාසික මූලාශ්‍ර සාක්ෂි දරයි.",
-      "යුගය සහ අදාළ ඓතිහාසික චරිතය සඳහන් කරන්න."
-    )
+    return VoiceQuizHistoryBank.getQuestion(grade, setNum, qIndex, theme)
   }
 
+  // ==============================================================================
+  // SCIENCE QUESTIONS (GRADE 9, 10, 11) - 100% ACCURATE & DEDICATED BANK
+  // ==============================================================================
+  private fun createScienceQuestion(
+    grade: String,
+    setNum: Int,
+    qIndex: Int,
+    globalIndex: Int,
+    theme: String
+  ): Quintuple<String, String, List<String>, String, String> {
+    return VoiceQuizScienceBank.getQuestion(grade, setNum, qIndex, theme)
+  }
+
+  // ==============================================================================
+  // GEOGRAPHY QUESTIONS (GRADE 9, 10, 11) - 100% ACCURATE & SHORT (DEDICATED BANK)
+  // ==============================================================================
+  private fun createGeographyQuestion(
+    grade: String,
+    setNum: Int,
+    qIndex: Int,
+    globalIndex: Int,
+    theme: String
+  ): Quintuple<String, String, List<String>, String, String> {
+    return VoiceQuizGeographyBank.getQuestion(grade, setNum, qIndex, theme)
+  }
+
+  // ==============================================================================
+  // MATH QUESTIONS (GRADE 9, 10, 11) - SIMPLE, DIRECT & NO FORMULAS (DEDICATED BANK)
+  // ==============================================================================
+  private fun createMathQuestion(
+    grade: String,
+    setNum: Int,
+    qIndex: Int,
+    globalIndex: Int,
+    theme: String
+  ): Quintuple<String, String, List<String>, String, String> {
+    return VoiceQuizMathBank.getQuestion(grade, setNum, qIndex, theme)
+  }
+
+  // ==============================================================================
+  // ENGLISH QUESTIONS - SHORT, DIRECT & EASY VOCABULARY (DEDICATED BANK)
+  // ==============================================================================
   private fun createEnglishQuestion(
     grade: String,
     setNum: Int,
@@ -573,38 +659,12 @@ object ComprehensiveVoiceQuizRepository {
     globalIndex: Int,
     theme: String
   ): Quintuple<String, String, List<String>, String, String> {
-    when (setNum) {
-      1 -> return Quintuple(
-        "Speak two complete sentences describing your daily morning routine in the Simple Present Tense.",
-        "Describe your daily morning routine in Simple Present Tense.",
-        listOf("wake up", "brush", "wash", "breakfast", "school", "go", "morning", "at"),
-        "I wake up at 6:00 a.m. every morning. Then I brush my teeth and get ready for school.",
-        "Use 'I wake up...' and 'I go to school...' in present tense."
-      )
-      4 -> return Quintuple(
-        "Convert this active sentence into passive voice: 'The teacher explained the difficult grammar lesson.'",
-        "Convert to passive: The teacher explained the difficult grammar lesson.",
-        listOf("was explained", "difficult grammar lesson", "by the teacher", "explained"),
-        "The difficult grammar lesson was explained by the teacher.",
-        "Start with 'The difficult grammar lesson was explained...'"
-      )
-      6 -> return Quintuple(
-        "Complete this conditional sentence: 'If you study hard every day, ...'",
-        "Complete the first conditional sentence: If you study hard every day...",
-        listOf("will pass", "will succeed", "will get", "can pass", "good results"),
-        "If you study hard every day, you will pass the O/L examination with good results.",
-        "Use 'you will pass' or 'you will succeed'."
-      )
-      else -> return Quintuple(
-        "Speak an English sentence demonstrating your knowledge of $theme (#$qIndex).",
-        "Speak a sentence related to $theme in correct English.",
-        listOf("english", "sentence", "grammar", "because", "study", "exam", "good"),
-        "A well-structured English sentence using correct subject-verb agreement and vocabulary related to $theme.",
-        "Speak clearly in English with proper sentence structure."
-      )
-    }
+    return VoiceQuizEnglishBank.getQuestion(grade, setNum, qIndex, theme)
   }
 
+  // ==============================================================================
+  // ICT QUESTIONS - SHORT & DIRECT (DEDICATED BANK)
+  // ==============================================================================
   private fun createIctQuestion(
     grade: String,
     setNum: Int,
@@ -612,33 +672,12 @@ object ComprehensiveVoiceQuizRepository {
     globalIndex: Int,
     theme: String
   ): Quintuple<String, String, List<String>, String, String> {
-    if (setNum == 3 || theme.contains("ද්විමය")) {
-      return Quintuple(
-        "පරිගණකයේ දත්ත නිරූපණය සඳහා භාවිත කරන ද්විමය (Binary) සංඛ්‍යා පද්ධතියේ ඇති සංකේත දෙක මොනවාද?",
-        "What are the two symbols used in the binary number system?",
-        listOf("0 සහ 1", "0 and 1", "බිංදුව සහ එක", "Zero and One", "0", "1"),
-        "0 සහ 1 යන සංකේත දෙක පමණි. ඒවා Bits (Binary Digits) ලෙස හැඳින්වේ.",
-        "බිංදුව සහ එක සිහිපත් කරන්න."
-      )
-    }
-    if (setNum == 4 || theme.contains("ද්වාර")) {
-      return Quintuple(
-        "මූලික තාර්කික ද්වාර (Logic Gates) ත්‍රිත්වය නම් කර ඒවායේ ක්‍රියාකාරිත්වය කෙටියෙන් පවසන්න.",
-        "Name the three fundamental logic gates and state their operation.",
-        listOf("AND", "OR", "NOT", "ද්වාර", "ඇන්ඩ්", "ඕර්", "නොට්"),
-        "AND ද්වාරය, OR ද්වාරය සහ NOT ද්වාරය වේ. NOT මඟින් ප්‍රතිදානය ප්‍රතිවර්තනය කරයි.",
-        "AND, OR සහ NOT සිහිපත් කරන්න."
-      )
-    }
-    return Quintuple(
-      "ICT ප්‍රශ්නය #$qIndex ($theme): මෙහි මූලික සංකල්පය හෝ තාක්ෂණික යෙදුම කුමක්ද?",
-      "State the fundamental concept or technical term for $theme question #$qIndex.",
-      listOf("පරිගණක", "දත්ත", "තොරතුරු", "ජාල", "ක්‍රමලේඛන", "ICT", "Hardware", "Software"),
-      "$theme ආශ්‍රිත #$qIndex ප්‍රශ්නය: නිල විෂය නිර්දේශයේ දක්වා ඇති පරිගණක විද්‍යාත්මක මූලධර්මයයි.",
-      "අදාළ තාක්ෂණික පදය ඉංග්‍රීසි හෝ සිංහලෙන් නිවැරදිව පවසන්න."
-    )
+    return VoiceQuizIctBank.getQuestion(grade, setNum, qIndex, theme)
   }
 
+  // ==============================================================================
+  // BUDDHISM QUESTIONS - 100% CURRICULUM ACCURATE (DEDICATED BANK)
+  // ==============================================================================
   private fun createBuddhismQuestion(
     grade: String,
     setNum: Int,
@@ -646,33 +685,12 @@ object ComprehensiveVoiceQuizRepository {
     globalIndex: Int,
     theme: String
   ): Quintuple<String, String, List<String>, String, String> {
-    if (setNum == 2 || theme.contains("ධම්මචක්කප්පවත්තන")) {
-      return Quintuple(
-        "බුදුරජාණන් වහන්සේ දේශනා කළ ප්‍රථම ධර්ම දේශනාව කුමක්ද? එය දේශනා කළේ කා හටද?",
-        "What was the first sermon preached by the Buddha and to whom?",
-        listOf("ධම්මචක්කප්පවත්තන", "පස්වග මහණුන්", "බරණැස", "ඉසිපතන", "Dhammacakka"),
-        "ධම්මචක්කප්පවත්තන සූත්‍රයයි. බරණැස ඉසිපතන මිගදායේදී කොණ්ඩඤ්ඤ ඇතුළු පස්වග තවුසන් හට දේශනා කරන ලදී.",
-        "ප්‍රථම ධර්ම දේශනාව හා පස්වග මහණුන් සිහිපත් කරන්න."
-      )
-    }
-    if (setNum == 8 || theme.contains("චතුරාර්ය")) {
-      return Quintuple(
-        "බුදු දහමේ මූලික හරය වන චතුරාර්ය සත්‍යය ධර්ම 4 පිළිවෙළින් නම් කරන්න.",
-        "Name the Four Noble Truths in Buddhism.",
-        listOf("දුක්ඛ", "සමුදය", "නිරෝධ", "මාර්ග", "චතුරාර්ය සත්‍යය"),
-        "1. දුක්ඛ සත්‍යය, 2. දුක්ඛ සමුදය සත්‍යය, 3. දුක්ඛ නිරෝධ සත්‍යය, 4. දුක්ඛ නිරෝධ ගාමිණී පටිපදා ආර්ය සත්‍යය (මාර්ග සත්‍යය).",
-        "දුක, හටගැනීම, නැතිවීම සහ මඟ සිහිපත් කරන්න."
-      )
-    }
-    return Quintuple(
-      "බුද්ධ ධර්මය ප්‍රශ්නය #$qIndex ($theme): මෙහි ධර්මානුකූල අර්ථය හා වැදගත්කම කුමක්ද?",
-      "State the Dhamma meaning and significance for $theme question #$qIndex.",
-      listOf("ධර්මය", "ශීලය", "සමාධිය", "ප්‍රඥාව", "බුදුරදුන්", "සූත්‍රය"),
-      "$theme හි #$qIndex ධර්ම කාරණය: බුද්ධ දේශනාවට අනුකූලව සදාචාරාත්මක හා දහම් සංකල්ප නිවැරදිව ප්‍රකාශ කිරීමයි.",
-      "අදාළ සූත්‍රය හෝ බෞද්ධ සංකල්පය පැහැදිලිව ප්‍රකාශ කරන්න."
-    )
+    return VoiceQuizBuddhismBank.getQuestion(grade, setNum, qIndex, theme)
   }
 
+  // ==============================================================================
+  // GENERAL SUBJECT (SINHALA, COMMERCE, AGRI, CIVICS, HEALTH) - DEDICATED BANK
+  // ==============================================================================
   private fun createGeneralSubjectQuestion(
     grade: String,
     subject: String,
@@ -681,13 +699,7 @@ object ComprehensiveVoiceQuizRepository {
     globalIndex: Int,
     theme: String
   ): Quintuple<String, String, List<String>, String, String> {
-    return Quintuple(
-      "$subject ප්‍රශ්නය #$qIndex ($theme): සාමාන්‍ය පෙළ විභාගයේදී විමසන ප්‍රධාන මූල ධර්මය කුමක්ද?",
-      "State the core principle tested in O/L for $subject in $theme question #$qIndex.",
-      listOf(subject, "මූලධර්මය", "විභාගය", "නියමය", "ලක්ෂණ", "අර්ථය"),
-      "$subject හි $theme ආශ්‍රිත නිල විෂය නිර්දේශ පිළිතුර සහ විභාග ලකුණු ලබාදෙන මූල පද මෙහිදී අගය කරනු ලැබේ.",
-      "විෂයට අදාළ ප්‍රධාන කරුණු හා උදාහරණ සඳහන් කරන්න."
-    )
+    return VoiceQuizGeneralBank.getQuestion(subject, grade, setNum, qIndex, theme)
   }
 }
 

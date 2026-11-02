@@ -1777,7 +1777,6 @@ fun StructuredQuestionCard(
   showMarkingMode: Boolean,
   onOpenFullScreen: () -> Unit = {}
 ) {
-  // සෑම විටම මුල් අවස්ථාවේ සිට ප්‍රශ්නය හා පිළිතුර එකවර විවෘතව පෙන්වයි
   var isExpanded by remember { mutableStateOf(true) }
 
   Card(
@@ -1790,52 +1789,6 @@ fun StructuredQuestionCard(
       .clickable(onClick = onOpenFullScreen)
   ) {
     Column(modifier = Modifier.padding(14.dp)) {
-      // Tap to Full Screen Banner Indicator
-      Surface(
-        onClick = onOpenFullScreen,
-        shape = RoundedCornerShape(8.dp),
-        color = Color(0xFFEFF6FF),
-        border = BorderStroke(1.dp, Color(0xFFBFDBFE)),
-        modifier = Modifier
-          .fillMaxWidth()
-          .padding(bottom = 10.dp)
-      ) {
-        Row(
-          modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-          verticalAlignment = Alignment.CenterVertically,
-          horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-          Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-              imageVector = Icons.Default.Fullscreen,
-              contentDescription = "Full Screen",
-              tint = Color(0xFF2563EB),
-              modifier = Modifier.size(16.dp)
-            )
-            Spacer(modifier = Modifier.width(6.dp))
-            Text(
-              text = "තට්ටු කර සම්පූර්ණ තිරයෙන් කියවන්න",
-              fontSize = 11.sp,
-              fontWeight = FontWeight.Bold,
-              color = Color(0xFF1D4ED8)
-            )
-          }
-
-          Surface(
-            shape = RoundedCornerShape(4.dp),
-            color = Color(0xFF2563EB)
-          ) {
-            Text(
-              text = "Full Screen ↗",
-              fontSize = 9.sp,
-              color = Color.White,
-              fontWeight = FontWeight.Bold,
-              modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-            )
-          }
-        }
-      }
-
       Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -1873,41 +1826,21 @@ fun StructuredQuestionCard(
           }
         }
 
-        Row(verticalAlignment = Alignment.CenterVertically) {
-          Surface(
-            shape = RoundedCornerShape(6.dp),
-            color = Color(0xFFDCFCE7)
-          ) {
-            Text(
-              text = "ලකුණු ${item.totalMarks}",
-              fontSize = 10.sp,
-              fontWeight = FontWeight.Bold,
-              color = Color(0xFF16A34A),
-              modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
-            )
-          }
-
-          Spacer(modifier = Modifier.width(6.dp))
-
-          Surface(
-            onClick = onOpenFullScreen,
-            shape = CircleShape,
-            color = Color(0xFFF1F5F9),
-            modifier = Modifier.size(28.dp)
-          ) {
-            Box(contentAlignment = Alignment.Center) {
-              Icon(
-                imageVector = Icons.Default.Fullscreen,
-                contentDescription = "Full Screen",
-                tint = Color(0xFF1E293B),
-                modifier = Modifier.size(16.dp)
-              )
-            }
-          }
+        Surface(
+          shape = RoundedCornerShape(6.dp),
+          color = Color(0xFFDCFCE7)
+        ) {
+          Text(
+            text = "ලකුණු ${item.totalMarks}",
+            fontSize = 10.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF16A34A),
+            modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
+          )
         }
       }
 
-      Spacer(modifier = Modifier.height(8.dp))
+      Spacer(modifier = Modifier.height(10.dp))
 
       Text(
         text = "ප්‍රශ්න අංක ${item.globalIndex}: ${item.topicSinhala}",
@@ -1916,24 +1849,25 @@ fun StructuredQuestionCard(
         color = Color(0xFF0F172A)
       )
 
-      Spacer(modifier = Modifier.height(4.dp))
-      Text(
-        text = item.mainScenario,
-        fontSize = 12.sp,
-        color = Color(0xFF475569),
-        lineHeight = 16.sp
-      )
+      if (item.mainScenario.isNotBlank()) {
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+          text = item.mainScenario,
+          fontSize = 12.sp,
+          color = Color(0xFF475569),
+          lineHeight = 16.sp
+        )
+      }
 
-      Spacer(modifier = Modifier.height(12.dp))
+      Spacer(modifier = Modifier.height(10.dp))
       HorizontalDivider(color = Color(0xFFF1F5F9))
       Spacer(modifier = Modifier.height(10.dp))
 
-      // Sub questions preview
+      // Sub questions preview (Question + Answer + Marking Scheme)
       item.subQuestions.forEach { sub ->
         Column(
           modifier = Modifier
             .fillMaxWidth()
-            .clickable { onOpenFullScreen() }
             .padding(vertical = 4.dp)
         ) {
           Row(
@@ -1966,7 +1900,7 @@ fun StructuredQuestionCard(
             ) {
               Column(modifier = Modifier.padding(10.dp)) {
                 Text(
-                  text = "✅ සම්මත ආදර්ශ පිළිතුර (Model Answer):",
+                  text = "✅ ආදර්ශ පිළිතුර (Model Answer):",
                   fontSize = 10.sp,
                   fontWeight = FontWeight.Bold,
                   color = Color(0xFF166534)
@@ -1979,19 +1913,21 @@ fun StructuredQuestionCard(
                   modifier = Modifier.padding(vertical = 4.dp)
                 )
 
-                Text(
-                  text = "📌 ලකුණු දීමේ පටිපාටිය (Marking Rubric):",
-                  fontSize = 10.sp,
-                  fontWeight = FontWeight.Bold,
-                  color = Color(0xFF15803D),
-                  modifier = Modifier.padding(top = 4.dp)
-                )
-                sub.keyPoints.forEach { pt ->
+                if (sub.keyPoints.isNotEmpty()) {
                   Text(
-                    text = "• $pt",
+                    text = "📌 ලකුණු දීමේ පටිපාටිය (Marking Rubric):",
                     fontSize = 10.sp,
-                    color = Color(0xFF166534)
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF15803D),
+                    modifier = Modifier.padding(top = 4.dp)
                   )
+                  sub.keyPoints.forEach { pt ->
+                    Text(
+                      text = "• $pt",
+                      fontSize = 10.sp,
+                      color = Color(0xFF166534)
+                    )
+                  }
                 }
               }
             }
@@ -2003,24 +1939,9 @@ fun StructuredQuestionCard(
 
       Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically
       ) {
-        Button(
-          onClick = onOpenFullScreen,
-          shape = RoundedCornerShape(8.dp),
-          colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2563EB)),
-          contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
-        ) {
-          Icon(
-            imageVector = Icons.Default.Fullscreen,
-            contentDescription = null,
-            modifier = Modifier.size(15.dp)
-          )
-          Spacer(modifier = Modifier.width(4.dp))
-          Text("පූර්ණ තිරයෙන් කියවන්න", fontSize = 11.sp, fontWeight = FontWeight.Bold)
-        }
-
         OutlinedButton(
           onClick = { isExpanded = !isExpanded },
           shape = RoundedCornerShape(8.dp),

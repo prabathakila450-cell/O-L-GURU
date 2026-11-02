@@ -18,7 +18,8 @@ object ShortAnswerQuestionFactory {
                      setNumber * 10
 
         return when {
-            subject.contains("විද්‍යා") -> buildScienceQuestions(baseId, grade, setNumber, subject, topic)
+            subject.contains("භූගෝල") -> buildGeographyQuestions(baseId, grade, setNumber, subject, topic)
+            subject.contains("විද්‍යා") && !subject.contains("භූගෝල") -> buildScienceQuestions(baseId, grade, setNumber, subject, topic)
             subject.contains("ගණිත") -> buildMathsQuestions(baseId, grade, setNumber, subject, topic)
             subject.contains("ඉතිහාස") -> buildHistoryQuestions(baseId, grade, setNumber, subject, topic)
             subject.contains("බුද්ධ") -> buildBuddhismQuestions(baseId, grade, setNumber, subject, topic)
@@ -26,7 +27,6 @@ object ShortAnswerQuestionFactory {
             subject.contains("English") || subject.contains("ඉංග්‍රීසි") -> buildEnglishQuestions(baseId, grade, setNumber, subject, topic)
             subject.contains("ICT") || subject.contains("තොරතුරු") -> buildIctQuestions(baseId, grade, setNumber, subject, topic)
             subject.contains("ව්‍යාපාර") || subject.contains("ගිණුම්") -> buildCommerceQuestions(baseId, grade, setNumber, subject, topic)
-            subject.contains("භූගෝල") -> buildGeographyQuestions(baseId, grade, setNumber, subject, topic)
             subject.contains("පුරවැසි") -> buildCivicsQuestions(baseId, grade, setNumber, subject, topic)
             subject.contains("සෞඛ්‍ය") -> buildHealthQuestions(baseId, grade, setNumber, subject, topic)
             else -> buildGeneralQuestions(baseId, grade, setNumber, subject, topic)

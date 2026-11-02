@@ -1580,6 +1580,8 @@ fun SubjectContentScreen(
   var musicMasterHubInitialCategory by remember { mutableStateOf<MusicSectionCategory?>(null) }
   var showAgriMasterHubDialog by remember { mutableStateOf(false) }
   var agriMasterHubInitialCategory by remember { mutableStateOf<AgriSectionCategory?>(null) }
+  var showGeoMasterHubDialog by remember { mutableStateOf(false) }
+  var geoMasterHubInitialCategory by remember { mutableStateOf<GeoSectionCategory?>(null) }
 
   val subjectNotes = remember(notesList, subject.id, noteSearchFilter, grade) {
     notesList.filter { isMatchSubject(it.subject, it.topicSinhala, subject) }
@@ -1845,6 +1847,17 @@ fun SubjectContentScreen(
       },
       initialSectionCategory = agriMasterHubInitialCategory,
       onDismiss = { showAgriMasterHubDialog = false }
+    )
+  }
+  if (showGeoMasterHubDialog) {
+    GeographyGrade10And11MasterHubDialog(
+      initialGradeTab = when (grade) {
+        "10" -> GeoGradeTab.GRADE_10
+        "11" -> GeoGradeTab.GRADE_11
+        else -> GeoGradeTab.ALL
+      },
+      initialSectionCategory = geoMasterHubInitialCategory,
+      onDismiss = { showGeoMasterHubDialog = false }
     )
   }
 
@@ -4052,6 +4065,19 @@ fun SubjectContentScreen(
           onOpenFullHub = { cat ->
             agriMasterHubInitialCategory = cat
             showAgriMasterHubDialog = true
+          }
+        )
+      }
+
+      // 🌍 Grade 10 & 11 Geography Master Hub (Strictly exclusive to Geography subject only)
+      val isGeographySubjectCard = (subject.nameSinhala.contains("භූගෝල") || subject.name.contains("Geography", ignoreCase = true) || subject.id.contains("geo")) &&
+          !subject.nameSinhala.contains("ඉතිහාසය") && !subject.id.contains("history")
+      if (isGeographySubjectCard) {
+        // 🌟 100% ACCURATE GRADE 10 & 11 GEOGRAPHY SYLLABUS MASTER HUB
+        GeographyGrade10And11MasterHubCard(
+          onOpenFullHub = { cat ->
+            geoMasterHubInitialCategory = cat
+            showGeoMasterHubDialog = true
           }
         )
       }
