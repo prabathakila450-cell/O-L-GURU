@@ -49,8 +49,23 @@ object SocialCommerceTrueFalseBank {
         examTrap = "අන්තර්ජාලය (Internet) යනු ලොව විශාලතම WAN ජාලයයි."
       )
     )
-    val safeIndex = (topicIndex + (batchIndex * 2)) % items.size
-    return items[safeIndex]
+    val ictGradeOffset = when (grade) {
+      9 -> 0
+      10 -> 2
+      11 -> 4
+      else -> 0
+    }
+    val safeIndex = (number - 1 + ictGradeOffset) % items.size
+    val base = items[safeIndex]
+    val isAlt = ((number - 1) / items.size) % 2 == 1
+    if (!isAlt) return base
+    return TrueFalseTopicContent(
+      unitName = base.unitName,
+      statement = "ප්‍රශ්න අංක ${number}: ${base.unitName} - ${base.statement}",
+      isTrue = base.isTrue,
+      justification = base.justification,
+      examTrap = base.examTrap
+    )
   }
 
   fun getGeographyQuestion(grade: Int, number: Int, batchIndex: Int, topicIndex: Int): TrueFalseTopicContent {
@@ -83,8 +98,23 @@ object SocialCommerceTrueFalseBank {
         examTrap = "ඊසානදිග මෝසමෙන් වියළි කලාපයට හා උතුරු නැගෙනහිරට වැසි ලැබේ."
       )
     )
-    val safeIndex = (topicIndex + (batchIndex * 2)) % items.size
-    return items[safeIndex]
+    val geoGradeOffset = when (grade) {
+      9 -> 0
+      10 -> 1
+      11 -> 2
+      else -> 0
+    }
+    val safeIndex = (number - 1 + geoGradeOffset) % items.size
+    val base = items[safeIndex]
+    val isAlt = ((number - 1) / items.size) % 2 == 1
+    if (!isAlt) return base
+    return TrueFalseTopicContent(
+      unitName = base.unitName,
+      statement = "ප්‍රශ්න අංක ${number}: ${base.unitName} - ${base.statement}",
+      isTrue = base.isTrue,
+      justification = base.justification,
+      examTrap = base.examTrap
+    )
   }
 
   fun getCivicsQuestion(grade: Int, number: Int, batchIndex: Int, topicIndex: Int): TrueFalseTopicContent {
@@ -117,8 +147,23 @@ object SocialCommerceTrueFalseBank {
         examTrap = "ශ්‍රී ලංකාවට සර්වජන ඡන්ද බලය ලැබුණේ 1931 ඩොනමෝර් ප්‍රතිසංස්කරණ මඟිනි."
       )
     )
-    val safeIndex = (topicIndex + (batchIndex * 2)) % items.size
-    return items[safeIndex]
+    val civGradeOffset = when (grade) {
+      9 -> 0
+      10 -> 1
+      11 -> 2
+      else -> 0
+    }
+    val safeIndex = (number - 1 + civGradeOffset) % items.size
+    val base = items[safeIndex]
+    val isAlt = ((number - 1) / items.size) % 2 == 1
+    if (!isAlt) return base
+    return TrueFalseTopicContent(
+      unitName = base.unitName,
+      statement = "ප්‍රශ්න අංක ${number}: ${base.unitName} - ${base.statement}",
+      isTrue = base.isTrue,
+      justification = base.justification,
+      examTrap = base.examTrap
+    )
   }
 
   fun getCommerceQuestion(grade: Int, number: Int, batchIndex: Int, topicIndex: Int): TrueFalseTopicContent {
@@ -151,7 +196,22 @@ object SocialCommerceTrueFalseBank {
         examTrap = "මහ බැංකුවේ ප්‍රධාන අරමුණු: මිල ස්ථායිතාව සහ මූල්‍ය පද්ධති ස්ථායිතාවයි."
       )
     )
-    val safeIndex = (topicIndex + (batchIndex * 2)) % items.size
-    return items[safeIndex]
+    val commGradeOffset = when (grade) {
+      9 -> 0
+      10 -> 1
+      11 -> 2
+      else -> 0
+    }
+    val safeIndex = (number - 1 + commGradeOffset) % items.size
+    val base = items[safeIndex]
+    val isAlt = ((number - 1) / items.size) % 2 == 1
+    if (!isAlt) return base
+    return TrueFalseTopicContent(
+      unitName = base.unitName,
+      statement = "ප්‍රශ්න අංක ${number}: ${base.unitName} - ${base.statement}",
+      isTrue = base.isTrue,
+      justification = base.justification,
+      examTrap = base.examTrap
+    )
   }
 }

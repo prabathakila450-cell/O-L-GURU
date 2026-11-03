@@ -18,23 +18,27 @@ object HistoryPastPaper60QuestionsProvider {
 
     fun buildHistoryQuestion(year: Int, qNum: Int, yearStr: String, subjectTitle: String): PastPaperQuestion {
         val q = qNum.coerceIn(1, 60)
-        val yearInt = yearStr.toIntOrNull() ?: year
+        
+        // Map year to a specific bank and term to ensure 100% uniqueness across 2019-2024
+        val mockQ = when(yearStr) {
+            "2024" -> HistoryGrade11QuestionBank.getQuestion(term = 3, paperIdx = 1, qNum = q)
+            "2023" -> HistoryGrade11QuestionBank.getQuestion(term = 2, paperIdx = 1, qNum = q)
+            "2022" -> HistoryGrade11QuestionBank.getQuestion(term = 1, paperIdx = 1, qNum = q)
+            "2021" -> HistoryGrade10QuestionBank.getQuestion(term = 3, paperIdx = 1, qNum = q)
+            "2020" -> HistoryGrade10QuestionBank.getQuestion(term = 2, paperIdx = 1, qNum = q)
+            "2019" -> HistoryGrade10QuestionBank.getQuestion(term = 1, paperIdx = 1, qNum = q)
+            else -> HistoryGrade11QuestionBank.getQuestion(term = 3, paperIdx = 1, qNum = q)
+        }
 
-        val questions = getHistoryQuestionsList()
-
-        val yOffset = Math.abs(yearInt - 2015)
-        val idx = ((q - 1) + yOffset * 13) % questions.size
-        val baseData = questions[idx]
-
-        val finalTitle = "[$yearStr O/L - Q$q] " + baseData.text
+        val finalTitle = "[$yearStr O/L - Q$q] " + mockQ.questionText.substringAfter(": ")
 
         return PastPaperQuestion(
             id = qNum,
             questionText = finalTitle,
-            options = baseData.options,
-            correctOptionIndex = baseData.correctIdx,
-            explanationSinhala = baseData.explanation,
-            topicCategory = baseData.topic,
+            options = mockQ.options,
+            correctOptionIndex = mockQ.correctOption,
+            explanationSinhala = mockQ.explanation,
+            topicCategory = mockQ.topicName,
             year = yearStr,
             subject = subjectTitle
         )

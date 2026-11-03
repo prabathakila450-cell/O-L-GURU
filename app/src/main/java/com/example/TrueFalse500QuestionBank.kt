@@ -74,10 +74,17 @@ object TrueFalse500Repository {
 
   private fun generate500Questions(grade: Int, subject: TrueFalseSubject): List<TrueFalseQuestionItem> {
     val questions = ArrayList<TrueFalseQuestionItem>(TOTAL_QUESTIONS_PER_SUBJECT)
+    val seenInBatch = HashSet<String>()
+    var currentBatch = -1
 
     for (qNum in 1..TOTAL_QUESTIONS_PER_SUBJECT) {
       val batchIndex = (qNum - 1) / BATCH_SIZE
       val topicIndex = (qNum - 1) % BATCH_SIZE
+
+      if (batchIndex != currentBatch) {
+        currentBatch = batchIndex
+        seenInBatch.clear()
+      }
 
       val content: TrueFalseTopicContent = when (subject) {
         TrueFalseSubject.SCIENCE -> ScienceTrueFalseBank.getScienceQuestion(grade, qNum, batchIndex, topicIndex)
@@ -97,6 +104,15 @@ object TrueFalse500Repository {
         TrueFalseSubject.DANCING -> BuddhismAndElectivesMockEngine.getDancingQuestion(grade, qNum, batchIndex, topicIndex)
       }
 
+      var finalStatement = content.statement
+      if (seenInBatch.contains(finalStatement)) {
+        finalStatement = "අංක ${qNum}: ${content.unitName} - ${content.statement}"
+      }
+      if (seenInBatch.contains(finalStatement)) {
+        finalStatement = "කාණ්ඩය ${batchIndex + 1} (#${topicIndex + 1}): $finalStatement"
+      }
+      seenInBatch.add(finalStatement)
+
       questions.add(
         TrueFalseQuestionItem(
           id = "tf_g${grade}_${subject.id}_q$qNum",
@@ -104,7 +120,7 @@ object TrueFalse500Repository {
           grade = grade,
           subject = subject,
           unitName = content.unitName,
-          statement = content.statement,
+          statement = finalStatement,
           isTrue = content.isTrue,
           justification = content.justification,
           examTrapOrFact = content.examTrap

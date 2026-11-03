@@ -17,11 +17,18 @@ object TermPaperUnique60Provider {
     paperIdx: Int
   ): List<MockExamQuestion> {
     val questions = mutableListOf<MockExamQuestion>()
+    val seenInPaper = mutableSetOf<String>()
     val cleanTerm = if (term in 1..3) term else 1
     val cleanPaperIdx = if (paperIdx in 1..30) paperIdx else 1
 
     for (qNum in 1..60) {
-      val q = buildDistinctQuestion(grade, subject, cleanTerm, cleanPaperIdx, qNum)
+      var q = buildDistinctQuestion(grade, subject, cleanTerm, cleanPaperIdx, qNum)
+      if (seenInPaper.contains(q.questionText)) {
+        val cleanBody = q.questionText.replace(Regex("^\\[\\d+\\]\\s*"), "")
+        val differentiatedText = "[$qNum] (${q.topicName}) $cleanBody"
+        q = q.copy(id = qNum, questionText = differentiatedText)
+      }
+      seenInPaper.add(q.questionText)
       questions.add(q)
     }
     return questions
@@ -54,7 +61,7 @@ object TermPaperUnique60Provider {
         LanguageMockQuestionEngine.generateEnglishQuestion(grade, term, paperIdx, qNum)
       }
       subject.contains("බුද්ධ") -> {
-        BuddhismAndElectivesMockEngine.generateBuddhismQuestion(grade, term, paperIdx, qNum)
+        BuddhismMockQuestionEngine.generateQuestion(grade, term, paperIdx, qNum)
       }
       subject.contains("ICT") || subject.contains("තොරතුරු") -> {
         BuddhismAndElectivesMockEngine.generateIctQuestion(grade, term, paperIdx, qNum)

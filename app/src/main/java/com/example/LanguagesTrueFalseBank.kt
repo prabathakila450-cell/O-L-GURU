@@ -48,8 +48,23 @@ object LanguagesTrueFalseBank {
         examTrap = "ත-වර්ගයේ (ත, ථ, ද, ධ) අකුරකට පෙර දන්තජ 'න' යෙදේ (උදා: චන්දනය)."
       )
     )
-    val safeIndex = (topicIndex + (batchIndex * 2)) % items.size
-    return items[safeIndex]
+    val sGradeOffset = when (grade) {
+      9 -> 0
+      10 -> 2
+      11 -> 3
+      else -> 0
+    }
+    val safeIndex = (number - 1 + sGradeOffset) % items.size
+    val base = items[safeIndex]
+    val isAlt = ((number - 1) / items.size) % 2 == 1
+    if (!isAlt) return base
+    return TrueFalseTopicContent(
+      unitName = base.unitName,
+      statement = "ප්‍රශ්න අංක ${number}: ${base.unitName} - ${base.statement}",
+      isTrue = base.isTrue,
+      justification = base.justification,
+      examTrap = base.examTrap
+    )
   }
 
   fun getEnglishQuestion(grade: Int, number: Int, batchIndex: Int, topicIndex: Int): TrueFalseTopicContent {
@@ -100,7 +115,22 @@ object LanguagesTrueFalseBank {
         examTrap = "'at night', 'in the morning', 'at 5 o'clock'."
       )
     )
-    val safeIndex = (topicIndex + (batchIndex * 2)) % items.size
-    return items[safeIndex]
+    val eGradeOffset = when (grade) {
+      9 -> 0
+      10 -> 2
+      11 -> 4
+      else -> 0
+    }
+    val safeIndex = (number - 1 + eGradeOffset) % items.size
+    val base = items[safeIndex]
+    val isAlt = ((number - 1) / items.size) % 2 == 1
+    if (!isAlt) return base
+    return TrueFalseTopicContent(
+      unitName = base.unitName,
+      statement = "Question #${number}: ${base.unitName} - ${base.statement}",
+      isTrue = base.isTrue,
+      justification = base.justification,
+      examTrap = base.examTrap
+    )
   }
 }

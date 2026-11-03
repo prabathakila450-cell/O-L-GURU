@@ -935,13 +935,14 @@ object ComprehensiveStructuredEssayRepository {
 
     for (setNum in 1..25) {
       val unitTheme = themes.getOrElse(setNum - 1) { "$grade ශ්‍රේණිය $subject - කාණ්ඩය $setNum" }
+      val seenTitles = mutableSetOf<String>()
 
       for (qIndexInSet in 1..20) {
         val globalIndex = (setNum - 1) * 20 + qIndexInSet
         val isStructured = qIndexInSet <= 12 // 1-12 Structured, 13-20 Essay
         val type = if (isStructured) "STRUCTURED" else "ESSAY"
 
-        val item = createCurriculumAlignedItem(
+        var item = createCurriculumAlignedItem(
           id = "sq_${grade}_${subject.hashCode()}_${globalIndex}",
           grade = grade,
           subject = subject,
@@ -951,6 +952,18 @@ object ComprehensiveStructuredEssayRepository {
           unitTheme = unitTheme,
           type = type
         )
+
+        if (seenTitles.contains(item.topicSinhala)) {
+          val cleanTheme = unitTheme.substringAfter(". ").trim()
+          val uniqueTitle = if (type == "STRUCTURED") {
+            "$cleanTheme: විශේෂිත ව්‍යුහගත ප්‍රශ්නය අංක $qIndexInSet"
+          } else {
+            "$cleanTheme (රචනා ප්‍රශ්නය ${qIndexInSet - 12}): විශේෂිත විග්‍රහය #$qIndexInSet"
+          }
+          item = item.copy(topicSinhala = uniqueTitle)
+        }
+        seenTitles.add(item.topicSinhala)
+
         list.add(item)
       }
     }

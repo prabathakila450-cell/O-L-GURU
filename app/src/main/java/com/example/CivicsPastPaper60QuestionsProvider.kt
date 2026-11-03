@@ -16,17 +16,27 @@ object CivicsPastPaper60QuestionsProvider {
 
     fun buildCivicsQuestion(year: Int, qNum: Int, yearStr: String, subjectTitle: String): PastPaperQuestion {
         val q = qNum.coerceIn(1, 60)
-        val yearInt = yearStr.toIntOrNull() ?: year
         
-        val data = getQuestionData(q, yearInt, yearStr)
-        
+        // Map year to a specific bank and term to ensure 100% uniqueness across 2019-2024
+        val mockQ = when(yearStr) {
+            "2024" -> CivicsGrade11QuestionBank.getQuestion(term = 3, paperIdx = 1, qNum = q)
+            "2023" -> CivicsGrade11QuestionBank.getQuestion(term = 2, paperIdx = 1, qNum = q)
+            "2022" -> CivicsGrade11QuestionBank.getQuestion(term = 1, paperIdx = 1, qNum = q)
+            "2021" -> CivicsGrade10QuestionBank.getQuestion(term = 3, paperIdx = 1, qNum = q)
+            "2020" -> CivicsGrade10QuestionBank.getQuestion(term = 2, paperIdx = 1, qNum = q)
+            "2019" -> CivicsGrade10QuestionBank.getQuestion(term = 1, paperIdx = 1, qNum = q)
+            else -> CivicsGrade11QuestionBank.getQuestion(term = 3, paperIdx = 1, qNum = q)
+        }
+
+        val finalTitle = "[$yearStr O/L - Q$q] " + mockQ.questionText.substringAfter(": ")
+
         return PastPaperQuestion(
             id = qNum,
-            questionText = data.text,
-            options = data.options,
-            correctOptionIndex = data.correctIdx,
-            explanationSinhala = data.explanation,
-            topicCategory = data.topic,
+            questionText = finalTitle,
+            options = mockQ.options,
+            correctOptionIndex = mockQ.correctOption,
+            explanationSinhala = mockQ.explanation,
+            topicCategory = mockQ.topicName,
             year = yearStr,
             subject = subjectTitle
         )

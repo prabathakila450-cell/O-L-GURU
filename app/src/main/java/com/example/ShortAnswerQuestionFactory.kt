@@ -71,7 +71,7 @@ object ShortAnswerQuestionFactory {
                     listOf("දෙවන සංරචකය", "ප්‍රධාන කොටස 2", "ව්‍යුහය 2")
                 ),
                 officialMarkingScheme = "• එක් සංරචකයක් සඳහා (ලකුණු 1)\n• අනෙක් සංරචකය සඳහා (ලකුණු 1)",
-                sampleIdealAnswer = "1. ප්‍රධාන පළමු සංරචකය\n2. ප්‍රධාන දෙවන සංරචකය"
+                sampleIdealAnswer = "1. වෘෂණ / ශුක්‍රාණු (පිරිමි ප්‍රජනක පද්ධතිය)\n2. ඩිම්බකෝෂ / ඩිම්බ (ස්ත්‍රී ප්‍රජනක පද්ධතිය)"
             ),
             ShortAnswerQuestion(
                 id = baseId + 4, grade = grade, setNumber = setNumber, subject = subject, topic = topic,
@@ -82,7 +82,7 @@ object ShortAnswerQuestionFactory {
                     listOf("පරිවර්තනය වන ශක්තිය", "ප්‍රතිදාන ශක්තිය", "අවසාන ශක්ති ආකාරය")
                 ),
                 officialMarkingScheme = "• ශක්ති ආදානය හඳුනාගැනීමට (ලකුණු 1)\n• ශක්ති පරිවර්තනය නිවැරදිව දැක්වීමට (ලකුණු 1)",
-                sampleIdealAnswer = "ආරම්භක ශක්ති ආකාරය ක්‍රියාවලිය මඟින් ප්‍රයෝජනවත් පරිවර්තිත ශක්ති ආකාරයක් බවට පත්වේ."
+                sampleIdealAnswer = "ආරම්භක ශක්ති ආකාරය (උදා: සූර්යාලෝකය හෝ විද්‍යුත් ශක්තිය) ක්‍රියාවලිය මඟින් ප්‍රයෝජනවත් පරිවර්තිත ශක්ති ආකාරයක් (රසායනික හෝ යාන්ත්‍රික) බවට පත්වේ."
             ),
             ShortAnswerQuestion(
                 id = baseId + 5, grade = grade, setNumber = setNumber, subject = subject, topic = topic,
@@ -93,7 +93,7 @@ object ShortAnswerQuestionFactory {
                     listOf("පාලිත සාධකය 2", "නියතය 2", "නියත පීඩනය")
                 ),
                 officialMarkingScheme = "• එක් පාලිත සාධකයකට (ලකුණු 1)\n• දෙවන පාලිත සාධකයට (ලකුණු 1)",
-                sampleIdealAnswer = "1. පරීක්ෂණයේ නියතව තබා ගන්නා බාහිර සාධකය 1\n2. පරීක්ෂණයේ නියතව තබා ගන්නා සාධකය 2"
+                sampleIdealAnswer = "1. පරීක්ෂණය පුරා නියත උෂ්ණත්වය පවත්වා ගැනීම\n2. රසායනික ද්‍රව්‍යවල නියත සාන්ද්‍රණය හා පරිමාව භාවිතය"
             ),
             ShortAnswerQuestion(
                 id = baseId + 6, grade = grade, setNumber = setNumber, subject = subject, topic = topic,

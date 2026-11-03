@@ -166,11 +166,11 @@ fun QuadraticEquationSolverView() {
   var bText by remember { mutableStateOf("-5") }
   var cText by remember { mutableStateOf("6") }
 
-  val a = aText.toDoubleOrNull() ?: 1.0
-  val b = bText.toDoubleOrNull() ?: 0.0
-  val c = cText.toDoubleOrNull() ?: 0.0
+  val a = aText.toDoubleOrNull()
+  val b = bText.toDoubleOrNull()
+  val c = cText.toDoubleOrNull()
 
-  val discriminant = (b * b) - (4 * a * c)
+  val isValid = a != null && b != null && c != null
 
   LazyColumn(
     modifier = Modifier.fillMaxSize(),
@@ -258,57 +258,91 @@ fun QuadraticEquationSolverView() {
           )
           Spacer(modifier = Modifier.height(8.dp))
 
-          Text(
-            text = "පියවර 1: වර්ගජ සූත්‍රය යෙදීම\n   x = [-b ± √(b² - 4ac)] / 2a",
-            color = Color.White,
-            fontFamily = FontFamily.Monospace,
-            fontSize = 12.sp
-          )
-          Spacer(modifier = Modifier.height(6.dp))
+          if (!isValid) {
+            Text(
+              text = "කරුණාකර නිවැරදි සංඛ්‍යාත්මක අගයන් ඇතුළත් කරන්න.",
+              color = Color(0xFF94A3B8),
+              fontSize = 12.sp,
+              fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+            )
+          } else {
+            val aa = a!!
+            val bb = b!!
+            val cc = c!!
 
-          Text(
-            text = "පියවර 2: විවේචකය (Discriminant Δ) සෙවීම\n   Δ = b² - 4ac\n   Δ = ($b)² - 4($a)($c) = $discriminant",
-            color = Color(0xFFBAE6FD),
-            fontSize = 12.sp,
-            fontFamily = FontFamily.Monospace
-          )
-          Spacer(modifier = Modifier.height(6.dp))
-
-          val natureOfRoots = when {
-            discriminant > 0 -> "විවේචකය Δ > 0 බැවින් මූල දෙකක් ඇත (සැබෑ හා වෙනස් මූල)."
-            discriminant == 0.0 -> "විවේචකය Δ = 0 බැවින් සමපාත මූල දෙකක් (තනි මූලයක්) ඇත."
-            else -> "විවේචකය Δ < 0 බැවින් තාත්වික මූල නොපවතී (සංකීර්ණ මූල)."
-          }
-          Text(
-            text = "පියවර 3: මූලයන්හි ස්වභාවය\n   $natureOfRoots",
-            color = if (discriminant >= 0) Color(0xFF86EFAC) else Color(0xFFFCA5A5),
-            fontSize = 11.5.sp
-          )
-          Spacer(modifier = Modifier.height(8.dp))
-
-          if (discriminant >= 0) {
-            val root1 = (-b + sqrt(discriminant)) / (2 * a)
-            val root2 = (-b - sqrt(discriminant)) / (2 * a)
-            Surface(
-              shape = RoundedCornerShape(8.dp),
-              color = Color(0xFF10B981).copy(alpha = 0.2f),
-              border = BorderStroke(1.dp, Color(0xFF10B981))
-            ) {
-              Column(modifier = Modifier.padding(10.dp)) {
+            if (aa == 0.0) {
+              Text(
+                text = "අවවාදයයි: 'a' අගය 0 විය නොහැක. (එය වර්ගජ සමීකරණයක් නොවේ, සරල රේඛීය සමීකරණයකි).",
+                color = Color(0xFFFCA5A5),
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold
+              )
+              if (bb != 0.0) {
+                Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                  text = "🎯 අවසන් මූලයන් (Roots):",
-                  color = Color(0xFF86EFAC),
-                  fontWeight = FontWeight.Bold,
-                  fontSize = 12.sp
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                  text = "x₁ = ${String.format("%.3f", root1)}\nx₂ = ${String.format("%.3f", root2)}",
+                  text = "රේඛීය විසඳුම: x = -c / b = ${String.format("%.3f", -cc / bb)}",
                   color = Color.White,
-                  fontWeight = FontWeight.ExtraBold,
-                  fontSize = 14.sp,
-                  fontFamily = FontFamily.Monospace
+                  fontFamily = FontFamily.Monospace,
+                  fontSize = 13.sp
                 )
+              }
+            } else {
+              val discriminant = (bb * bb) - (4 * aa * cc)
+
+              Text(
+                text = "පියවර 1: වර්ගජ සූත්‍රය යෙදීම\n   x = [-b ± √(b² - 4ac)] / 2a",
+                color = Color.White,
+                fontFamily = FontFamily.Monospace,
+                fontSize = 12.sp
+              )
+              Spacer(modifier = Modifier.height(6.dp))
+
+              Text(
+                text = "පියවර 2: විවේචකය (Discriminant Δ) සෙවීම\n   Δ = b² - 4ac\n   Δ = ($bb)² - 4($aa)($cc) = $discriminant",
+                color = Color(0xFFBAE6FD),
+                fontSize = 12.sp,
+                fontFamily = FontFamily.Monospace
+              )
+              Spacer(modifier = Modifier.height(6.dp))
+
+              val natureOfRoots = when {
+                discriminant > 0 -> "විවේචකය Δ > 0 බැවින් මූල දෙකක් ඇත (සැබෑ හා වෙනස් මූල)."
+                discriminant == 0.0 -> "විවේචකය Δ = 0 බැවින් සමපාත මූල දෙකක් (තනි මූලයක්) ඇත."
+                else -> "විවේචකය Δ < 0 බැවින් තාත්වික මූල නොපවතී (සංකීර්ණ මූල)."
+              }
+              Text(
+                text = "පියවර 3: මූලයන්හි ස්වභාවය\n   $natureOfRoots",
+                color = if (discriminant >= 0) Color(0xFF86EFAC) else Color(0xFFFCA5A5),
+                fontSize = 11.5.sp
+              )
+              Spacer(modifier = Modifier.height(8.dp))
+
+              if (discriminant >= 0) {
+                val root1 = (-bb + sqrt(discriminant)) / (2 * aa)
+                val root2 = (-bb - sqrt(discriminant)) / (2 * aa)
+                Surface(
+                  shape = RoundedCornerShape(8.dp),
+                  color = Color(0xFF10B981).copy(alpha = 0.2f),
+                  border = BorderStroke(1.dp, Color(0xFF10B981))
+                ) {
+                  Column(modifier = Modifier.padding(10.dp)) {
+                    Text(
+                      text = "🎯 අවසන් මූලයන් (Roots):",
+                      color = Color(0xFF86EFAC),
+                      fontWeight = FontWeight.Bold,
+                      fontSize = 12.sp
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                      text = if (discriminant == 0.0) "x = ${String.format("%.3f", root1)}" 
+                             else "x₁ = ${String.format("%.3f", root1)}\nx₂ = ${String.format("%.3f", root2)}",
+                      color = Color.White,
+                      fontWeight = FontWeight.ExtraBold,
+                      fontSize = 14.sp,
+                      fontFamily = FontFamily.Monospace
+                    )
+                  }
+                }
               }
             }
           }

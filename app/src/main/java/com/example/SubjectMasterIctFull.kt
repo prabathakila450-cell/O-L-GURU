@@ -260,6 +260,6 @@ object SubjectMasterIctFull {
           SubjectFactPoint(20, "කාර්යක්ෂම පරිගණක ඉරියව් (Ergonomics)", "පරිගණකය ඉදිරියේ නිවැරදිව වාඩිවීමේ ඉරියව්වයි: පිටකොන්ද කෙළින් තබාගැනීම, ඇස් මොනිටරයේ ඉහළ මට්ටමට සමපාත වීම, අත් සහ වැලමිට 90° කෝණයක තබාගැනීම සහ සෑම විනාඩි 20 කට වරක් විවේකයක් ගැනීම.", "RSI (Repetitive Strain Injury) සහ ඇස් වෙහෙසීම වළක්වයි.")
         )
       )
-    )
+    ) + SubjectMasterIctPart2.getCategories()
   }
 }

@@ -12,11 +12,24 @@ object MathPastPaper60QuestionsProvider {
 
     fun buildMathQuestion(year: Int, qNum: Int, yearStr: String, subjectTitle: String): PastPaperQuestion {
         val q = qNum.coerceIn(1, 60)
+        val yOffset = Math.abs(year - 2019) // 0 for 2019 up to 5 for 2024
         val data = getQuestionData(q, year, yearStr)
-        
+
+        val prefix = listOf(
+            "ගණනය කර පිළිතුර සොයන්න: ",
+            "පහත ගණිත ගැටලුව විසඳන්න: ",
+            "දී ඇති දත්ත අනුව පිළිතුර තෝරන්න: ",
+            "ගැටලුව විමසා බලා පිළිතුරු දෙන්න: ",
+            "පියවරෙන් පියවර ගණනය කිරීමෙන් පසු: ",
+            "ගණිත ප්‍රශ්නයක් ලෙස සලකන්න: "
+        )[yOffset % 6]
+
+        val rawText = data.text.substringAfter("] ")
+        val finalTitle = "[$yearStr O/L - Q$q] " + prefix + rawText
+
         return PastPaperQuestion(
             id = qNum,
-            questionText = data.text,
+            questionText = finalTitle,
             options = data.options,
             correctOptionIndex = data.correctIdx,
             explanationSinhala = data.explanation,

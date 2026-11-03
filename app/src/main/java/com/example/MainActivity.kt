@@ -206,14 +206,18 @@ const val APPROVAL_VALIDITY_MILLIS = APPROVAL_VALIDITY_DAYS * 24L * 60L * 60L * 
 fun UserAccount.isApprovalExpired(): Boolean {
   if (!isApproved) return false
   if (isAuthorizedAdminUser(usernameOrPhone)) return false
-  val approvedTime = approvalTimestamp ?: return false
+  val approvedTime = approvalTimestamp ?: requestTimestamp ?: try {
+    SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).parse(registerDate)?.time
+  } catch (_: Exception) { null } ?: return false
   return (System.currentTimeMillis() - approvedTime) >= APPROVAL_VALIDITY_MILLIS
 }
 
 fun UserAccount.getRemainingApprovalDays(): Int {
   if (!isApproved) return 0
   if (isAuthorizedAdminUser(usernameOrPhone)) return 180
-  val approvedTime = approvalTimestamp ?: return 180
+  val approvedTime = approvalTimestamp ?: requestTimestamp ?: try {
+    SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).parse(registerDate)?.time
+  } catch (_: Exception) { null } ?: System.currentTimeMillis()
   val elapsed = System.currentTimeMillis() - approvedTime
   val remaining = APPROVAL_VALIDITY_MILLIS - elapsed
   return (remaining / (24L * 60L * 60L * 1000L)).toInt().coerceAtLeast(0)
@@ -8758,19 +8762,21 @@ fun UnlimitedAccessPaymentDialog(
           Spacer(modifier = Modifier.height(14.dp))
 
           // 5. PRIMARY ACTION: AUTOMATICALLY RECORDS IN APP AND LAUNCHES WHATSAPP DIRECTLY TO ADMIN
-          Button(
-            onClick = {
-              if (studentName.isBlank() || studentPhone.isBlank()) {
-                Toast.makeText(context, "කරුණාකර ඔබගේ නම සහ දුරකථන අංකය ඇතුළත් කරන්න", Toast.LENGTH_SHORT).show()
-              } else {
-                // Step A: Automatically register / record in app database immediately!
-                onSubmitReceipt(studentName.trim(), studentPhone.trim(), selectedPackage, selectedSlipUri)
+          Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+          ) {
+            Button(
+              onClick = {
+                if (studentName.isBlank() || studentPhone.isBlank()) {
+                  Toast.makeText(context, "කරුණාකර ඔබගේ නම සහ දුරකථන අංකය ඇතුළත් කරන්න", Toast.LENGTH_SHORT).show()
+                } else {
+                  onSubmitReceipt(studentName.trim(), studentPhone.trim(), selectedPackage, selectedSlipUri)
 
-                // Step B: Format pre-filled WhatsApp message for Admin
-                val nowTimeFormatted = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date())
-                val (devId, devName) = getDeviceIdentifier(context)
-                val slipNote = if (selectedSlipUri != null) "රිසිට්පත තෝරා ඇත (ස්ලිප් පත මෙයට අමුණා ඇත)" else "WhatsApp හරහා රිසිට්පත එවනු ලැබේ"
-                val wpMessage = """
+                  val nowTimeFormatted = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date())
+                  val (devId, devName) = getDeviceIdentifier(context)
+                  val slipNote = if (selectedSlipUri != null) "රිසිට්පත තෝරා ඇත (ස්ලිප් පත මෙයට අමුණා ඇත)" else "WhatsApp හරහා රිසිට්පත එවනු ලැබේ"
+                  val wpMessage = """
 🌟 *O/L Study Portal - ඇඩ්මින් අනුමැති ඉල්ලීම* 🌟
 -----------------------------------------
 👤 *ශිෂ්‍යයාගේ නම:* ${studentName.trim()}
@@ -8785,36 +8791,37 @@ fun UnlimitedAccessPaymentDialog(
 මම ලංකා බැංකුවේ 90313771 ගිණුමට රු. 1,000 තැන්පත් කළ අතර, ඇප් එක තුළද අනුමැති ඉල්ලීම ස්වයංක්‍රීයව සටහන් විය. කරුණාකර මගේ ගිණුම අනුමත කර දෙන්න. ($slipNote)
 """.trimIndent()
 
-                val wpUri = Uri.parse("https://wa.me/94772843861?text=" + Uri.encode(wpMessage))
-                val intent = Intent(Intent.ACTION_VIEW, wpUri)
-                try {
-                  context.startActivity(intent)
-                } catch (_: Exception) {
-                  Toast.makeText(context, "WhatsApp විවෘත කිරීමට නොහැකි විය: 0772843861 අංකයට යොමු කරන්න", Toast.LENGTH_LONG).show()
-                }
+                  val wpUri = Uri.parse("https://wa.me/94772843861?text=" + Uri.encode(wpMessage))
+                  val intent = Intent(Intent.ACTION_VIEW, wpUri)
+                  try {
+                    context.startActivity(intent)
+                  } catch (_: Exception) {
+                    Toast.makeText(context, "WhatsApp විවෘත කිරීමට නොහැකි විය: 0772843861 අංකයට යොමු කරන්න", Toast.LENGTH_LONG).show()
+                  }
 
-                Toast.makeText(
-                  context,
-                  "✅ අනුමැති ඉල්ලීම ඇප් එකේ සටහන් විය! දැන් WhatsApp හරහා ඇඩ්මින්ට යවන්න.",
-                  Toast.LENGTH_LONG
-                ).show()
-                onDismiss()
-              }
-            },
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF25D366)),
-            shape = RoundedCornerShape(12.dp),
-            modifier = Modifier
-              .fillMaxWidth()
-              .height(50.dp)
-          ) {
-            Icon(Icons.Default.Chat, contentDescription = "WhatsApp", tint = Color.White, modifier = Modifier.size(20.dp))
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-              text = "ඇඩ්මින් අනුමැතිය ඉල්ලුම් කර WhatsApp හරහා යවන්න",
-              fontWeight = FontWeight.Bold,
-              fontSize = 11.5.sp,
-              color = Color.White
-            )
+                  Toast.makeText(
+                    context,
+                    "✅ අනුමැති ඉල්ලීම ඇප් එකේ සටහන් විය! දැන් WhatsApp හරහා ඇඩ්මින්ට යවන්න.",
+                    Toast.LENGTH_LONG
+                  ).show()
+                  onDismiss()
+                }
+              },
+              colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF25D366)),
+              shape = RoundedCornerShape(12.dp),
+              modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp)
+            ) {
+              Icon(Icons.Default.Chat, contentDescription = "WhatsApp", tint = Color.White, modifier = Modifier.size(20.dp))
+              Spacer(modifier = Modifier.width(8.dp))
+              Text(
+                text = "📲 WhatsApp (077 284 3861) හරහා යවන්න",
+                fontWeight = FontWeight.Bold,
+                fontSize = 12.sp,
+                color = Color.White
+              )
+            }
           }
 
           Spacer(modifier = Modifier.height(8.dp))

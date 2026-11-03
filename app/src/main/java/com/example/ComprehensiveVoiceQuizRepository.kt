@@ -547,11 +547,12 @@ object ComprehensiveVoiceQuizRepository {
     setNum: Int,
     theme: String
   ): List<VoiceQuestionItem> {
+    val seenTexts = mutableSetOf<String>()
     return (1..20).map { qIndex ->
       val globalIndex = (setNum - 1) * 20 + qIndex
       val id = "vq_${grade}_${subject.hashCode()}_${setNum}_$qIndex"
 
-      val (qSin, qEng, keywords, modelAns, hint) = createQuestionData(
+      var data = createQuestionData(
         grade = grade,
         subject = subject,
         setNum = setNum,
@@ -560,6 +561,11 @@ object ComprehensiveVoiceQuizRepository {
         theme = theme
       )
 
+      if (data.first in seenTexts) {
+        data = generateUniqueTopicQuestion(theme, subject, setNum, qIndex)
+      }
+      seenTexts.add(data.first)
+
       VoiceQuestionItem(
         id = id,
         grade = grade,
@@ -567,13 +573,47 @@ object ComprehensiveVoiceQuizRepository {
         setNumber = setNum,
         questionIndexInSet = qIndex,
         globalIndex = globalIndex,
-        questionSinhala = qSin,
-        questionEnglishPhonetic = qEng,
-        expectedKeywords = keywords,
-        modelAnswer = modelAns,
-        hint = hint,
+        questionSinhala = data.first,
+        questionEnglishPhonetic = data.second,
+        expectedKeywords = data.third,
+        modelAnswer = data.fourth,
+        hint = data.fifth,
         unitCategory = theme
       )
+    }
+  }
+
+  private fun generateUniqueTopicQuestion(
+    cleanTheme: String,
+    subject: String,
+    setNum: Int,
+    qIndex: Int
+  ): Quintuple<String, String, List<String>, String, String> {
+    val topic = cleanTheme.replace(Regex("^[0-9]+\\.\\s*"), "").trim()
+    val keyword = topic.split(" ").firstOrNull { it.length > 2 } ?: subject
+    val kw = listOf(keyword, "මූලික", "සංකල්පය")
+
+    return when (qIndex) {
+      1 -> Quintuple("$topic ඒකකයේ මූලික සංකල්පය කුමක්ද?", "Basic concept of $topic?", kw, "$topic ආශ්‍රිත ප්‍රධාන විෂය කරුණ වේ.", "පාඩමේ මූලික අර්ථ දැක්වීමයි.")
+      2 -> Quintuple("$topic හි ප්‍රධාන කොටස්/වර්ගීකරණය නම් කරන්න.", "Main parts or classification of $topic?", kw, "$topic හි ප්‍රධාන වර්ගීකරණයයි.", "ප්‍රධාන කොටස් සිහිපත් කරන්න.")
+      3 -> Quintuple("$topic සඳහා විෂය නිර්දේශයේ ඇති ප්‍රධාන උදාහරණය කුමක්ද?", "Key curriculum example for $topic?", kw, "$topic හි ප්‍රධාන උදාහරණය වේ.", "පෙළපොතේ උදාහරණයයි.")
+      4 -> Quintuple("$topic එදිනෙදා ජීවිතයට උපයෝගී වන ආකාරයක් පවසන්න.", "Everyday application of $topic?", kw, "එදිනෙදා භාවිතයේදී යොදාගන්නා ආකාරයයි.", "ජීවිතයට ඇති සම්බන්ධයයි.")
+      5 -> Quintuple("$topic හි අඩංගු ප්‍රධාන ලක්ෂණය කුමක්ද?", "Main characteristic of $topic?", kw, "$topic හි ප්‍රධාන කැපී පෙනෙන ලක්ෂණයයි.", "ප්‍රධාන ලක්ෂණයයි.")
+      6 -> Quintuple("$topic ක්‍රියාවලිය සාර්ථකව පවත්වා ගැනීමට අවශ්‍ය ප්‍රධාන සාධකය කුමක්ද?", "Key factor needed for $topic?", kw, "ඊට අවශ්‍ය ප්‍රධාන පාරිසරික හෝ භෞතික සාධකයයි.", "අවශ්‍ය සාධකයයි.")
+      7 -> Quintuple("$topic හා සම්බන්ධ ප්‍රධාන මිනුම් ඒකකය කුමක්ද?", "Standard unit or measurement for $topic?", kw, "$topic ආශ්‍රිත සම්මත ඒකකයයි.", "මිනුම් ඒකකයයි.")
+      8 -> Quintuple("$topic හි ප්‍රධාන කාර්යභාරය කුමක්ද?", "Primary role or function of $topic?", kw, "පද්ධතිය තුළ ඉටුකරන ප්‍රධාන කාර්යයයි.", "ප්‍රධාන කාර්යයයි.")
+      9 -> Quintuple("$topic වෙනස් වීමට බලපාන ප්‍රධාන හේතුව කුමක්ද?", "Primary cause for change in $topic?", kw, "ඊට බලපාන පාරිසරික හෝ රසායනික හේතුවයි.", "හේතුව සිහිපත් කරන්න.")
+      10 -> Quintuple("$topic හි ප්‍රධාන වාසිය හෝ වැදගත්කම කුමක්ද?", "Main advantage or importance of $topic?", kw, "සමාජයට හෝ ජීවීන්ට ඇති වැදගත්කමයි.", "වැදගත්කමයි.")
+      11 -> Quintuple("$topic පරීක්ෂණාත්මකව නිරීක්ෂණය කරන ආකාරය කුමක්ද?", "How to experimentally observe $topic?", kw, "විද්‍යාගාර පරීක්ෂණයේ නිරීක්ෂණයයි.", "පරීක්ෂණාත්මක නිරීක්ෂණයයි.")
+      12 -> Quintuple("$topic හි ප්‍රධාන නීතිය හෝ තියරිය කුමක්ද?", "Key law or principle of $topic?", kw, "විෂය නිර්දේශයේ අඩංගු නියමයයි.", "නියමය හෝ ප්‍රමේයයයි.")
+      13 -> Quintuple("$topic හි මූලික ඒකකය හඳුන්වන නම කුමක්ද?", "Basic unit name of $topic?", kw, "එහි කුඩාම හෝ මූලික කොටසයි.", "මූලික ඒකකයයි.")
+      14 -> Quintuple("$topic අඩාල වූ විට සිදුවන ප්‍රධාන බලපෑම කුමක්ද?", "Main impact if $topic is disrupted?", kw, "පද්ධතියට සිදුවන අහිතකර වෙනසයි.", "බලපෑම සලකන්න.")
+      15 -> Quintuple("$topic නිරූපණය කිරීමට භාවිත කරන සටහන් ක්‍රමය කුමක්ද?", "Diagram or notation used for $topic?", kw, "පාඩමේ ඇති රූප සටහන හෝ ප්‍රස්ථාරයයි.", "සටහන් ක්‍රමයයි.")
+      16 -> Quintuple("$topic ආරක්ෂා කර ගැනීමට හෝ දියුණු කිරීමට ගන්නා පියවර කුමක්ද?", "Step to protect or improve $topic?", kw, "ඊට අදාළ සංරක්ෂණ හෝ සංවර්ධන පියවරයි.", "සංරක්ෂණ පියවරයි.")
+      17 -> Quintuple("$topic පිළිබඳ ශ්‍රී ලංකා විෂය නිර්දේශයේ අවධාරණය කරන කරුණ කුමක්ද?", "Focus area in Sri Lankan syllabus for $topic?", kw, "විභාගයට අසන ප්‍රධාන සිද්ධාන්තයයි.", "විභාග ඉලක්කයයි.")
+      18 -> Quintuple("$topic හි ප්‍රධාන අවාසිය හෝ සීමාව කුමක්ද?", "Main limitation of $topic?", kw, "එහි ඇති සීමාකාරී සාධකයයි.", "සීමාව සලකන්න.")
+      19 -> Quintuple("$topic මැනීමට භාවිත කරන ප්‍රධාන උපකරණය කුමක්ද?", "Main tool or instrument to measure $topic?", kw, "විද්‍යාගාර හෝ ක්ෂේත්‍ර උපකරණයයි.", "උපකරණයේ නමයි.")
+      else -> Quintuple("$topic ඒකකයේ විශේෂිත අවධානය යොමු කළ යුතු ප්‍රශ්නය කුමක්ද?", "Special focus question for $topic?", kw, "ඒකකයේ $qIndex වන විශේෂ ප්‍රශ්නයයි.", "පාඩමේ අවසන් කරුණයි.")
     }
   }
 

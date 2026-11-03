@@ -1382,7 +1382,7 @@ private fun AdminSettingsSection(
         }
         Spacer(modifier = Modifier.height(8.dp))
         Text("• ප්‍රධාන ඇඩ්මින්: අකිල ප්‍රභාත් දිසානායක", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFF0F172A))
-        Text("• බලයලත් දුරකථන අංකය: 0772843861 / 0717136085", fontSize = 11.sp, color = Color(0xFF334155))
+        Text("• බලයලත් දුරකථන අංකය: 0772843861", fontSize = 11.sp, color = Color(0xFF334155))
         Text("• බලයලත් Email: prabathakila450@gmail.com", fontSize = 11.sp, color = Color(0xFF334155))
         Text("• වත්මන් ඇඩ්මින් මුරපදය: $currentPassword", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1D4ED8))
 

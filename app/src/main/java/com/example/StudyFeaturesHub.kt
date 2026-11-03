@@ -2395,7 +2395,7 @@ val formulaSubjectsList = listOf(
     accentColor = Color(0xFF2563EB),
     secondaryColor = Color(0xFFEFF6FF),
     borderColor = Color(0xFFBFDBFE),
-    tagText = "සූත්‍ර 24+"
+    tagText = "සූත්‍ර 35+"
   ),
   FormulaSubjectInfo(
     code = "SCIENCE",
@@ -2406,7 +2406,7 @@ val formulaSubjectsList = listOf(
     accentColor = Color(0xFF059669),
     secondaryColor = Color(0xFFECFDF5),
     borderColor = Color(0xFFA7F3D0),
-    tagText = "නියම 24+"
+    tagText = "නියම 35+"
   ),
   FormulaSubjectInfo(
     code = "TIMELINE",
@@ -2417,7 +2417,7 @@ val formulaSubjectsList = listOf(
     accentColor = Color(0xFFD97706),
     secondaryColor = Color(0xFFFFFBEB),
     borderColor = Color(0xFFFDE68A),
-    tagText = "සිදුවීම් 27+"
+    tagText = "සිදුවීම් 35+"
   ),
   FormulaSubjectInfo(
     code = "COMMERCE",
@@ -2428,7 +2428,7 @@ val formulaSubjectsList = listOf(
     accentColor = Color(0xFF7C3AED),
     secondaryColor = Color(0xFFFAF5FF),
     borderColor = Color(0xFFE9D5FF),
-    tagText = "සමීකරණ 8+"
+    tagText = "සමීකරණ 18+"
   ),
   FormulaSubjectInfo(
     code = "ICT",
@@ -2439,7 +2439,7 @@ val formulaSubjectsList = listOf(
     accentColor = Color(0xFF0284C7),
     secondaryColor = Color(0xFFF0F9FF),
     borderColor = Color(0xFFBAE6FD),
-    tagText = "නීති 10+"
+    tagText = "නීති 18+"
   ),
   FormulaSubjectInfo(
     code = "GEOGRAPHY",
@@ -2450,7 +2450,7 @@ val formulaSubjectsList = listOf(
     accentColor = Color(0xFF0D9488),
     secondaryColor = Color(0xFFF0FDFA),
     borderColor = Color(0xFF99F6E4),
-    tagText = "මූලධර්ම 8+"
+    tagText = "මූලධර්ම 15+"
   ),
   FormulaSubjectInfo(
     code = "CIVICS",
@@ -2461,7 +2461,7 @@ val formulaSubjectsList = listOf(
     accentColor = Color(0xFFE11D48),
     secondaryColor = Color(0xFFFFF1F2),
     borderColor = Color(0xFFFECDD3),
-    tagText = "ව්‍යවස්ථා 6+"
+    tagText = "ව්‍යවස්ථා 15+"
   ),
   FormulaSubjectInfo(
     code = "BUDDHISM",
@@ -2472,7 +2472,7 @@ val formulaSubjectsList = listOf(
     accentColor = Color(0xFFEA580C),
     secondaryColor = Color(0xFFFFF7ED),
     borderColor = Color(0xFFFFEDD5),
-    tagText = "සංකල්ප 6+"
+    tagText = "සංකල්ප 15+"
   ),
   FormulaSubjectInfo(
     code = "ENGLISH",
@@ -2483,7 +2483,7 @@ val formulaSubjectsList = listOf(
     accentColor = Color(0xFF4F46E5),
     secondaryColor = Color(0xFFEEF2FF),
     borderColor = Color(0xFFC7D2FE),
-    tagText = "Structures 6+"
+    tagText = "Structures 15+"
   ),
   FormulaSubjectInfo(
     code = "SINHALA",
@@ -2494,7 +2494,7 @@ val formulaSubjectsList = listOf(
     accentColor = Color(0xFFDC2626),
     secondaryColor = Color(0xFFFEF2F2),
     borderColor = Color(0xFFFECACA),
-    tagText = "රීති 6+"
+    tagText = "රීති 15+"
   ),
   FormulaSubjectInfo(
     code = "HEALTH",
@@ -2505,7 +2505,7 @@ val formulaSubjectsList = listOf(
     accentColor = Color(0xFF16A34A),
     secondaryColor = Color(0xFFF0FDF4),
     borderColor = Color(0xFFBBF7D0),
-    tagText = "සූත්‍ර 5+"
+    tagText = "සූත්‍ර 12+"
   )
 )
 
@@ -2848,22 +2848,29 @@ fun FormulaAndTimelineHubScreen(
         // Title Row for subjects
         item(key = "subject_section_label") {
           Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 2.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 4.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
           ) {
             Text(
-              text = "📂 විෂය තෝරන්න (Select Subject to View Formulas):",
+              text = "📂 විෂය තෝරන්න (Select Subject):",
               fontSize = 12.sp,
               fontWeight = FontWeight.Bold,
-              color = Color(0xFF1E293B)
+              color = Color(0xFF1E293B),
+              modifier = Modifier.weight(1f)
             )
-            Text(
-              text = "100% O/L සිලබස්",
-              fontSize = 10.sp,
-              fontWeight = FontWeight.Bold,
-              color = Color(0xFF10B981)
-            )
+            Surface(
+              shape = RoundedCornerShape(4.dp),
+              color = Color(0xFFD1FAE5)
+            ) {
+              Text(
+                text = "100% O/L සිලබස්",
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF047857),
+                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+              )
+            }
           }
         }
 

@@ -24,6 +24,10 @@ object TimedPastPaperYearProvider {
       subject.contains("වාණිජ") || subject.contains("ගිණුම්") -> "commerce"
       subject.contains("පුරවැසි") -> "civics"
       subject.contains("සෞඛ්‍ය") -> "health"
+      subject.contains("කෘෂි") -> "agriculture"
+      subject.contains("චිත්‍ර") -> "art"
+      subject.contains("සංගීත") -> "music"
+      subject.contains("නර්තන") -> "dancing"
       else -> "science"
     }
 
@@ -56,6 +60,10 @@ object TimedPastPaperYearProvider {
       "civics" -> buildCivicsPastQuestion(year, qNum, seed, yearStr, subjectTitle)
       "geography" -> buildGeographyPastQuestion(year, qNum, seed, yearStr, subjectTitle)
       "health" -> buildHealthPastQuestion(year, qNum, seed, yearStr, subjectTitle)
+      "agriculture" -> buildAgriculturePastQuestion(year, qNum, seed, yearStr, subjectTitle)
+      "art" -> buildArtPastQuestion(year, qNum, seed, yearStr, subjectTitle)
+      "music" -> buildMusicPastQuestion(year, qNum, seed, yearStr, subjectTitle)
+      "dancing" -> buildDancingPastQuestion(year, qNum, seed, yearStr, subjectTitle)
       else -> buildSciencePastQuestion(year, qNum, seed, yearStr, subjectTitle)
     }
   }
@@ -114,6 +122,22 @@ object TimedPastPaperYearProvider {
 
   private fun buildHealthPastQuestion(year: Int, qNum: Int, seed: Int, yearStr: String, subjectTitle: String): PastPaperQuestion {
     return HealthPastPaper60QuestionsProvider.buildHealthQuestion(year, qNum, yearStr, subjectTitle)
+  }
+
+  private fun buildAgriculturePastQuestion(year: Int, qNum: Int, seed: Int, yearStr: String, subjectTitle: String): PastPaperQuestion {
+    return AgriculturePastPaper60QuestionsProvider.buildAgricultureQuestion(year, qNum, yearStr, subjectTitle)
+  }
+
+  private fun buildArtPastQuestion(year: Int, qNum: Int, seed: Int, yearStr: String, subjectTitle: String): PastPaperQuestion {
+    return ArtPastPaper60QuestionsProvider.buildArtQuestion(year, qNum, yearStr, subjectTitle)
+  }
+
+  private fun buildMusicPastQuestion(year: Int, qNum: Int, seed: Int, yearStr: String, subjectTitle: String): PastPaperQuestion {
+    return MusicPastPaper60QuestionsProvider.buildMusicQuestion(year, qNum, yearStr, subjectTitle)
+  }
+
+  private fun buildDancingPastQuestion(year: Int, qNum: Int, seed: Int, yearStr: String, subjectTitle: String): PastPaperQuestion {
+    return DancingPastPaper60QuestionsProvider.buildDancingQuestion(year, qNum, yearStr, subjectTitle)
   }
 
   private data class Quad(

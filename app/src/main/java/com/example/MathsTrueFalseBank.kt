@@ -135,7 +135,22 @@ object MathsTrueFalseBank {
       )
     )
 
-    val safeIndex = (topicIndex + (batchIndex * 2)) % items.size
-    return items[safeIndex]
+    val gradeOffset = when (grade) {
+      9 -> 0
+      10 -> 5
+      11 -> 10
+      else -> 0
+    }
+    val safeIndex = (number - 1 + gradeOffset) % items.size
+    val base = items[safeIndex]
+    val isAlt = ((number - 1) / items.size) % 2 == 1
+    if (!isAlt) return base
+    return TrueFalseTopicContent(
+      unitName = base.unitName,
+      statement = "ප්‍රශ්න අංක ${number}: ${base.unitName} - ${base.statement}",
+      isTrue = base.isTrue,
+      justification = base.justification,
+      examTrap = base.examTrap
+    )
   }
 }

@@ -49,8 +49,23 @@ object HistoryBuddhismTrueFalseBank {
         examTrap = "1818 සහ 1848 නිදහස් අරගල දෙකේ නායකයන් පටලවා නොගන්න."
       )
     )
-    val safeIndex = (topicIndex + (batchIndex * 2)) % items.size
-    return items[safeIndex]
+    val gradeOffset = when (grade) {
+      9 -> 0
+      10 -> 2
+      11 -> 4
+      else -> 0
+    }
+    val safeIndex = (number - 1 + gradeOffset) % items.size
+    val base = items[safeIndex]
+    val isAlt = ((number - 1) / items.size) % 2 == 1
+    if (!isAlt) return base
+    return TrueFalseTopicContent(
+      unitName = base.unitName,
+      statement = "ප්‍රශ්න අංක ${number}: ${base.unitName} - ${base.statement}",
+      isTrue = base.isTrue,
+      justification = base.justification,
+      examTrap = base.examTrap
+    )
   }
 
   fun getBuddhismQuestion(grade: Int, number: Int, batchIndex: Int, topicIndex: Int): TrueFalseTopicContent {
@@ -101,7 +116,22 @@ object HistoryBuddhismTrueFalseBank {
         examTrap = "මිහිඳු හිමියන් රජුගේ බුද්ධිය පරීක්ෂා කළේ අඹ ගස සහ ඥාතීන් මුල් කරගෙනය."
       )
     )
-    val safeIndex = (topicIndex + (batchIndex * 2)) % items.size
-    return items[safeIndex]
+    val bGradeOffset = when (grade) {
+      9 -> 0
+      10 -> 2
+      11 -> 4
+      else -> 0
+    }
+    val safeIndex = (number - 1 + bGradeOffset) % items.size
+    val base = items[safeIndex]
+    val isAlt = ((number - 1) / items.size) % 2 == 1
+    if (!isAlt) return base
+    return TrueFalseTopicContent(
+      unitName = base.unitName,
+      statement = "ප්‍රශ්න අංක ${number}: ${base.unitName} - ${base.statement}",
+      isTrue = base.isTrue,
+      justification = base.justification,
+      examTrap = base.examTrap
+    )
   }
 }

@@ -1265,34 +1265,33 @@ fun DailyMixedChallengeSection(
 
   var activeSubjectName by remember { mutableStateOf<String?>(null) }
   var subjectSearchQuery by remember { mutableStateOf("") }
+  var selectedSetNumber by remember(activeSubjectName) { mutableIntStateOf(1) }
 
   // BackHandler to return to selection grid
   BackHandler(enabled = activeSubjectName != null) {
     activeSubjectName = null
   }
 
-  val filteredPool = remember(activeSubjectName) {
-    if (activeSubjectName == null || activeSubjectName == "සියලුම විෂයයන්") {
-      DailyMixed50QuestionsBank.pool50
-    } else {
-      DailyMixed50QuestionsBank.pool50.filter { it.subject.contains(activeSubjectName!!) || activeSubjectName!!.contains(it.subject) }
-    }
+  val setsForSubject = remember(activeSubjectName) {
+    if (activeSubjectName != null) {
+      DailyChallengeMasterRepository.getSetsForSubject(activeSubjectName!!)
+    } else emptyList()
   }
 
-  var selectedDaySet by remember(activeSubjectName) { mutableIntStateOf(1) } // 1..5
-  val questions = remember(activeSubjectName, selectedDaySet, filteredPool) {
-    if (filteredPool.isEmpty()) {
-      DailyMixed50QuestionsBank.pool50.take(10)
-    } else {
-      val startIndex = ((selectedDaySet - 1) * 10).coerceIn(0, (filteredPool.size - 1).coerceAtLeast(0))
-      filteredPool.subList(startIndex, (startIndex + 10).coerceAtMost(filteredPool.size))
-    }
+  val currentSetInfo = setsForSubject.find { it.setNumber == selectedSetNumber } 
+    ?: setsForSubject.firstOrNull() 
+    ?: QuestionSetInfo(1, "O/L", "කාණ්ඩය 01", activeSubjectName ?: "", "🎯")
+
+  val questions = remember(activeSubjectName, selectedSetNumber) {
+    if (activeSubjectName != null) {
+      DailyChallengeMasterRepository.getQuestionsForSet(activeSubjectName!!, selectedSetNumber)
+    } else emptyList()
   }
 
-  var currentQIndex by remember(activeSubjectName, selectedDaySet) { mutableIntStateOf(0) }
-  var selectedOption by remember(activeSubjectName, selectedDaySet, currentQIndex) { mutableStateOf<Int?>(null) }
-  var userAnswers by remember(activeSubjectName, selectedDaySet) { mutableStateOf<Map<Int, Int>>(emptyMap()) }
-  var isSubmitted by remember(activeSubjectName, selectedDaySet) { mutableStateOf(false) }
+  var currentQIndex by remember(activeSubjectName, selectedSetNumber) { mutableIntStateOf(0) }
+  var selectedOption by remember(activeSubjectName, selectedSetNumber, currentQIndex) { mutableStateOf<Int?>(null) }
+  var userAnswers by remember(activeSubjectName, selectedSetNumber) { mutableStateOf<Map<Int, Int>>(emptyMap()) }
+  var isSubmitted by remember(activeSubjectName, selectedSetNumber) { mutableStateOf(false) }
   var streak by remember { mutableIntStateOf(prefs.getInt("streak_days", 3)) }
   var highScore by remember { mutableIntStateOf(prefs.getInt("high_score", 8)) }
 
@@ -1375,9 +1374,14 @@ fun DailyMixedChallengeSection(
       item {
         // Special "Mixed All" Card
         QaSubjectMiniCard(
-          category = ShortAnswerSubjectInfo("සියලුම විෂයයන්", "Mixed Subjects", "🎯", Color(0xFF10B981), "දිනපතා 10", "ප්‍රශ්න 50 • කාණ්ඩ 5", "සියලුම විෂයයන්ගෙන් සැකසූ මිශ්‍ර ප්‍රශ්න"),
+          category = ShortAnswerSubjectInfo("සියලුම විෂයයන්", "Mixed Subjects", "🎯", Color(0xFF10B981), "කාණ්ඩ 20", "ප්‍රශ්න 200 • කාණ්ඩ 20", "සියලුම විෂයයන්ගෙන් සැකසූ මිශ්‍ර ප්‍රශ්න"),
           onClick = { 
             activeSubjectName = "සියලුම විෂයයන්"
+            selectedSetNumber = 1
+            currentQIndex = 0
+            userAnswers = emptyMap()
+            selectedOption = null
+            isSubmitted = false
             onFullScreenToggle(true)
           }
         )
@@ -1401,6 +1405,11 @@ fun DailyMixedChallengeSection(
                 category = subjInfo,
                 onClick = {
                   activeSubjectName = subjInfo.subjectName
+                  selectedSetNumber = 1
+                  currentQIndex = 0
+                  userAnswers = emptyMap()
+                  selectedOption = null
+                  isSubmitted = false
                   onFullScreenToggle(true)
                 }
               )
@@ -1421,7 +1430,7 @@ fun DailyMixedChallengeSection(
       verticalArrangement = Arrangement.spacedBy(12.dp),
       contentPadding = PaddingValues(top = 4.dp, bottom = 100.dp)
     ) {
-      // Horizontal Subject Selector
+      // 1. Horizontal Subject Selector
       item {
         Column {
           Row(
@@ -1443,7 +1452,14 @@ fun DailyMixedChallengeSection(
             item {
               val isSel = activeSubjectName == "සියලුම විෂයයන්"
               Surface(
-                onClick = { activeSubjectName = "සියලුම විෂයයන්" },
+                onClick = { 
+                  activeSubjectName = "සියලුම විෂයයන්"
+                  selectedSetNumber = 1
+                  currentQIndex = 0
+                  userAnswers = emptyMap()
+                  selectedOption = null
+                  isSubmitted = false
+                },
                 shape = RoundedCornerShape(10.dp),
                 color = if (isSel) Color(0xFF10B981) else Color(0xFF0F172A),
                 border = BorderStroke(1.dp, if (isSel) Color(0xFF10B981) else Color(0xFF334155))
@@ -1460,7 +1476,14 @@ fun DailyMixedChallengeSection(
             items(shortAnswerSubjectsList) { subjInfo ->
               val isSel = activeSubjectName == subjInfo.subjectName
               Surface(
-                onClick = { activeSubjectName = subjInfo.subjectName },
+                onClick = { 
+                  activeSubjectName = subjInfo.subjectName
+                  selectedSetNumber = 1
+                  currentQIndex = 0
+                  userAnswers = emptyMap()
+                  selectedOption = null
+                  isSubmitted = false
+                },
                 shape = RoundedCornerShape(10.dp),
                 color = if (isSel) subjInfo.color else Color(0xFF0F172A),
                 border = BorderStroke(1.dp, if (isSel) subjInfo.color else Color(0xFF334155))
@@ -1472,6 +1495,81 @@ fun DailyMixedChallengeSection(
                   color = if (isSel) Color.Black else Color.White,
                   modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp)
                 )
+              }
+            }
+          }
+        }
+      }
+
+      // 2. Category / Set Selector Card (20 Categories)
+      item {
+        Card(
+          shape = RoundedCornerShape(16.dp),
+          colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
+          border = BorderStroke(1.dp, Color(0xFF334155))
+        ) {
+          Column(modifier = Modifier.padding(14.dp)) {
+            Row(
+              modifier = Modifier.fillMaxWidth(),
+              horizontalArrangement = Arrangement.SpaceBetween,
+              verticalAlignment = Alignment.CenterVertically
+            ) {
+              Text(
+                text = "${activeSubjectName} ප්‍රශ්න කාණ්ඩය (කාණ්ඩ 20):",
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+              )
+              Surface(
+                shape = RoundedCornerShape(6.dp),
+                color = Color(0xFF10B981).copy(alpha = 0.2f)
+              ) {
+                Text(
+                  text = "කාණ්ඩය ${String.format("%02d", selectedSetNumber)} / 20",
+                  fontSize = 10.5.sp,
+                  fontWeight = FontWeight.Bold,
+                  color = Color(0xFF34D399),
+                  modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp)
+                )
+              }
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // Horizontally Scrollable 20 Categories Row
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+              items(setsForSubject) { setInfo ->
+                val isSetSel = setInfo.setNumber == selectedSetNumber
+                Surface(
+                  onClick = {
+                    selectedSetNumber = setInfo.setNumber
+                    currentQIndex = 0
+                    userAnswers = emptyMap()
+                    selectedOption = null
+                    isSubmitted = false
+                  },
+                  shape = RoundedCornerShape(10.dp),
+                  color = if (isSetSel) Color(0xFF047857) else Color(0xFF0F172A),
+                  border = BorderStroke(1.2.dp, if (isSetSel) Color(0xFF34D399) else Color(0xFF334155)),
+                  modifier = Modifier.testTag("daily_set_${setInfo.setNumber}")
+                ) {
+                  Row(
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 7.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                  ) {
+                    Text(
+                      text = setInfo.icon,
+                      fontSize = 12.sp
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                      text = setInfo.titleSinhala,
+                      fontSize = 11.sp,
+                      fontWeight = if (isSetSel) FontWeight.Bold else FontWeight.Medium,
+                      color = if (isSetSel) Color.White else Color(0xFFCBD5E1)
+                    )
+                  }
+                }
               }
             }
           }
@@ -1499,13 +1597,15 @@ fun DailyMixedChallengeSection(
               Spacer(modifier = Modifier.width(6.dp))
               Column {
                 Text(
-                  text = "විෂය: ${activeSubjectName ?: "සියලුම විෂයයන්"}",
-                  fontSize = 12.sp,
+                  text = "${activeSubjectName ?: "සියලුම විෂයයන්"} • ${currentSetInfo.titleSinhala}",
+                  fontSize = 11.5.sp,
                   fontWeight = FontWeight.Bold,
-                  color = Color(0xFF34D399)
+                  color = Color(0xFF34D399),
+                  maxLines = 1,
+                  overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                  text = "ඉහළම ලකුණු: $highScore/10",
+                  text = "ඉහළම ලකුණු: $highScore/10 • කාණ්ඩය ${String.format("%02d", selectedSetNumber)}",
                   fontSize = 10.sp,
                   color = Color(0xFF94A3B8)
                 )
@@ -1563,7 +1663,7 @@ fun DailyMixedChallengeSection(
             Spacer(modifier = Modifier.height(10.dp))
             Text(
               text = q.question,
-              fontSize = 14.sp,
+              fontSize = 13.5.sp,
               fontWeight = FontWeight.Bold,
               color = Color.White,
               lineHeight = 20.sp
@@ -1606,7 +1706,7 @@ fun DailyMixedChallengeSection(
                   Spacer(modifier = Modifier.width(10.dp))
                   Text(
                     text = optText,
-                    fontSize = 12.5.sp,
+                    fontSize = 12.sp,
                     color = Color.White
                   )
                 }
@@ -1629,7 +1729,7 @@ fun DailyMixedChallengeSection(
                 currentQIndex++
               } else {
                 isSubmitted = true
-                val correct = questions.count { userAnswers[it.id - 1] == it.correctIndex }
+                val correct = questions.indices.count { idx -> userAnswers[idx] == questions[idx].correctIndex }
                 if (correct > highScore) {
                   highScore = correct
                   prefs.edit().putInt("high_score", correct).apply()
@@ -1656,7 +1756,7 @@ fun DailyMixedChallengeSection(
         }
       }
     } else if (isSubmitted) {
-      val correctCount = questions.count { userAnswers[it.id - 1] == it.correctIndex }
+      val correctCount = questions.indices.count { idx -> userAnswers[idx] == questions[idx].correctIndex }
       val percentage = if (questions.isNotEmpty()) (correctCount * 100) / questions.size else 0
 
       item {
@@ -1672,6 +1772,12 @@ fun DailyMixedChallengeSection(
             horizontalAlignment = Alignment.CenterHorizontally
           ) {
             Text("🎉 අභියෝගය සම්පූර්ණයි!", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+              text = "${activeSubjectName ?: "සියලුම විෂයයන්"} • ${currentSetInfo.titleSinhala}",
+              fontSize = 11.5.sp,
+              color = Color(0xFFA7F3D0)
+            )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
               text = "$correctCount / ${questions.size}",
@@ -1685,18 +1791,41 @@ fun DailyMixedChallengeSection(
               color = Color(0xFFA7F3D0)
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
-            Button(
-              onClick = {
-                isSubmitted = false
-                currentQIndex = 0
-                userAnswers = emptyMap()
-                selectedOption = null
-              },
-              colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981)),
-              shape = RoundedCornerShape(8.dp)
+            Spacer(modifier = Modifier.height(14.dp))
+            Row(
+              modifier = Modifier.fillMaxWidth(),
+              horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-              Text("නැවත කරන්න (Retake)", color = Color.Black, fontWeight = FontWeight.Bold)
+              Button(
+                onClick = {
+                  isSubmitted = false
+                  currentQIndex = 0
+                  userAnswers = emptyMap()
+                  selectedOption = null
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981)),
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.weight(1f)
+              ) {
+                Text("නැවත කරන්න (Retake)", color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 11.sp)
+              }
+
+              if (selectedSetNumber < 20) {
+                Button(
+                  onClick = {
+                    selectedSetNumber++
+                    isSubmitted = false
+                    currentQIndex = 0
+                    userAnswers = emptyMap()
+                    selectedOption = null
+                  },
+                  colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0284C7)),
+                  shape = RoundedCornerShape(8.dp),
+                  modifier = Modifier.weight(1f)
+                ) {
+                  Text("මීළඟ කාණ්ඩය (${String.format("%02d", selectedSetNumber + 1)}) ➔", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 11.sp)
+                }
+              }
             }
           }
         }
@@ -2014,7 +2143,7 @@ fun TrueFalseWithJustificationSection(
   var subjectSearchQuery by remember { mutableStateOf("") }
 
   LaunchedEffect(Unit) {
-    onFullScreenToggle(true)
+    onFullScreenToggle(false)
   }
 
   // BackHandler
@@ -2584,7 +2713,7 @@ fun TrueFalse500Content(
   var userAnswers by remember { mutableStateOf<Map<String, Boolean>>(emptyMap()) }
 
   // Focus Question Mode: When true, screen is 100% full screen with all outer/inner clutter removed
-  var isFocusQuestionMode by remember { mutableStateOf(true) }
+  var isFocusQuestionMode by remember { mutableStateOf(false) }
   var showQuestionSheet by remember { mutableStateOf(false) }
   var showSubjectBatchDialog by remember { mutableStateOf(false) }
 

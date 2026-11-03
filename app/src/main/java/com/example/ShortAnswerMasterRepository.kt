@@ -47,19 +47,45 @@ object ShortAnswerMasterRepository {
         }
     }
 
+    fun cleanSubject(subjectName: String): String {
+        if (subjects.contains(subjectName)) return subjectName
+        val trimmed = subjectName.trim()
+        if (subjects.contains(trimmed)) return trimmed
+        return when {
+            subjectName.contains("භූගෝල") -> "භූගෝල විද්‍යාව"
+            subjectName.contains("කෘෂි") -> "කෘෂි විද්‍යාව"
+            subjectName.contains("විද්‍යා") -> "විද්‍යාව"
+            subjectName.contains("ගණිත") -> "ගණිතය"
+            subjectName.contains("ඉතිහාස") -> "ඉතිහාසය"
+            subjectName.contains("බුද්ධ") -> "බුද්ධ ධර්මය"
+            subjectName.contains("සිංහල") -> "සිංහල"
+            subjectName.contains("English") || subjectName.contains("ඉංග්‍රීසි") -> "English"
+            subjectName.contains("ICT") || subjectName.contains("තොරතුරු") -> "ICT"
+            subjectName.contains("ව්‍යාපාර") || subjectName.contains("ගිණුම්") || subjectName.contains("වාණිජ") -> "ව්‍යාපාර හා ගිණුම්කරණය"
+            subjectName.contains("පුරවැසි") -> "පුරවැසි අධ්‍යාපනය"
+            subjectName.contains("සෞඛ්‍ය") -> "සෞඛ්‍ය හා ශාරීරික අධ්‍යාපනය"
+            subjectName.contains("චිත්‍ර") -> "චිත්‍ර කලාව"
+            subjectName.contains("සංගීත") -> "සංගීතය"
+            subjectName.contains("නර්තන") -> "නර්තනය"
+            else -> subjects.find { it == subjectName } ?: subjectName
+        }
+    }
+
     // Returns exactly 20 distinct syllabus-based sets for the specified subject and grade
     fun getSetsForSubject(grade: String, subjectName: String): List<QuestionSetInfo> {
-        val icon = getSubjectIcon(subjectName)
-        val cleanSubj = subjects.find { subjectName.contains(it) || it.contains(subjectName) } ?: subjectName
-        val topics = getTopicsForSubject(grade, cleanSubj)
+        val cleanSubj = cleanSubject(subjectName)
+        val categories = SubjectMasterRepository.getCategoriesForSubject(cleanSubj)
+        val icon = getSubjectIcon(cleanSubj)
         return (1..20).map { setNum ->
-            val topicTitle = topics.getOrElse(setNum - 1) { "විෂය නිර්දේශ ඒකකය $setNum" }
+            val cat = categories.getOrNull(setNum - 1)
+            val topicTitle = cat?.titleSinhala?.replace(Regex("^කාණ්ඩය \\d+:\\s*"), "") 
+                ?: getTopicsForSubject(grade, cleanSubj).getOrElse(setNum - 1) { "විෂය ඒකකය $setNum" }
             QuestionSetInfo(
                 setNumber = setNum,
                 grade = grade,
                 titleSinhala = "කාණ්ඩය ${String.format("%02d", setNum)}: $topicTitle",
                 subject = cleanSubj,
-                icon = icon
+                icon = cat?.icon ?: icon
             )
         }
     }
@@ -211,24 +237,126 @@ object ShortAnswerMasterRepository {
                 "වසංගත රෝග සහ ගෝලීය සෞඛ්‍ය අනතුරු", "හදිසි අනතුරු නිවාරණය සහ ආරක්ෂාව", "කම්පනය (Shock) සහ සිහිසුන් වීමේ ප්‍රථමාධාර", "විෂවීම් සහ පිළිස්සුම් සඳහා හදිසි සත්කාර",
                 "යෝග අභ්‍යාස සහ භාවනාවේ සෞඛ්‍ය ප්‍රතිලාභ", "මත්ද්‍රව්‍යවලට ඇබ්බැහි වීම සහ පුනරුත්ථාපනය", "ප්‍රජා සෞඛ්‍ය සේවා සහ සෞඛ්‍ය වෛද්‍ය නිලධාරී (MOH)", "යහපත් ජීවන රටාව සහ දීර්ඝායුෂ"
             )
-            else -> (1..20).map { "විෂය නිර්දේශ ඒකකය $it" }
+            subject.contains("කෘෂි") -> listOf(
+                "පාංශු කළමනාකරණය සහ පාංශු සංරක්ෂණය", "බෝග පෝෂණය සහ ශාක පෝෂක", "බීජ සහ රෝපණ ද්‍රව්‍ය නිෂ්පාදනය", "තවාන් කළමනාකරණය සහ පැළ නිෂ්පාදනය",
+                "වාරිමාර්ග සහ ක්ෂේත්‍ර ජල කළමනාකරණය", "බෝග ආරක්ෂණය - වල් පැළෑටි පාලනය", "බෝග ආරක්ෂණය - පළිබෝධ කළමනාකරණය", "බෝග ආරක්ෂණය - ශාක රෝග කළමනාකරණය",
+                "වී වගාව සහ අස්වනු නෙලීම", "වැවිලි බෝග වගාව (තේ, රබර්, පොල්)", "එළවළු සහ පලතුරු බෝග වගාව", "බිම්මල් වගාව සහ නව කෘෂි ව්‍යවසාය",
+                "ආරක්ෂිත ගෘහ තුළ බෝග වගාව", "සත්ව පාලනය - කිරි ගව පාලනය", "සත්ව පාලනය - කුකුළු පාලනය", "පසු අස්වනු තාක්ෂණය සහ ආහාර කල්තබා ගැනීම",
+                "කෘෂිකාර්මික උපකරණ, යන්ත්‍ර සහ නඩත්තුව", "කාබනික ගොවිතැන සහ තිරසාර කෘෂිකර්මය", "කෘෂි ව්‍යාපාර කළමනාකරණය සහ අලෙවිකරණය", "නූතන කෘෂි තාක්ෂණය සහ නිරවද්‍ය කෘෂිකර්මය"
+            )
+            subject.contains("චිත්‍ර") -> listOf(
+                "දෘශ්‍ය කලාවේ මූලධර්ම සහ මූලද්‍රව්‍ය", "වර්ණ න්‍යාය සහ වර්ණ සංයෝජනය", "රේඛා චිත්‍ර, ආලෝකය සහ සෙවණැලි", "මානව රූප ඇඳීම සහ සමානුපාත",
+                "ස්වභාවික සහ පාරිසරික චිත්‍ර ඇඳීම", "නිශ්චල ද්‍රව්‍ය චිත්‍ර ඇඳීම (Still Life)", "මූර්ති කලාව සහ ත්‍රිමාණ නිර්මාණ", "ලක්දිව ප්‍රාග් ඓතිහාසික හා අනුරාධපුර සිතුවම්",
+                "සීගිරි බිතුසිතුවම් සහ තාක්ෂණය", "පොළොන්නරු යුගයේ සිතුවම් සහ ප්‍රතිමා", "මහනුවර සම්ප්‍රදායේ බිතුසිතුවම් කලාව", "දේශීය මුද්‍රා, කැටයම් සහ වාස්තු විද්‍යාව",
+                "දේශීය වෙස් මුහුණු කලාව සහ නිර්මාණ", "ඉන්දියානු චිත්‍ර සහ මූර්ති කලාව (අජන්තා, එල්ලෝරා)", "බටහිර පුනරුද යුගයේ කලාව (ඩා වින්චි, මයිකල්ඇන්ජලෝ)", "බටහිර නූතන කලා ප්‍රවණතා (ඉම්ප්‍රෙෂනිස්ම්, කියුබිස්ම්)",
+                "ශ්‍රී ලංකාවේ නූතන චිත්‍ර කලාව සහ 43 කල්ලිය", "මුද්‍රණ කලාව සහ ග්‍රැෆික් නිර්මාණ", "ඇසුරුම් නිර්මාණකරණය සහ වෙළඳ දැන්වීම් කලාව", "කලා විචාරය සහ සෞන්දර්ය ඇගයීම"
+            )
+            subject.contains("සංගීත") -> listOf(
+                "නාදයේ ලක්ෂණ සහ සංගීත මූලධර්ම", "ස්වර, සප්තකය සහ තානාන්තර", "රාගධාරී සංගීතය - බිලාවල් හා කල්‍යාණ ථාට", "රාගධාරී සංගීතය - කාෆි, ඛමාජ් හා භෛරව ථාට",
+                "උතුරු ඉන්දීය රාග (යමන්, භූපාලි, බිලාවල්, කාෆි, භෛරව්)", "තාල විද්‍යාව සහ ලය (තීන්තාල, ඒක්තාල, ජප්තාල, දාද්‍රා, කහර්වා)", "ශ්‍රී ලාංකේය ජන සංගීතය සහ ගැමි ගීත", "ප්‍රශස්ති, වන්නම් සහ සින්දු සාහිත්‍යය",
+                "නූර්ති සහ නාඩගම් සංගීතය", "සරල ගීතය සහ ගුවන්විදුලි සංගීත යුගය", "සංගීත භාණ්ඩ වර්ගීකරණය (තත, සුෂිර, ඝන, අවනද්ධ)", "තත් භාණ්ඩ (සිතාරය, එස්රාජය, වයලීනය)",
+                "සුෂිර භාණ්ඩ (බටනලාව, ෂහනායි, හාමෝනියම්)", "අවනද්ධ භාණ්ඩ (තබ්ලාව, ගැටබෙරය, යක්බෙරය, දවුල)", "කර්ණාටක සංගීත සම්ප්‍රදාය සහ ත්‍රිමූර්තිය", "බටහිර සංගීත මූලධර්ම සහ ස්ටාෆ් නොටේෂන්",
+                "ප්‍රවීණ දේශීය සංගීතඥයන් සහ මෙහෙවර", "ශ්‍රවණ අභ්‍යාස සහ ස්වර ලිපි ප්‍රස්ථාරකරණය", "නූතන පර්යේෂණාත්මක සහ නාට්‍ය සංගීතය", "විභාග ප්‍රශ්න පත්‍ර සහ ප්‍රායෝගික පරීක්ෂණ මඟපෙන්වීම"
+            )
+            subject.contains("නර්තන") -> listOf(
+                "ත්‍රිවිධ දේශීය නර්තන සම්ප්‍රදාය", "උඩරට නර්තනය සහ වන්නම් 18", "පහතරට නර්තනය, තොවිල් සහ දෙවොල් මඩු", "සබරගමු නර්තනය, මඩු ශාන්තිකර්ම සහ දවුල් වාදනය",
+                "දේශීය බෙර වාදන ශිල්පය සහ අක්ෂර මාලාව", "කොහොඹා කංකාරි ශාන්තිකර්මය සහ යක්තුන", "ගැමි නාට්‍ය සහ කෝලම්, සොකරි, නාඩගම්", "දහඅට සන්නිය සහ සන්නි යකුම",
+                "වෙස් තට්ටුව, ආභරණ සහ නර්තන ඇඳුම් කට්ටල", "අභිනය, රස භාව සහ මුද්‍රා ශාස්ත්‍රය", "තාල, මාත්‍රා, කස්තිරම් සහ අඩව්", "දේශීය නර්තන ඉතිහාසය, ගුරුකුල සහ මහා නර්තන ශිල්පීන්",
+                "භාරතීය සම්භාව්‍ය නර්තන (භරතනාට්‍යම්, කථක්, කථකලි, මණිපුරි)", "බටහිර සහ නූතන නර්තන ශෛලීන් සහ නිර්මාණාත්මක මුද්‍රා නාට්‍ය", "ශ්‍රී දළදා පෙරහැර මංගල්‍යය සහ නර්තන පංගු", "නර්තන අභ්‍යාස, ශාරීරික නම්‍යතාව සහ සෞඛ්‍යය",
+                "නර්තන සංගීතය, ගායනා සහ ප්‍රශස්ති", "දේශීය වෙස් මුහුණු කැටයම් සහ වර්ණ ගැන්වීම", "නූතන වේදිකා නර්තනය සහ ආලෝකකරණය", "විභාග ප්‍රශ්න පත්‍ර සාකච්ඡාව සහ ප්‍රායෝගික පරීක්ෂණ"
+            )
+            else -> {
+                val cleanSubj = subjects.find { subject.contains(it) || it.contains(subject) } ?: subject
+                val cats = SubjectMasterRepository.getCategoriesForSubject(cleanSubj)
+                if (cats.isNotEmpty()) {
+                    cats.map { it.titleSinhala.replace(Regex("^කාණ්ඩය \\d+:\\s*"), "") }
+                } else {
+                    (1..20).map { "විෂය නිර්දේශ ඒකකය $it" }
+                }
+            }
         }
     }
 
     // Returns exactly 10 distinct, syllabus-aligned questions for the specified set
     fun getQuestions(grade: String, subjectName: String, setNumber: Int): List<ShortAnswerQuestion> {
-        val cleanSubj = subjects.find { subjectName.contains(it) || it.contains(subjectName) } ?: subjectName
-        
-        // 1. Check if there are pre-curated questions in existing static sets for this subject & set
+        val cleanSubj = cleanSubject(subjectName)
+        val categories = SubjectMasterRepository.getCategoriesForSubject(cleanSubj)
+        val cat = categories.getOrNull(setNumber - 1)
+
+        val topicName = cat?.titleSinhala?.replace(Regex("^කාණ්ඩය \\d+:\\s*"), "")
+            ?: getTopicsForSubject(grade, cleanSubj).getOrElse(setNumber - 1) { "විෂය ඒකකය $setNumber" }
+
+        // If category has rich authentic points, construct 10 distinct questions directly from points 0..9
+        if (cat != null && cat.points.isNotEmpty()) {
+            val baseId = (grade.toIntOrNull() ?: 10) * 100000 + 
+                         (cleanSubj.hashCode().let { if (it < 0) -it else it } % 1000) * 1000 + 
+                         setNumber * 20
+            val selectedPoints = cat.points.take(10)
+            return selectedPoints.mapIndexed { idx, point ->
+                val qNum = idx + 1
+                val qPrompt = createSpecificQuestion(cleanSubj, topicName, point, qNum)
+
+                val key1 = point.title.replace(Regex("\\(.*\\)"), "").trim()
+                val detailClauses = point.detail.split(",", " සහ ", " හෝ ", ".").map { it.trim() }.filter { it.length in 3..25 }
+                val key2 = detailClauses.firstOrNull() ?: point.examHighlight.take(20)
+
+                val synonymsList = listOf(
+                    listOf(key1, point.title, point.title.replace(" ", "")),
+                    if (detailClauses.isNotEmpty()) detailClauses.take(3) else listOf(key2, "නිවැරදි පිළිතුර", "විෂය මූලපදය")
+                )
+
+                ShortAnswerQuestion(
+                    id = baseId + qNum,
+                    grade = grade,
+                    setNumber = setNumber,
+                    subject = cleanSubj,
+                    topic = topicName,
+                    question = qPrompt,
+                    keyPoints = listOf(key1, key2),
+                    synonyms = synonymsList,
+                    officialMarkingScheme = "• ${point.title} නිවැරදිව හඳුනාගැනීමට හා නම් කිරීමට (ලකුණු 1)\n• ${point.examHighlight} (ලකුණු 1)",
+                    sampleIdealAnswer = "${point.detail}\n(${point.examHighlight})"
+                )
+            }
+        }
+
+        // Fallback to static curated questions if present
         val curated = getCuratedQuestions(grade, cleanSubj, setNumber)
         if (curated.isNotEmpty() && curated.size >= 10) {
             return curated.take(10)
         }
 
-        // 2. Synthesize authentic syllabus questions for this exact unit
-        val topics = getTopicsForSubject(grade, cleanSubj)
-        val topic = topics.getOrElse(setNumber - 1) { "විෂය ඒකකය $setNumber" }
-        return ShortAnswerQuestionFactory.buildQuestionsForUnit(grade, cleanSubj, setNumber, topic)
+        return ShortAnswerQuestionFactory.buildQuestionsForUnit(grade, cleanSubj, setNumber, topicName)
+    }
+
+    private fun createSpecificQuestion(subject: String, topic: String, point: SubjectFactPoint, qNum: Int): String {
+        val title = point.title
+        val prefix = "$topic - ප්‍රශ්න $qNum: "
+        val body = when {
+            title.contains("අර්ථදැක්වීම") || title.contains("යනු කුමක්ද") ->
+                "$title පිළිබඳ පැහැදිලි විග්‍රහයක් ලබාදෙන්න."
+            title.contains(Regex("\\d+")) ->
+                "$title නම් කර, ඒ පිළිබඳ විභාගානුකූල කෙටි සටහනක් ලියන්න."
+            title.contains("නියමය") || title.contains("සමීකරණය") || title.contains("සූත්‍රය") ->
+                "$title ප්‍රකාශ කර, එහි අඩංගු රාශීන් සහ සම්මත ඒකක දක්වන්න."
+            title.contains("වෙනස") || title.contains("සංසන්දනය") ->
+                "$title පැහැදිලි කරමින් ප්‍රධාන වෙනස්කම් 2 ක් පෙන්වා දෙන්න."
+            title.contains("පරීක්ෂාව") || title.contains("පරීක්ෂණය") ->
+                "$title සිදුකරන ආකාරය සහ එහි නිරීක්ෂණය වන ප්‍රතිඵලය ලියන්න."
+            title.contains("ලක්ෂණ") || title.contains("ගුණ") ->
+                "$title අතරින් ප්‍රධාන කරුණු 2 ක් නම් කර විස්තර කරන්න."
+            title.contains("කාර්යය") || title.contains("භූමිකාව") ->
+                "$title විස්තර කරමින්, එමඟින් ඉටුවන ප්‍රධාන සේවාව සඳහන් කරන්න."
+            title.contains("හේතු") || title.contains("බලපෑම") ->
+                "$title කෙරෙහි බලපාන ප්‍රධාන සාධක පෙන්වා දෙන්න."
+            title.contains("ක්‍රමවේදය") || title.contains("ක්‍රමය") ->
+                "$title ක්‍රියාත්මක වන ආකාරය පියවරෙන් පියවර දක්වන්න."
+            qNum % 4 == 1 -> "$title යනු කුමක්ද? එහි මූලික විෂයානුකූල පදනම ලියා දක්වන්න."
+            qNum % 4 == 2 -> "$title පිළිබඳව O/L විභාග මට්ටමේ කෙටි විවරණයක් සපයන්න."
+            qNum % 4 == 3 -> "$title හා අදාළ ප්‍රධාන කරුණු 2 ක් නිදසුන් සහිතව දක්වන්න."
+            else -> "$title හි වැදගත්කම විභාග ලකුණු පටිපාටියට අනුකූලව පැහැදිලි කරන්න."
+        }
+        return prefix + body
     }
 
     private fun getCuratedQuestions(grade: String, subject: String, setNumber: Int): List<ShortAnswerQuestion> {
