@@ -2,6 +2,7 @@ package com.example
 
 import android.widget.Toast
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.foundation.text.selection.DisableSelection
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -119,14 +120,18 @@ fun SinhalaShortNotesPdfReaderDialog(
 
   Dialog(
     onDismissRequest = onDismiss,
-    properties = DialogProperties(usePlatformDefaultWidth = false)
+    properties = DialogProperties(
+      usePlatformDefaultWidth = false,
+      securePolicy = AppSecurityManager.getSecureFlagPolicy()
+    )
   ) {
-    Surface(
-      modifier = Modifier
-        .fillMaxSize()
-        .testTag("sinhala_short_notes_pdf_reader_dialog"),
-      color = readerTheme.backgroundColor
-    ) {
+    DisableSelection {
+      Surface(
+        modifier = Modifier
+          .fillMaxSize()
+          .testTag("sinhala_short_notes_pdf_reader_dialog"),
+        color = readerTheme.backgroundColor
+      ) {
       Column(modifier = Modifier.fillMaxSize()) {
 
         // Top Main Header Bar
@@ -731,10 +736,14 @@ fun SinhalaShortNotesPdfReaderDialog(
       }
     }
   }
+}
 
   // Quick Jump Dialog
   if (showJumpDialog) {
-    Dialog(onDismissRequest = { showJumpDialog = false }) {
+    Dialog(
+      onDismissRequest = { showJumpDialog = false },
+      properties = DialogProperties(securePolicy = AppSecurityManager.getSecureFlagPolicy())
+    ) {
       Surface(
         shape = RoundedCornerShape(16.dp),
         color = Color(0xFF0F172A),

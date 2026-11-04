@@ -84,12 +84,16 @@ fun SanduCommerceTheoryReaderDialog(
 
   Dialog(
     onDismissRequest = onDismiss,
-    properties = DialogProperties(usePlatformDefaultWidth = false)
+    properties = DialogProperties(
+      usePlatformDefaultWidth = false,
+      securePolicy = AppSecurityManager.getSecureFlagPolicy()
+    )
   ) {
-    Surface(
-      modifier = Modifier.fillMaxSize(),
-      color = bgColor
-    ) {
+    androidx.compose.foundation.text.selection.DisableSelection {
+      Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = bgColor
+      ) {
       Column(modifier = Modifier.fillMaxSize()) {
         // Top App Bar
         TopAppBar(
@@ -760,6 +764,7 @@ fun SanduCommerceTheoryReaderDialog(
       }
     }
   }
+}
 
   // Quick Jump Dialog
   if (showJumpDialog) {

@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.selection.DisableSelection
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -113,14 +114,18 @@ fun ScienceDiagramsPdfReaderDialog(
 
   Dialog(
     onDismissRequest = onDismiss,
-    properties = DialogProperties(usePlatformDefaultWidth = false)
+    properties = DialogProperties(
+      usePlatformDefaultWidth = false,
+      securePolicy = AppSecurityManager.getSecureFlagPolicy()
+    )
   ) {
-    Surface(
-      modifier = Modifier
-        .fillMaxSize()
-        .testTag("science_diagrams_pdf_reader_dialog"),
-      color = readerTheme.backgroundColor
-    ) {
+    DisableSelection {
+      Surface(
+        modifier = Modifier
+          .fillMaxSize()
+          .testTag("science_diagrams_pdf_reader_dialog"),
+        color = readerTheme.backgroundColor
+      ) {
       Column(modifier = Modifier.fillMaxSize()) {
 
         // =========================================================================================
@@ -722,6 +727,7 @@ fun ScienceDiagramsPdfReaderDialog(
       }
     }
   }
+}
 
   // Jump to Page Dialog
   if (showJumpDialog) {

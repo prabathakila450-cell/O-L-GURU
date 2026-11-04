@@ -160,6 +160,14 @@ object AppSecurityManager {
     return isAdminSession
   }
 
+  fun getSecureFlagPolicy(): androidx.compose.ui.window.SecureFlagPolicy {
+    return if (isAdminSession || isDeviceEmulator()) {
+      androidx.compose.ui.window.SecureFlagPolicy.SecureOff
+    } else {
+      androidx.compose.ui.window.SecureFlagPolicy.SecureOn
+    }
+  }
+
   /**
    * 100% Anti-VPN and Proxy detection suite.
    * Checks Android NetworkCapabilities for TRANSPORT_VPN and inspects network interfaces.

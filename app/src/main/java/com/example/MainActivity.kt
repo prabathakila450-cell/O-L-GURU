@@ -3329,7 +3329,7 @@ fun StudentPortalApp() {
           onDismissRequest = { showIframePdfModal = false },
           properties = DialogProperties(
             usePlatformDefaultWidth = false,
-            securePolicy = SecureFlagPolicy.SecureOff
+            securePolicy = AppSecurityManager.getSecureFlagPolicy()
           )
         ) {
           Surface(
@@ -9032,7 +9032,7 @@ fun LoginAndApprovalDialog(
 
   Dialog(
     onDismissRequest = onDismiss,
-    properties = DialogProperties(usePlatformDefaultWidth = false, securePolicy = SecureFlagPolicy.SecureOff)
+    properties = DialogProperties(usePlatformDefaultWidth = false, securePolicy = AppSecurityManager.getSecureFlagPolicy())
   ) {
     Box(
       modifier = Modifier

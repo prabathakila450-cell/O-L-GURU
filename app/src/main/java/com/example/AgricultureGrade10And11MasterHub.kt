@@ -127,7 +127,7 @@ fun AgricultureGrade10And11MasterHubDialog(
     onDismissRequest = onDismiss,
     properties = DialogProperties(
       usePlatformDefaultWidth = false,
-      securePolicy = SecureFlagPolicy.Inherit
+      securePolicy = AppSecurityManager.getSecureFlagPolicy()
     )
   ) {
     BackHandler { onDismiss() }

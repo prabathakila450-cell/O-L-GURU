@@ -512,7 +512,7 @@ fun CommerceGrade10And11MasterHubDialog(
     properties = DialogProperties(
       usePlatformDefaultWidth = false,
       decorFitsSystemWindows = false,
-      securePolicy = SecureFlagPolicy.SecureOff
+      securePolicy = AppSecurityManager.getSecureFlagPolicy()
     )
   ) {
     Surface(

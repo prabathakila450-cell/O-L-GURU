@@ -91,12 +91,16 @@ fun SanduTheory100PagesReaderDialog(
 
   Dialog(
     onDismissRequest = onDismiss,
-    properties = DialogProperties(usePlatformDefaultWidth = false)
+    properties = DialogProperties(
+      usePlatformDefaultWidth = false,
+      securePolicy = AppSecurityManager.getSecureFlagPolicy()
+    )
   ) {
-    Surface(
-      modifier = Modifier.fillMaxSize(),
-      color = bgColor
-    ) {
+    androidx.compose.foundation.text.selection.DisableSelection {
+      Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = bgColor
+      ) {
       Column(modifier = Modifier.fillMaxSize()) {
         // Ultra-Compact Top Bar (Hidden in Full Screen Mode)
         AnimatedVisibility(visible = !isFullScreenMode) {
@@ -571,11 +575,13 @@ fun SanduTheory100PagesReaderDialog(
       }
     }
   }
+}
 
   // Quick Jump Dialog
   if (showJumpDialog) {
     AlertDialog(
       onDismissRequest = { showJumpDialog = false },
+      properties = DialogProperties(securePolicy = AppSecurityManager.getSecureFlagPolicy()),
       title = {
         Text("පිටුවකට හෝ ඒකකයකට පනින්න", fontWeight = FontWeight.Bold, fontSize = 15.sp)
       },
