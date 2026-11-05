@@ -191,7 +191,7 @@ object AppSecurityManager {
         while (interfaces.hasMoreElements()) {
           val networkInterface = interfaces.nextElement()
           val name = networkInterface.name?.lowercase() ?: continue
-          if (networkInterface.isUp && (name.contains("tun") || name.contains("ppp") || name.contains("tap") || name.contains("vpn") || name.contains("p2p"))) {
+          if (networkInterface.isUp && (name.contains("tun") || name.contains("ppp") || name.contains("vpn"))) {
             return true
           }
         }
