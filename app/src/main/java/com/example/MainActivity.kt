@@ -8453,7 +8453,7 @@ fun UnlimitedAccessPaymentDialog(
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                  text = "මාස 6ක සාමාජිකත්වය (රු. 1,000)",
+                  text = "මාස 6ක සාමාජිකත්වය",
                   fontSize = 11.sp,
                   fontWeight = FontWeight.Bold,
                   color = Color(0xFFE65100)
@@ -8491,103 +8491,47 @@ fun UnlimitedAccessPaymentDialog(
             modifier = Modifier.fillMaxWidth()
           ) {
             Column(modifier = Modifier.padding(14.dp)) {
-              Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
-              ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                  Icon(
-                    imageVector = Icons.Default.AccountBalance,
-                    contentDescription = "Bank",
-                    tint = BluePrimary,
-                    modifier = Modifier.size(20.dp)
-                  )
-                  Spacer(modifier = Modifier.width(8.dp))
-                  Text(
-                    text = "🏛️ ලංකා බැංකුව (Bank of Ceylon)",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 13.sp,
-                    color = BluePrimary
-                  )
-                }
+              Text(
+                text = "ඔබගේ පැය 24ක නොමිලේ පරිශීලක කාලය අවසන් වී ඇත. සීමාවකින් තොරව මාස 6ක භාවිතය සඳහා රු. 1000ක මුදලක් පහත ගිණුමට තැන්පත් කර ස්ලිප් එකේ පැහැදිලි ඡායාරූපයක් එක් කරන්න.",
+                fontSize = 11.5.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF1E3A8A),
+                lineHeight = 16.sp
+              )
+              
+              Spacer(modifier = Modifier.height(6.dp))
+              
+              Text(
+                text = "වැඩි විස්තර - ඇඩ්මින් 0772843861",
+                fontSize = 11.5.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFFC62828)
+              )
 
-                Surface(
-                  shape = RoundedCornerShape(6.dp),
-                  color = Color(0xFFDCFCE7),
-                  border = BorderStroke(1.dp, Color(0xFF86EFAC))
-                ) {
-                  Text(
-                    text = "රු. 1,000 (මාස 6)",
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF15803D),
-                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                  )
-                }
-              }
-
-              HorizontalDivider(color = Color(0xFFBFDBFE), modifier = Modifier.padding(vertical = 8.dp))
-
-              // High-Visibility Account Number Box with 1-Tap Copy
-              Surface(
-                shape = RoundedCornerShape(12.dp),
-                color = Color.White,
-                border = BorderStroke(1.5.dp, Color(0xFF2563EB)),
-                modifier = Modifier.fillMaxWidth()
-              ) {
-                Row(
-                  modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 12.dp, vertical = 10.dp),
-                  verticalAlignment = Alignment.CenterVertically,
-                  horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                  Column {
-                    Text(
-                      text = "💳 ගිණුම් අංකය (Account Number):",
-                      fontSize = 10.sp,
-                      fontWeight = FontWeight.Medium,
-                      color = Color(0xFF475569)
-                    )
-                    Text(
-                      text = "90313771",
-                      fontSize = 20.sp,
-                      fontWeight = FontWeight.ExtraBold,
-                      color = Color(0xFF1D4ED8),
-                      letterSpacing = 1.sp
-                    )
-                  }
-
-                  Button(
-                    onClick = {
-                      val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                      val clip = ClipData.newPlainText("Account Number", "90313771")
-                      clipboard.setPrimaryClip(clip)
-                      Toast.makeText(context, "✅ ගිණුම් අංකය (90313771) පිටපත් විය!", Toast.LENGTH_SHORT).show()
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1D4ED8)),
-                    shape = RoundedCornerShape(8.dp),
-                    contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
-                    modifier = Modifier.height(34.dp)
-                  ) {
-                    Icon(Icons.Default.ContentCopy, contentDescription = "Copy", modifier = Modifier.size(14.dp))
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text("Copy", fontWeight = FontWeight.Bold, fontSize = 11.sp)
-                  }
-                }
+              Spacer(modifier = Modifier.height(12.dp))
+              HorizontalDivider(color = Color(0xFFBFDBFE))
+              Spacer(modifier = Modifier.height(12.dp))
+              Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                  imageVector = Icons.Default.AccountBalance,
+                  contentDescription = "Bank",
+                  tint = BluePrimary,
+                  modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                  text = "🏛️ ලංකා බැංකුව (Bank of Ceylon)",
+                  fontWeight = FontWeight.Bold,
+                  fontSize = 13.sp,
+                  color = BluePrimary
+                )
               }
 
               Spacer(modifier = Modifier.height(8.dp))
-
-              Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text("නම (Account Name):", fontSize = 11.sp, color = NeutralMedium)
-                Text("D.H.M A P DISANAYAKA", fontSize = 11.sp, color = NeutralDark, fontWeight = FontWeight.Bold)
-              }
-              Row(modifier = Modifier.fillMaxWidth().padding(top = 2.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text("ශාඛාව (Branch):", fontSize = 11.sp, color = NeutralMedium)
-                Text("අඹන්පොල (Ambanpola)", fontSize = 11.sp, color = NeutralDark, fontWeight = FontWeight.Bold)
-              }
+              
+              CopyableDetailBar("ගිණුම් අංකය (Account Number)", "90313771")
+              CopyableDetailBar("ගිණුම් නම (Account Name)", "D.H.M A P DISANAYAKA")
+              CopyableDetailBar("ශාඛාව (Branch)", "අඹන්පොල ශාඛාව (Bank of Ceylon)")
             }
           }
 
@@ -8980,6 +8924,48 @@ fun ReceiptPreviewDialog(
           ) {
             Text("Close Preview")
           }
+        }
+      }
+    }
+  }
+}
+
+@Composable
+private fun CopyableDetailBar(label: String, value: String) {
+  val context = LocalContext.current
+  Surface(
+    shape = RoundedCornerShape(8.dp),
+    color = Color.White,
+    border = BorderStroke(1.dp, Color(0xFFE2E8F0)),
+    modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp)
+  ) {
+    Row(
+      modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
+      verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+      Column(modifier = Modifier.weight(1f)) {
+        Text(text = label, fontSize = 9.sp, color = Color(0xFF64748B), fontWeight = FontWeight.Medium)
+        Text(text = value, fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1E293B))
+      }
+      Surface(
+        onClick = {
+          val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+          val clip = ClipData.newPlainText(label, value)
+          clipboard.setPrimaryClip(clip)
+          Toast.makeText(context, "✅ $label පිටපත් විය!", Toast.LENGTH_SHORT).show()
+        },
+        shape = RoundedCornerShape(6.dp),
+        color = Color(0xFFF1F5F9),
+        modifier = Modifier.size(32.dp)
+      ) {
+        Box(contentAlignment = Alignment.Center) {
+          Icon(
+            imageVector = Icons.Default.ContentCopy,
+            contentDescription = "Copy",
+            tint = Color(0xFF3B82F6),
+            modifier = Modifier.size(14.dp)
+          )
         }
       }
     }
@@ -9502,62 +9488,46 @@ fun LoginAndApprovalDialog(
             )
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Sleek Compact Bank Details Card for Registration Form
-            var showRegBankDetails by remember { mutableStateOf(false) }
+            // Sleek Permanent Bank Details Card for Registration Form
             Surface(
-              shape = RoundedCornerShape(10.dp),
+              shape = RoundedCornerShape(12.dp),
               color = Color(0xFFF0F7FF),
               border = BorderStroke(1.2.dp, Color(0xFF3B82F6)),
-              modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp)
+              modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)
             ) {
-              Column(modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)) {
-                Row(
-                  modifier = Modifier.fillMaxWidth(),
-                  horizontalArrangement = Arrangement.SpaceBetween,
-                  verticalAlignment = Alignment.CenterVertically
-                ) {
-                  Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
-                    Icon(Icons.Default.AccountBalance, contentDescription = "Bank", tint = BluePrimary, modifier = Modifier.size(16.dp))
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text("🏛️ ලංකා බැංකුව: 90313771 (රු. 1,000 / මාස 6)", fontSize = 10.5.sp, fontWeight = FontWeight.Bold, color = BluePrimary)
-                  }
-                  Row(verticalAlignment = Alignment.CenterVertically) {
-                    Button(
-                      onClick = {
-                        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                        val clip = ClipData.newPlainText("Account Number", "90313771")
-                        clipboard.setPrimaryClip(clip)
-                        Toast.makeText(context, "✅ ගිණුම් අංකය (90313771) පිටපත් විය!", Toast.LENGTH_SHORT).show()
-                      },
-                      colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1D4ED8)),
-                      contentPadding = PaddingValues(horizontal = 6.dp, vertical = 1.dp),
-                      shape = RoundedCornerShape(6.dp),
-                      modifier = Modifier.height(26.dp)
-                    ) {
-                      Icon(Icons.Default.ContentCopy, contentDescription = "Copy", modifier = Modifier.size(12.dp))
-                      Spacer(modifier = Modifier.width(2.dp))
-                      Text("Copy", fontSize = 9.5.sp, fontWeight = FontWeight.Bold)
-                    }
-                    IconButton(
-                      onClick = { showRegBankDetails = !showRegBankDetails },
-                      modifier = Modifier.size(26.dp)
-                    ) {
-                      Icon(
-                        imageVector = if (showRegBankDetails) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                        contentDescription = "Expand",
-                        tint = BluePrimary,
-                        modifier = Modifier.size(18.dp)
-                      )
-                    }
-                  }
+              Column(modifier = Modifier.padding(12.dp)) {
+                Text(
+                  text = "ඔබගේ පැය 24ක නොමිලේ පරිශීලක කාලය අවසන් වී ඇත. සීමාවකින් තොරව මාස 6ක භාවිතය සඳහා රු. 1000ක මුදලක් පහත ගිණුමට තැන්පත් කර ස්ලිප් එකේ පැහැදිලි ඡායාරූපයක් එක් කරන්න.",
+                  fontSize = 11.sp,
+                  fontWeight = FontWeight.Bold,
+                  color = Color(0xFF1E3A8A),
+                  lineHeight = 16.sp
+                )
+                
+                Spacer(modifier = Modifier.height(4.dp))
+                
+                Text(
+                  text = "වැඩි විස්තර - ඇඩ්මින් 0772843861",
+                  fontSize = 11.sp,
+                  fontWeight = FontWeight.Bold,
+                  color = Color(0xFFC62828)
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+                HorizontalDivider(color = Color(0xFFBFDBFE))
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                  Icon(Icons.Default.AccountBalance, contentDescription = "Bank", tint = BluePrimary, modifier = Modifier.size(18.dp))
+                  Spacer(modifier = Modifier.width(8.dp))
+                  Text("🏛️ ලංකා බැංකුව (Bank of Ceylon)", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = BluePrimary)
                 }
-                if (showRegBankDetails) {
-                  Spacer(modifier = Modifier.height(4.dp))
-                  HorizontalDivider(color = Color(0xFFBFDBFE))
-                  Spacer(modifier = Modifier.height(4.dp))
-                  Text("ගිණුම් නම: D.H.M A P DISANAYAKA", fontSize = 10.sp, color = NeutralDark, fontWeight = FontWeight.Bold)
-                  Text("ශාඛාව: අඹන්පොල ශාඛාව (Bank of Ceylon)", fontSize = 10.sp, color = NeutralMedium)
-                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                CopyableDetailBar("ගිණුම් අංකය (Account Number)", "90313771")
+                CopyableDetailBar("ගිණුම් නම (Account Name)", "D.H.M A P DISANAYAKA")
+                CopyableDetailBar("ශාඛාව (Branch)", "අඹන්පොල ශාඛාව (Bank of Ceylon)")
               }
             }
 

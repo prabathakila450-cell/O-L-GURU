@@ -910,8 +910,12 @@ private fun AdminUserItemCard(
             onClick = {
               val cleanNumber = user.usernameOrPhone.replace("+", "").replace(" ", "").trim()
               val targetPhone = if (cleanNumber.startsWith("0")) "94" + cleanNumber.substring(1) else cleanNumber
-              val wpUri = Uri.parse("https://wa.me/$targetPhone?text=ආයුබෝවන්%20${user.fullName},%20O/L%20Study%20Portal%20ඇප්%20එකේ%20ඔබගේ%20අනුමැති%20ඉල්ලීම%20සම්බන්ධවයි!")
-              val intent = Intent(Intent.ACTION_VIEW, wpUri)
+              val whatsappMsg = "ආයුබෝවන් ${user.fullName}, O/L Study Portal ඇප් එකේ ඔබගේ අනුමැති ඉල්ලීම සම්බන්ධවයි!"
+              val encodedMsg = Uri.encode(whatsappMsg)
+              val wpUri = Uri.parse("https://api.whatsapp.com/send?phone=$targetPhone&text=$encodedMsg")
+              val intent = Intent(Intent.ACTION_VIEW, wpUri).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+              }
               try {
                 context.startActivity(intent)
               } catch (_: Exception) {
