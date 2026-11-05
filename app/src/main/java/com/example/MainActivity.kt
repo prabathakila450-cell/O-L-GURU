@@ -51,6 +51,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -206,18 +211,14 @@ const val APPROVAL_VALIDITY_MILLIS = APPROVAL_VALIDITY_DAYS * 24L * 60L * 60L * 
 fun UserAccount.isApprovalExpired(): Boolean {
   if (!isApproved) return false
   if (isAuthorizedAdminUser(usernameOrPhone)) return false
-  val approvedTime = approvalTimestamp ?: requestTimestamp ?: try {
-    SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).parse(registerDate)?.time
-  } catch (_: Exception) { null } ?: return false
+  val approvedTime = approvalTimestamp ?: return false // If approved but no timestamp, it's not yet validly timed
   return (System.currentTimeMillis() - approvedTime) >= APPROVAL_VALIDITY_MILLIS
 }
 
 fun UserAccount.getRemainingApprovalDays(): Int {
   if (!isApproved) return 0
   if (isAuthorizedAdminUser(usernameOrPhone)) return 180
-  val approvedTime = approvalTimestamp ?: requestTimestamp ?: try {
-    SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).parse(registerDate)?.time
-  } catch (_: Exception) { null } ?: System.currentTimeMillis()
+  val approvedTime = approvalTimestamp ?: return 0
   val elapsed = System.currentTimeMillis() - approvedTime
   val remaining = APPROVAL_VALIDITY_MILLIS - elapsed
   return (remaining / (24L * 60L * 60L * 1000L)).toInt().coerceAtLeast(0)
@@ -613,7 +614,7 @@ fun StudentPortalApp() {
       UserAccount("1", "අකිල ප්‍රභාත් දිසානායක (Admin)", "0772843861", "A20020521PD", isApproved = true, paymentStatus = "Approved", requestedGradePackage = "06 සිට 11 දක්වා සියලුම ශ්‍රේණි (All Grades Mega Pack)", approvedGrades = listOf("06", "07", "08", "09", "10", "11", "6 ශ්‍රේණිය", "7 ශ්‍රේණිය", "8 ශ්‍රේණිය", "9 ශ්‍රේණිය", "10 ශ්‍රේණිය", "11 ශ්‍රේණිය")),
       UserAccount("2", "අකිල ප්‍රභාත් දිසානායක (Admin)", "0717136085", "A20020521PD", isApproved = true, paymentStatus = "Approved", requestedGradePackage = "06 සිට 11 දක්වා සියලුම ශ්‍රේණි (All Grades Mega Pack)", approvedGrades = listOf("06", "07", "08", "09", "10", "11", "6 ශ්‍රේණිය", "7 ශ්‍රේණිය", "8 ශ්‍රේණිය", "9 ශ්‍රේණිය", "10 ශ්‍රේණිය", "11 ශ්‍රේණිය")),
       UserAccount("3", "අකිල ප්‍රභාත් දිසානායක (Admin)", "prabathakila450@gmail.com", "A20020521PD", isApproved = true, paymentStatus = "Approved", requestedGradePackage = "06 සිට 11 දක්වා සියලුම ශ්‍රේණි (All Grades Mega Pack)", approvedGrades = listOf("06", "07", "08", "09", "10", "11", "6 ශ්‍රේණිය", "7 ශ්‍රේණිය", "8 ශ්‍රේණිය", "9 ශ්‍රේණිය", "10 ශ්‍රේණිය", "11 ශ්‍රේණිය")),
-      UserAccount("student_01", "සාමාන්‍ය ශිෂ්‍ය ගිණුම (O/L Student)", "0771234567", "1234", isApproved = true, paymentStatus = "Approved", requestedGradePackage = "06 සිට 11 දක්වා සියලුම ශ්‍රේණි (All Grades Mega Pack)", approvedGrades = listOf("06", "07", "08", "09", "10", "11", "6 ශ්‍රේණිය", "7 ශ්‍රේණිය", "8 ශ්‍රේණිය", "9 ශ්‍රේණිය", "10 ශ්‍රේණිය", "11 ශ්‍රේණිය"))
+      UserAccount("student_01", "සාමාන්‍ය ශිෂ්‍ය ගිණුම (O/L Student)", "0771234567", "1234", isApproved = false, paymentStatus = "Pending Approval", requestedGradePackage = "06 සිට 11 දක්වා සියලුම ශ්‍රේණි (All Grades Mega Pack)", approvedGrades = listOf("06", "07", "08", "09", "10", "11", "6 ශ්‍රේණිය", "7 ශ්‍රේණිය", "8 ශ්‍රේණිය", "9 ශ්‍රේණිය", "10 ශ්‍රේණිය", "11 ශ්‍රේණිය"))
     )
 
     // Permanently filter out and prune any mock/fake demo accounts previously saved in local storage
@@ -769,7 +770,7 @@ fun StudentPortalApp() {
         boundDeviceId = matchingUser.boundDeviceId ?: currDevId,
         boundDeviceName = matchingUser.boundDeviceName ?: currDevName,
         boundDate = matchingUser.boundDate ?: "2026-08-20",
-        isApproved = if (isThisAdmin) true else !matchingUser.isApprovalExpired()
+        isApproved = if (isThisAdmin) true else (matchingUser.isApproved && !matchingUser.isApprovalExpired())
       )
       val idx = registeredUsers.indexOf(matchingUser)
       if (idx >= 0) {
@@ -8399,27 +8400,34 @@ fun UnlimitedAccessPaymentDialog(
 
   Dialog(
     onDismissRequest = onDismiss,
-    properties = DialogProperties(usePlatformDefaultWidth = false)
+    properties = DialogProperties(
+      decorFitsSystemWindows = false,
+      usePlatformDefaultWidth = false
+    )
   ) {
     Box(
       modifier = Modifier
         .fillMaxWidth(0.95f)
-        .padding(14.dp),
+        .fillMaxHeight(0.90f)
+        .imePadding()
+        .systemBarsPadding()
+        .padding(vertical = 10.dp, horizontal = 6.dp),
       contentAlignment = Alignment.Center
     ) {
       Card(
-        shape = RoundedCornerShape(24.dp),
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
         border = BorderStroke(1.2.dp, Color(0xFFF59E0B)),
         modifier = Modifier
           .fillMaxWidth()
-          .verticalScroll(rememberScrollState())
+          .wrapContentHeight()
       ) {
         Column(
           modifier = Modifier
             .fillMaxWidth()
-            .padding(18.dp),
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp),
           horizontalAlignment = Alignment.CenterHorizontally
         ) {
           // Header with Gold Badge and Close Button
@@ -8998,6 +9006,7 @@ fun LoginAndApprovalDialog(
   onOpenStagingDialog: () -> Unit = {},
   onAddNewContentClick: () -> Unit = {}
 ) {
+  val context = LocalContext.current
   var selectedTab by remember(initialTab) { mutableStateOf(initialTab) } // 0: Login, 1: Register, 2: Admin
 
   // Login Form State
@@ -9009,6 +9018,19 @@ fun LoginAndApprovalDialog(
   var regName by remember { mutableStateOf("") }
   var regPhone by remember { mutableStateOf("") }
   var regPassword by remember { mutableStateOf("") }
+  var regSlipUri by remember { mutableStateOf<Uri?>(null) }
+  var regSlipName by remember { mutableStateOf<String?>(null) }
+
+  val regSlipPickerLauncher = rememberLauncherForActivityResult(
+    contract = ActivityResultContracts.GetContent()
+  ) { uri: Uri? ->
+    if (uri != null) {
+      regSlipUri = uri
+      regSlipName = getFileNameFromUri(context, uri)
+      Toast.makeText(context, "බැංකු රිසිට්පත තෝරාගන්නා ලදී: $regSlipName", Toast.LENGTH_SHORT).show()
+    }
+  }
+
   var autoApproveNewUser by remember { mutableStateOf(true) }
   var showRegSuccessDialog by remember { mutableStateOf(false) }
 
@@ -9028,29 +9050,37 @@ fun LoginAndApprovalDialog(
   var adminPdfCategory by remember { mutableStateOf("NOTE") } // "NOTE" or "PAPER"
   var adminPdfSubject by remember { mutableStateOf("විද්‍යාව") }
 
-  val context = LocalContext.current
-
   Dialog(
     onDismissRequest = onDismiss,
-    properties = DialogProperties(usePlatformDefaultWidth = false, securePolicy = AppSecurityManager.getSecureFlagPolicy())
+    properties = DialogProperties(
+      decorFitsSystemWindows = false,
+      usePlatformDefaultWidth = false,
+      securePolicy = AppSecurityManager.getSecureFlagPolicy()
+    )
   ) {
     Box(
       modifier = Modifier
-        .fillMaxWidth(0.94f)
-        .padding(16.dp),
+        .fillMaxWidth(0.95f)
+        .fillMaxHeight(0.90f)
+        .imePadding()
+        .systemBarsPadding()
+        .padding(vertical = 8.dp, horizontal = 6.dp),
       contentAlignment = Alignment.Center
     ) {
       Card(
-        shape = RoundedCornerShape(24.dp),
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         border = BorderStroke(1.dp, NeutralBorderLight),
         modifier = Modifier
           .fillMaxWidth()
-          .verticalScroll(rememberScrollState())
+          .wrapContentHeight()
       ) {
         Column(
-          modifier = Modifier.padding(20.dp),
+          modifier = Modifier
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp),
           horizontalAlignment = Alignment.CenterHorizontally
         ) {
           // Dialog Close Header
@@ -9344,11 +9374,8 @@ fun LoginAndApprovalDialog(
                     return@Button
                   }
 
-                  // Auto-approve and ensure full access to all grades if unapproved or expired
+                  // Preserve actual approval status for existing students
                   val updatedUser = foundUser.copy(
-                    isApproved = true,
-                    paymentStatus = "Approved",
-                    approvedGrades = if (foundUser.approvedGrades.isNotEmpty()) foundUser.approvedGrades else listOf("06", "07", "08", "09", "10", "11", "6 ශ්‍රේණිය", "7 ශ්‍රේණිය", "8 ශ්‍රේණිය", "9 ශ්‍රේණිය", "10 ශ්‍රේණිය", "11 ශ්‍රේණිය"),
                     boundDeviceId = foundUser.boundDeviceId ?: currDevId,
                     boundDeviceName = foundUser.boundDeviceName ?: currDevName,
                     boundDate = foundUser.boundDate ?: "2026-08-20"
@@ -9360,27 +9387,54 @@ fun LoginAndApprovalDialog(
                   AppSecurityManager.resetFailedLogins(cleanInput)
                   onUsersUpdated()
                   onLoginSuccess(updatedUser)
-                  Toast.makeText(context, "සාදරයෙන් පිළිගනිමු ${updatedUser.fullName}! (🎓 අනුමත ශිෂ්‍ය ගිණුම සක්‍රීයයි)", Toast.LENGTH_SHORT).show()
+                  if (updatedUser.isApproved) {
+                    Toast.makeText(context, "සාදරයෙන් පිළිගනිමු ${updatedUser.fullName}! (🎓 අනුමත ශිෂ්‍ය ගිණුම සක්‍රීයයි)", Toast.LENGTH_SHORT).show()
+                  } else {
+                    // WhatsApp Direct Sharing for Pending Users
+                    val whatsappMsg = "ආයුබෝවන් ඇඩ්මින්තුමනි!\n\nමම O/L Study Portal ඇප් එකේ මීට පෙර ලියාපදිංචි වී දැනට අනුමැතිය අපේක්ෂාවෙන් සිටිමි. කරුණාකර මගේ ගිණුම පරීක්ෂා කර අනුමත කරන්න.\n\n👤 නම: ${updatedUser.fullName}\n📞 අංකය: ${updatedUser.usernameOrPhone}\n📦 පැකේජය: ${updatedUser.requestedGradePackage}\n\nස්තූතියි!"
+                    val encodedMsg = Uri.encode(whatsappMsg)
+                    val wpUri = Uri.parse("https://wa.me/94772843861?text=$encodedMsg")
+                    val intent = Intent(Intent.ACTION_VIEW, wpUri)
+                    try {
+                      context.startActivity(intent)
+                      Toast.makeText(context, "⏳ ඔබගේ ගිණුම ඇඩ්මින් අනුමැතිය සඳහා යොමු කර ඇත. විස්තර WhatsApp මඟින් ඇඩ්මින්ට යොමු විය.", Toast.LENGTH_LONG).show()
+                    } catch (_: Exception) {
+                      Toast.makeText(context, "⏳ ඔබගේ ගිණුම ඇඩ්මින් අනුමැතිය සඳහා යොමු කර ඇත. ඇඩ්මින් පරීක්ෂා කර අනුමත කරන තෙක් මාස 6 සක්‍රීය නොවේ.", Toast.LENGTH_LONG).show()
+                    }
+                  }
                 } else {
-                  // If phone/email is not registered yet, auto-create and approve instantly
+                  // If phone/email is not registered yet, create pending approval account
                   val currentNow = System.currentTimeMillis()
                   val autoStudent = UserAccount(
                     id = currentNow.toString(),
                     fullName = if (cleanInput.all { it.isDigit() || it == '+' || it == '-' || it == ' ' }) "ශිෂ්‍ය පරිශීලක ($cleanInput)" else cleanInput,
                     usernameOrPhone = cleanInput,
                     password = cleanPass.ifBlank { "1234" },
-                    isApproved = true,
-                    paymentStatus = "Approved",
+                    isApproved = false,
+                    paymentStatus = "Pending Approval",
                     requestedGradePackage = "06 සිට 11 දක්වා සියලුම ශ්‍රේණි (All Grades)",
                     approvedGrades = listOf("06", "07", "08", "09", "10", "11", "6 ශ්‍රේණිය", "7 ශ්‍රේණිය", "8 ශ්‍රේණිය", "9 ශ්‍රේණිය", "10 ශ්‍රේණිය", "11 ශ්‍රේණිය"),
                     boundDeviceId = currDevId,
-                    boundDeviceName = currDevName
+                    boundDeviceName = currDevName,
+                    requestDate = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date(currentNow)),
+                    requestTimestamp = currentNow
                   )
                   registeredUsers.add(0, autoStudent)
                   AppSecurityManager.resetFailedLogins(cleanInput)
                   onUsersUpdated()
                   onLoginSuccess(autoStudent)
-                  Toast.makeText(context, "🎉 සාදරයෙන් පිළිගනිමු! ශිෂ්‍ය ගිණුම සාර්ථකව සක්‍රීය වී ඇතුළු විය.", Toast.LENGTH_LONG).show()
+
+                  // WhatsApp Direct Sharing for Auto-Registered Pending Users
+                  val whatsappMsg = "ආයුබෝවන් ඇඩ්මින්තුමනි!\n\nමම O/L Study Portal ඇප් එකේ අලුතින් ලියාපදිංචි වුනා. කරුණාකර මගේ ගිණුම පරීක්ෂා කර අනුමත කරන්න.\n\n👤 නම: ${autoStudent.fullName}\n📞 අංකය: ${autoStudent.usernameOrPhone}\n📦 පැකේජය: ${autoStudent.requestedGradePackage}\n\nස්තූතියි!"
+                  val encodedMsg = Uri.encode(whatsappMsg)
+                  val wpUri = Uri.parse("https://wa.me/94772843861?text=$encodedMsg")
+                  val intent = Intent(Intent.ACTION_VIEW, wpUri)
+                  try {
+                    context.startActivity(intent)
+                    Toast.makeText(context, "📝 අනුමැති ඉල්ලීම යොමු විය! විස්තර WhatsApp මඟින් ඇඩ්මින්ට යොමු විය.", Toast.LENGTH_LONG).show()
+                  } catch (_: Exception) {
+                    Toast.makeText(context, "📝 අනුමැති ඉල්ලීම යොමු විය! ඇඩ්මින් පරීක්ෂා කර අනුමත කරන තෙක් මාස 6 සක්‍රීය නොවේ.", Toast.LENGTH_LONG).show()
+                  }
                 }
               },
               colors = ButtonDefaults.buttonColors(containerColor = BluePrimary),
@@ -9394,7 +9448,7 @@ fun LoginAndApprovalDialog(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // One-Tap Instant Student Access (Guarantees zero-friction login)
+            // One-Tap Student Access
             Button(
               onClick = {
                 val (currDevId, currDevName) = getDeviceIdentifier(context)
@@ -9404,8 +9458,8 @@ fun LoginAndApprovalDialog(
                     fullName = "සාමාන්‍ය ශිෂ්‍ය සාමාජික (Student Member)",
                     usernameOrPhone = "0771234567",
                     password = "guest",
-                    isApproved = true,
-                    paymentStatus = "Approved",
+                    isApproved = false,
+                    paymentStatus = "Pending Approval",
                     requestedGradePackage = "06 සිට 11 දක්වා සියලුම ශ්‍රේණි (All Grades)",
                     approvedGrades = listOf("06", "07", "08", "09", "10", "11", "6 ශ්‍රේණිය", "7 ශ්‍රේණිය", "8 ශ්‍රේණිය", "9 ශ්‍රේණිය", "10 ශ්‍රේණිය", "11 ශ්‍රේණිය"),
                     boundDeviceId = currDevId,
@@ -9415,7 +9469,11 @@ fun LoginAndApprovalDialog(
                     onUsersUpdated()
                   }
                 onLoginSuccess(defaultStudent)
-                Toast.makeText(context, "🎓 ශිෂ්‍ය පිවිසුම සාර්ථකයි! සියලුම කෙටි සටහන්, ප්‍රශ්න පත්‍ර සහ Flashcards විවෘත විය.", Toast.LENGTH_SHORT).show()
+                if (defaultStudent.isApproved) {
+                  Toast.makeText(context, "🎓 ශිෂ්‍ය පිවිසුම සාර්ථකයි!", Toast.LENGTH_SHORT).show()
+                } else {
+                  Toast.makeText(context, "⏳ ඔබගේ ගිණුම ඇඩ්මින් අනුමැතිය සඳහා යොමු කර ඇත. ඇඩ්මින් පරීක්ෂා කර අනුමත කරන තෙක් මාස 6 සක්‍රීය නොවේ.", Toast.LENGTH_LONG).show()
+                }
               },
               colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0D9488)),
               shape = RoundedCornerShape(12.dp),
@@ -9444,54 +9502,62 @@ fun LoginAndApprovalDialog(
             )
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Prominent Bank Account Details Card for New Students
+            // Sleek Compact Bank Details Card for Registration Form
+            var showRegBankDetails by remember { mutableStateOf(false) }
             Surface(
-              shape = RoundedCornerShape(12.dp),
+              shape = RoundedCornerShape(10.dp),
               color = Color(0xFFF0F7FF),
-              border = BorderStroke(1.5.dp, Color(0xFF3B82F6)),
-              modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)
+              border = BorderStroke(1.2.dp, Color(0xFF3B82F6)),
+              modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp)
             ) {
-              Column(modifier = Modifier.padding(10.dp)) {
-                Row(
-                  verticalAlignment = Alignment.CenterVertically,
-                  horizontalArrangement = Arrangement.SpaceBetween,
-                  modifier = Modifier.fillMaxWidth()
-                ) {
-                  Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.AccountBalance, contentDescription = "Bank", tint = BluePrimary, modifier = Modifier.size(16.dp))
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text("🏛️ ලංකා බැංකුව (Bank of Ceylon)", fontSize = 11.5.sp, fontWeight = FontWeight.Bold, color = BluePrimary)
-                  }
-                  Text("රු. 1,000 / මාස 6", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Color(0xFF15803D))
-                }
-                Spacer(modifier = Modifier.height(4.dp))
+              Column(modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)) {
                 Row(
                   modifier = Modifier.fillMaxWidth(),
                   horizontalArrangement = Arrangement.SpaceBetween,
                   verticalAlignment = Alignment.CenterVertically
                 ) {
-                  Column {
-                    Text("ගිණුම් අංකය (Account Number):", fontSize = 9.5.sp, color = NeutralMedium)
-                    Text("90313771", fontSize = 16.sp, fontWeight = FontWeight.ExtraBold, color = Color(0xFF1D4ED8))
+                  Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+                    Icon(Icons.Default.AccountBalance, contentDescription = "Bank", tint = BluePrimary, modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text("🏛️ ලංකා බැංකුව: 90313771 (රු. 1,000 / මාස 6)", fontSize = 10.5.sp, fontWeight = FontWeight.Bold, color = BluePrimary)
                   }
-                  Button(
-                    onClick = {
-                      val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                      val clip = ClipData.newPlainText("Account Number", "90313771")
-                      clipboard.setPrimaryClip(clip)
-                      Toast.makeText(context, "✅ ගිණුම් අංකය (90313771) පිටපත් විය!", Toast.LENGTH_SHORT).show()
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1D4ED8)),
-                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
-                    shape = RoundedCornerShape(6.dp),
-                    modifier = Modifier.height(28.dp)
-                  ) {
-                    Icon(Icons.Default.ContentCopy, contentDescription = "Copy", modifier = Modifier.size(12.dp))
-                    Spacer(modifier = Modifier.width(3.dp))
-                    Text("Copy", fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                  Row(verticalAlignment = Alignment.CenterVertically) {
+                    Button(
+                      onClick = {
+                        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                        val clip = ClipData.newPlainText("Account Number", "90313771")
+                        clipboard.setPrimaryClip(clip)
+                        Toast.makeText(context, "✅ ගිණුම් අංකය (90313771) පිටපත් විය!", Toast.LENGTH_SHORT).show()
+                      },
+                      colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1D4ED8)),
+                      contentPadding = PaddingValues(horizontal = 6.dp, vertical = 1.dp),
+                      shape = RoundedCornerShape(6.dp),
+                      modifier = Modifier.height(26.dp)
+                    ) {
+                      Icon(Icons.Default.ContentCopy, contentDescription = "Copy", modifier = Modifier.size(12.dp))
+                      Spacer(modifier = Modifier.width(2.dp))
+                      Text("Copy", fontSize = 9.5.sp, fontWeight = FontWeight.Bold)
+                    }
+                    IconButton(
+                      onClick = { showRegBankDetails = !showRegBankDetails },
+                      modifier = Modifier.size(26.dp)
+                    ) {
+                      Icon(
+                        imageVector = if (showRegBankDetails) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                        contentDescription = "Expand",
+                        tint = BluePrimary,
+                        modifier = Modifier.size(18.dp)
+                      )
+                    }
                   }
                 }
-                Text("D.H.M A P DISANAYAKA • අඹන්පොල ශාඛාව", fontSize = 9.5.sp, color = Color(0xFF475569))
+                if (showRegBankDetails) {
+                  Spacer(modifier = Modifier.height(4.dp))
+                  HorizontalDivider(color = Color(0xFFBFDBFE))
+                  Spacer(modifier = Modifier.height(4.dp))
+                  Text("ගිණුම් නම: D.H.M A P DISANAYAKA", fontSize = 10.sp, color = NeutralDark, fontWeight = FontWeight.Bold)
+                  Text("ශාඛාව: අඹන්පොල ශාඛාව (Bank of Ceylon)", fontSize = 10.sp, color = NeutralMedium)
+                }
               }
             }
 
@@ -9561,7 +9627,86 @@ fun LoginAndApprovalDialog(
               modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Bank Receipt Upload Section at bottom of detail fields
+            Text(
+              text = "📸 බැංකු රිසිට්පත (Bank Slip / Screenshot) - විකල්ප:",
+              fontSize = 11.5.sp,
+              fontWeight = FontWeight.SemiBold,
+              color = Color(0xFF1E3A8A),
+              modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            if (regSlipUri != null) {
+              Surface(
+                shape = RoundedCornerShape(10.dp),
+                color = Color(0xFFECFDF5),
+                border = BorderStroke(1.dp, Color(0xFF10B981)),
+                modifier = Modifier.fillMaxWidth().padding(bottom = 6.dp)
+              ) {
+                Row(
+                  modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
+                  verticalAlignment = Alignment.CenterVertically,
+                  horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                  Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+                    Icon(Icons.Default.CheckCircle, contentDescription = "Selected", tint = Color(0xFF059669), modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                      text = regSlipName ?: "බැංකු රිසිට්පත ඇමුණා ඇත",
+                      fontSize = 11.sp,
+                      color = Color(0xFF065F46),
+                      fontWeight = FontWeight.Bold,
+                      maxLines = 1,
+                      overflow = TextOverflow.Ellipsis
+                    )
+                  }
+                  Row {
+                    TextButton(
+                      onClick = { regSlipPickerLauncher.launch("image/*") },
+                      contentPadding = PaddingValues(horizontal = 6.dp, vertical = 2.dp)
+                    ) {
+                      Text("වෙනස් කරන්න", fontSize = 10.sp)
+                    }
+                    IconButton(
+                      onClick = {
+                        regSlipUri = null
+                        regSlipName = null
+                      },
+                      modifier = Modifier.size(24.dp)
+                    ) {
+                      Icon(Icons.Default.Close, contentDescription = "Remove", tint = Color.Red, modifier = Modifier.size(16.dp))
+                    }
+                  }
+                }
+              }
+            } else {
+              OutlinedButton(
+                onClick = { regSlipPickerLauncher.launch("image/*") },
+                shape = RoundedCornerShape(10.dp),
+                border = BorderStroke(1.2.dp, Color(0xFF2563EB)),
+                modifier = Modifier.fillMaxWidth().height(42.dp)
+              ) {
+                Icon(
+                  imageVector = Icons.Default.UploadFile,
+                  contentDescription = "Upload Slip",
+                  tint = Color(0xFF1D4ED8),
+                  modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(
+                  text = "📎 බැංකු රිසිට්පත එක් කරන්න (Attach Bank Slip)",
+                  fontSize = 11.5.sp,
+                  fontWeight = FontWeight.Bold,
+                  color = Color(0xFF1D4ED8)
+                )
+              }
+            }
+
+            Spacer(modifier = Modifier.height(18.dp))
 
             Button(
               onClick = {
@@ -9579,16 +9724,21 @@ fun LoginAndApprovalDialog(
                 } else {
                   val existing = registeredUsers.find { it.usernameOrPhone.trim().equals(cleanPhone, ignoreCase = true) }
                   if (existing != null) {
-                    val approvedExisting = existing.copy(
-                      isApproved = true,
-                      paymentStatus = "Approved",
-                      approvedGrades = listOf("06", "07", "08", "09", "10", "11", "6 ශ්‍රේණිය", "7 ශ්‍රේණිය", "8 ශ්‍රේණිය", "9 ශ්‍රේණිය", "10 ශ්‍රේණිය", "11 ශ්‍රේණිය")
+                    val updatedExisting = existing.copy(
+                      slipImageUri = regSlipUri?.toString() ?: existing.slipImageUri,
+                      paymentStatus = if (regSlipUri != null) "Pending Approval (With Slip)" else existing.paymentStatus,
+                      boundDeviceId = existing.boundDeviceId ?: currDevId,
+                      boundDeviceName = existing.boundDeviceName ?: currDevName
                     )
                     val idx = registeredUsers.indexOf(existing)
-                    if (idx >= 0) registeredUsers[idx] = approvedExisting
+                    if (idx >= 0) registeredUsers[idx] = updatedExisting
                     onUsersUpdated()
-                    onLoginSuccess(approvedExisting)
-                    Toast.makeText(context, "සාදරයෙන් පිළිගනිමු ${approvedExisting.fullName}! සාර්ථකව Login විය.", Toast.LENGTH_SHORT).show()
+                    onLoginSuccess(updatedExisting)
+                    if (updatedExisting.isApproved) {
+                      Toast.makeText(context, "සාදරයෙන් පිළිගනිමු ${updatedExisting.fullName}! සාර්ථකව Login විය.", Toast.LENGTH_SHORT).show()
+                    } else {
+                      Toast.makeText(context, "⏳ ඔබගේ ගිණුම ඇඩ්මින් අනුමැතිය සඳහා පොරොත්තු ලැයිස්තුවේ ඇත. ඇඩ්මින් පරීක්ෂා කර අනුමත කරන තෙක් මාස 6 සක්‍රීය නොවේ.", Toast.LENGTH_LONG).show()
+                    }
                     return@Button
                   }
 
@@ -9599,8 +9749,9 @@ fun LoginAndApprovalDialog(
                     fullName = regName.trim(),
                     usernameOrPhone = cleanPhone,
                     password = regPassword.trim().ifBlank { "1234" },
-                    isApproved = true,
-                    paymentStatus = "Approved",
+                    isApproved = false,
+                    slipImageUri = regSlipUri?.toString(),
+                    paymentStatus = if (regSlipUri != null) "Pending Approval (With Slip)" else "Pending Approval",
                     requestedGradePackage = "06 සිට 11 දක්වා සියලුම ශ්‍රේණි (All Grades)",
                     approvedGrades = listOf("06", "07", "08", "09", "10", "11", "6 ශ්‍රේණිය", "7 ශ්‍රේණිය", "8 ශ්‍රේණිය", "9 ශ්‍රේණිය", "10 ශ්‍රේණිය", "11 ශ්‍රේණිය"),
                     boundDeviceId = currDevId,
@@ -9612,10 +9763,24 @@ fun LoginAndApprovalDialog(
                   registeredUsers.add(0, newAcc)
                   onUsersUpdated()
                   onLoginSuccess(newAcc)
-                  Toast.makeText(context, "🎉 ලියාපදිංචිය සාර්ථකයි! ඔබගේ ගිණුම සක්‍රීය වී ඇතුළු විය.", Toast.LENGTH_LONG).show()
+                  
+                  // WhatsApp Direct Sharing for Admin Approval
+                  val whatsappMsg = "ආයුබෝවන් ඇඩ්මින්තුමනි!\n\nමම O/L Study Portal ඇප් එකේ අලුතින් ලියාපදිංචි වුනා. කරුණාකර මගේ ගිණුම පරීක්ෂා කර අනුමත කරන්න.\n\n👤 නම: ${newAcc.fullName}\n📞 අංකය: ${newAcc.usernameOrPhone}\n📦 පැකේජය: ${newAcc.requestedGradePackage}\n📅 දිනය: ${newAcc.requestDate}\n\nස්තූතියි!"
+                  val encodedMsg = Uri.encode(whatsappMsg)
+                  val wpUri = Uri.parse("https://wa.me/94772843861?text=$encodedMsg")
+                  val intent = Intent(Intent.ACTION_VIEW, wpUri)
+                  try {
+                    context.startActivity(intent)
+                    Toast.makeText(context, "📝 ලියාපදිංචිය සාර්ථකයි! විස්තර WhatsApp මඟින් ඇඩ්මින්ට යොමු විය.", Toast.LENGTH_LONG).show()
+                  } catch (_: Exception) {
+                    Toast.makeText(context, "📝 ලියාපදිංචිය සාර්ථකයි! ඇඩ්මින් පරීක්ෂා කර අනුමත කරන තෙක් මාස 6 සක්‍රීය නොවේ.", Toast.LENGTH_LONG).show()
+                  }
+                  
                   regName = ""
                   regPhone = ""
                   regPassword = ""
+                  regSlipUri = null
+                  regSlipName = null
                 }
               },
               colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF137333)),

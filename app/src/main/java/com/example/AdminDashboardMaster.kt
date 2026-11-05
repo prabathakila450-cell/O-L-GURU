@@ -54,6 +54,7 @@ import androidx.compose.material.icons.filled.Verified
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -814,6 +815,8 @@ private fun AdminUserItemCard(
   val context = LocalContext.current
   val isAdminAccount = isAuthorizedAdminUser(user.usernameOrPhone)
   var showPassword by remember { mutableStateOf(false) }
+  var showRevokeConfirmDialog by remember { mutableStateOf(false) }
+  var showDeleteConfirmDialog by remember { mutableStateOf(false) }
 
   Surface(
     shape = RoundedCornerShape(16.dp),
@@ -1181,7 +1184,7 @@ private fun AdminUserItemCard(
             }
           } else {
             OutlinedButton(
-              onClick = onRevoke,
+              onClick = { showRevokeConfirmDialog = true },
               colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFD97706)),
               border = BorderStroke(1.dp, Color(0xFFFBBF24)),
               shape = RoundedCornerShape(8.dp),
@@ -1193,7 +1196,7 @@ private fun AdminUserItemCard(
           }
 
           IconButton(
-            onClick = onDelete,
+            onClick = { showDeleteConfirmDialog = true },
             modifier = Modifier.size(28.dp)
           ) {
             Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Color(0xFFEF4444), modifier = Modifier.size(16.dp))
@@ -1201,6 +1204,106 @@ private fun AdminUserItemCard(
         }
       }
     }
+  }
+
+  // Revoke Approval Confirmation Dialog
+  if (showRevokeConfirmDialog) {
+    AlertDialog(
+      onDismissRequest = { showRevokeConfirmDialog = false },
+      icon = {
+        Icon(
+          imageVector = Icons.Default.Warning,
+          contentDescription = "Warning",
+          tint = Color(0xFFD97706),
+          modifier = Modifier.size(28.dp)
+        )
+      },
+      title = {
+        Text(
+          text = "⚠️ අනුමැතිය අවලංගු කිරීමට ස්ථීරද?",
+          fontWeight = FontWeight.Bold,
+          fontSize = 15.sp,
+          color = Color(0xFF0F172A)
+        )
+      },
+      text = {
+        Text(
+          text = "${user.fullName} (${user.usernameOrPhone}) පරිශීලකයාගේ ඇඩ්මින් අනුමැතිය අවලංගු කිරීමට ස්ථීරද?",
+          fontSize = 13.sp,
+          color = Color(0xFF334155)
+        )
+      },
+      confirmButton = {
+        Button(
+          onClick = {
+            showRevokeConfirmDialog = false
+            onRevoke()
+          },
+          colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFDC2626)),
+          shape = RoundedCornerShape(8.dp)
+        ) {
+          Text("ස්ථීරයි", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+        }
+      },
+      dismissButton = {
+        OutlinedButton(
+          onClick = { showRevokeConfirmDialog = false },
+          shape = RoundedCornerShape(8.dp)
+        ) {
+          Text("අවලංගු කරන්න", fontSize = 12.sp)
+        }
+      }
+    )
+  }
+
+  // Delete User Account Confirmation Dialog
+  if (showDeleteConfirmDialog) {
+    AlertDialog(
+      onDismissRequest = { showDeleteConfirmDialog = false },
+      icon = {
+        Icon(
+          imageVector = Icons.Default.Delete,
+          contentDescription = "Delete",
+          tint = Color(0xFFEF4444),
+          modifier = Modifier.size(28.dp)
+        )
+      },
+      title = {
+        Text(
+          text = "🗑️ ගිණුම මකා දැමීමට ස්ථීරද?",
+          fontWeight = FontWeight.Bold,
+          fontSize = 15.sp,
+          color = Color(0xFF0F172A)
+        )
+      },
+      text = {
+        Text(
+          text = "${user.fullName} (${user.usernameOrPhone}) ගිණුම පද්ධතියෙන් සම්පූර්ණයෙන්ම මකා දැමීමට ස්ථීරද?",
+          fontSize = 13.sp,
+          color = Color(0xFF334155)
+        )
+      },
+      confirmButton = {
+        Button(
+          onClick = {
+            showDeleteConfirmDialog = false
+            onDelete()
+          },
+          colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFDC2626)),
+          shape = RoundedCornerShape(8.dp)
+        ) {
+          Text("ස්ථීරයි", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+        }
+      },
+      dismissButton = {
+        OutlinedButton(
+          onClick = { showDeleteConfirmDialog = false },
+          shape = RoundedCornerShape(8.dp)
+        ) {
+          Text("අවලංගු කරන්න", fontSize = 12.sp)
+        }
+      }
+    )
   }
 }
 
