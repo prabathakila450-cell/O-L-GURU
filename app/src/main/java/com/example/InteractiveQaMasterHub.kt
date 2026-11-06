@@ -2246,13 +2246,9 @@ fun MatchingGameView(matchSet: SubjectMatchSet, onBack: () -> Unit) {
   var selectedLeft by remember(matchSet.title) { mutableStateOf<String?>(null) }
   var studentPairs by remember(matchSet.title) { mutableStateOf<Map<String, String>>(emptyMap()) }
   var isChecked by remember(matchSet.title) { mutableStateOf(false) }
-  var matchViewMode by remember(matchSet.title) { mutableIntStateOf(0) } // 0: Step-by-Step, 1: Two Columns
-  var currentQuestionIndex by remember(matchSet.title) { mutableIntStateOf(0) }
 
   val dims = rememberScreenDimensions()
   val isCompact = dims.isSmallWidth
-
-  val currentItem = matchData.getOrElse(currentQuestionIndex) { matchData.first() }
 
   val selectedLeftIndex = if (selectedLeft != null) {
     matchData.indexOfFirst { it.leftText == selectedLeft } + 1
@@ -2305,566 +2301,267 @@ fun MatchingGameView(matchSet: SubjectMatchSet, onBack: () -> Unit) {
       }
     }
 
-    // View Mode Switcher
-    item {
-      Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-      ) {
-        Text(
-          text = "දර්ශන මාදිලිය:",
-          fontSize = if (isCompact) 8.5.sp else 9.5.sp,
-          color = Color(0xFF94A3B8),
-          fontWeight = FontWeight.Medium
-        )
-        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-          Surface(
-            onClick = { matchViewMode = 0 },
-            shape = RoundedCornerShape(6.dp),
-            color = if (matchViewMode == 0) Color(0xFF8B5CF6) else Color(0xFF1E293B),
-            border = BorderStroke(1.dp, if (matchViewMode == 0) Color.White else Color(0xFF334155))
-          ) {
-            Text(
-              text = "🎯 එකින් එක ගැලපීම",
-              fontSize = if (isCompact) 8.5.sp else 9.sp,
-              fontWeight = if (matchViewMode == 0) FontWeight.Bold else FontWeight.Normal,
-              color = if (matchViewMode == 0) Color.White else Color(0xFFCBD5E1),
-              modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp)
-            )
-          }
-
-          Surface(
-            onClick = { matchViewMode = 1 },
-            shape = RoundedCornerShape(6.dp),
-            color = if (matchViewMode == 1) Color(0xFF8B5CF6) else Color(0xFF1E293B),
-            border = BorderStroke(1.dp, if (matchViewMode == 1) Color.White else Color(0xFF334155))
-          ) {
-            Text(
-              text = "📋 තීරූ 2 ම (10 ම)",
-              fontSize = if (isCompact) 8.5.sp else 9.sp,
-              fontWeight = if (matchViewMode == 1) FontWeight.Bold else FontWeight.Normal,
-              color = if (matchViewMode == 1) Color.White else Color(0xFFCBD5E1),
-              modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp)
-            )
-          }
-        }
-      }
-    }
-
-    if (matchViewMode == 0) {
-      // ----------------------------------------------------
-      // MODE 0: STEP-BY-STEP (ZERO SCROLLING, ALL 10 ANSWERS)
-      // ----------------------------------------------------
-      // Question Navigator Chips (1 to 10)
+    // Direct Two-Column Matching View (තීරු දෙකම එකවර පෙන්වන පූර්ණ මුහුණත)
+    if (selectedLeft != null) {
       item {
-        LazyRow(
-          modifier = Modifier.fillMaxWidth(),
-          horizontalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-          items(matchData.size) { idx ->
-            val item = matchData[idx]
-            val isCurrent = currentQuestionIndex == idx
-            val isPaired = studentPairs.containsKey(item.leftText)
-            val isPairedCorrect = isChecked && studentPairs[item.leftText] == item.rightCorrectText
-
-            Surface(
-              onClick = { currentQuestionIndex = idx },
-              shape = RoundedCornerShape(6.dp),
-              color = when {
-                isCurrent -> Color(0xFF8B5CF6)
-                isChecked && isPairedCorrect -> Color(0xFF065F46)
-                isChecked && isPaired -> Color(0xFF7F1D1D)
-                isPaired -> Color(0xFF1E3A8A)
-                else -> Color(0xFF1E293B)
-              },
-              border = BorderStroke(
-                if (isCurrent) 1.5.dp else 1.dp,
-                if (isCurrent) Color.White else Color(0xFF334155)
-              )
-            ) {
-              Row(
-                modifier = Modifier.padding(horizontal = 7.dp, vertical = 4.dp),
-                verticalAlignment = Alignment.CenterVertically
-              ) {
-                if (isPaired) {
-                  Text("✓", fontSize = 8.5.sp, color = if (isCurrent) Color.White else Color(0xFF38BDF8), fontWeight = FontWeight.Bold)
-                  Spacer(modifier = Modifier.width(2.dp))
-                }
-                Text(
-                  text = "${idx + 1}",
-                  fontSize = 9.sp,
-                  fontWeight = FontWeight.Bold,
-                  color = if (isCurrent) Color.White else Color(0xFFCBD5E1)
-                )
-              }
-            }
-          }
-        }
-      }
-
-      // Active Question Card
-      item {
-        Card(
-          shape = RoundedCornerShape(10.dp),
-          colors = CardDefaults.cardColors(containerColor = Color(0xFF2E1065)),
-          border = BorderStroke(1.5.dp, Color(0xFFA78BFA)),
+        Surface(
+          shape = RoundedCornerShape(8.dp),
+          color = Color(0xFF5B21B6),
+          border = BorderStroke(1.dp, Color(0xFFA78BFA)),
           modifier = Modifier.fillMaxWidth()
         ) {
-          Column(modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp)) {
-            Row(
-              modifier = Modifier.fillMaxWidth(),
-              horizontalArrangement = Arrangement.SpaceBetween,
-              verticalAlignment = Alignment.CenterVertically
-            ) {
+          Row(
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
+            verticalAlignment = Alignment.CenterVertically
+          ) {
+            Text("🎯", fontSize = 11.sp)
+            Spacer(modifier = Modifier.width(6.dp))
+            Column(modifier = Modifier.weight(1f)) {
               Text(
-                text = "❓ ප්‍රශ්න අංක ${currentQuestionIndex + 1} / ${matchData.size} (A තීරුව):",
-                fontSize = if (isCompact) 9.5.sp else 10.5.sp,
+                text = "තෝරාගත් ප්‍රශ්න අංක $selectedLeftIndex (B තීරුවෙන් පිළිතුර මත ඔබන්න):",
+                fontSize = 8.5.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFFDDD6FE)
               )
-              Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                Surface(
-                  onClick = { if (currentQuestionIndex > 0) currentQuestionIndex-- },
-                  shape = RoundedCornerShape(4.dp),
-                  color = Color.White.copy(alpha = 0.15f),
-                  modifier = Modifier.size(24.dp)
-                ) {
-                  Box(contentAlignment = Alignment.Center) {
-                    Text("◀", fontSize = 10.sp, color = Color.White)
-                  }
-                }
-                Surface(
-                  onClick = { if (currentQuestionIndex < matchData.size - 1) currentQuestionIndex++ },
-                  shape = RoundedCornerShape(4.dp),
-                  color = Color.White.copy(alpha = 0.15f),
-                  modifier = Modifier.size(24.dp)
-                ) {
-                  Box(contentAlignment = Alignment.Center) {
-                    Text("▶", fontSize = 10.sp, color = Color.White)
-                  }
-                }
-              }
+              Text(
+                text = selectedLeft!!,
+                fontSize = 9.5.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+              )
             }
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Text(
-              text = currentItem.leftText,
-              fontSize = if (isCompact) 10.sp else 11.sp,
-              lineHeight = if (isCompact) 14.sp else 15.sp,
-              fontWeight = FontWeight.SemiBold,
-              color = Color.White
-            )
-
-            val paired = studentPairs[currentItem.leftText]
-            if (paired != null) {
-              Spacer(modifier = Modifier.height(6.dp))
-              Surface(
-                shape = RoundedCornerShape(6.dp),
-                color = when {
-                  isChecked && paired == currentItem.rightCorrectText -> Color(0xFF065F46)
-                  isChecked -> Color(0xFF7F1D1D)
-                  else -> Color(0xFF1E1B4B)
-                },
-                border = BorderStroke(1.dp, if (isChecked) Color.Transparent else Color(0xFF818CF8))
-              ) {
-                Row(
-                  modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                  verticalAlignment = Alignment.CenterVertically
-                ) {
-                  Text(
-                    text = "➔ ගැළපූ පිළිතුර: $paired",
-                    fontSize = if (isCompact) 8.5.sp else 9.5.sp,
-                    lineHeight = 12.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = if (isChecked) {
-                      if (paired == currentItem.rightCorrectText) Color(0xFF86EFAC) else Color(0xFFFCA5A5)
-                    } else Color(0xFFDDD6FE),
-                    modifier = Modifier.weight(1f)
-                  )
-                  if (!isChecked) {
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                      text = "✕ ඉවත් කරන්න",
-                      fontSize = 8.5.sp,
-                      color = Color(0xFFFCA5A5),
-                      fontWeight = FontWeight.Bold,
-                      modifier = Modifier.clickable {
-                        val updated = studentPairs.toMutableMap()
-                        updated.remove(currentItem.leftText)
-                        studentPairs = updated
-                      }
-                    )
-                  }
-                }
-              }
-              if (isChecked && paired != currentItem.rightCorrectText) {
-                Spacer(modifier = Modifier.height(3.dp))
-                Text(
-                  text = "💡 නිවැරදි පිළිතුර: ${currentItem.rightCorrectText}",
-                  fontSize = 9.sp,
-                  fontWeight = FontWeight.Bold,
-                  color = Color(0xFF34D399)
-                )
-              }
-            }
-          }
-        }
-      }
-
-      // Answers Section Header
-      item {
-        Text(
-          text = "B තීරුවෙන් නිවැරදි පිළිතුර තෝරන්න (පිළිතුරු 10 ම මෙහි ඇත):",
-          fontSize = if (isCompact) 8.5.sp else 9.5.sp,
-          color = Color(0xFF38BDF8),
-          fontWeight = FontWeight.Bold
-        )
-      }
-
-      // All 10 answers in clean list
-      items(shuffledRight.size) { ansIdx ->
-        val rightText = shuffledRight[ansIdx]
-        val pairedKey = studentPairs.entries.find { it.value == rightText }?.key
-        val isPairedWithCurrent = pairedKey == currentItem.leftText
-        val isPairedWithOther = pairedKey != null && !isPairedWithCurrent
-        val pairedQNum = if (pairedKey != null) {
-          matchData.indexOfFirst { it.leftText == pairedKey } + 1
-        } else null
-
-        Surface(
-          shape = RoundedCornerShape(7.dp),
-          color = when {
-            isChecked && isPairedWithCurrent && currentItem.rightCorrectText == rightText -> Color(0xFF065F46)
-            isChecked && isPairedWithCurrent -> Color(0xFF7F1D1D)
-            isPairedWithCurrent -> Color(0xFF6D28D9)
-            isPairedWithOther -> Color(0xFF0F172A)
-            else -> Color(0xFF1E293B)
-          },
-          border = BorderStroke(
-            if (isPairedWithCurrent) 1.5.dp else 1.dp,
-            when {
-              isChecked && isPairedWithCurrent && currentItem.rightCorrectText == rightText -> Color(0xFF34D399)
-              isChecked && isPairedWithCurrent -> Color(0xFFF87171)
-              isPairedWithCurrent -> Color(0xFFA78BFA)
-              isPairedWithOther -> Color(0xFF334155)
-              else -> Color(0xFF475569)
-            }
-          ),
-          modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-              if (!isChecked) {
-                val updated = studentPairs.toMutableMap()
-                val prevKey = updated.entries.find { it.value == rightText }?.key
-                if (prevKey != null) updated.remove(prevKey)
-                updated[currentItem.leftText] = rightText
-                studentPairs = updated
-
-                // Automatically advance to next unanswered question
-                val nextUnanswered = matchData.indices.firstOrNull { i -> !updated.containsKey(matchData[i].leftText) }
-                if (nextUnanswered != null) {
-                  currentQuestionIndex = nextUnanswered
-                }
-              }
-            }
-            .testTag("match_step_ans_$ansIdx")
-        ) {
-          Row(
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
-            verticalAlignment = Alignment.CenterVertically
-          ) {
+            Spacer(modifier = Modifier.width(4.dp))
             Surface(
+              onClick = { selectedLeft = null },
               shape = CircleShape,
-              color = if (isPairedWithCurrent) Color(0xFFA78BFA) else Color(0xFF334155),
+              color = Color.White.copy(alpha = 0.2f),
               modifier = Modifier.size(20.dp)
             ) {
               Box(contentAlignment = Alignment.Center) {
-                Text(
-                  text = ('A' + (ansIdx % 26)).toString(),
-                  fontSize = 9.sp,
-                  fontWeight = FontWeight.Bold,
-                  color = if (isPairedWithCurrent) Color(0xFF1E1B4B) else Color.White
-                )
-              }
-            }
-            Spacer(modifier = Modifier.width(8.dp))
-            Column(modifier = Modifier.weight(1f)) {
-              Text(
-                text = rightText,
-                fontSize = if (isCompact) 9.sp else 9.5.sp,
-                lineHeight = if (isCompact) 12.sp else 13.sp,
-                color = if (isPairedWithOther) Color(0xFF94A3B8) else Color.White
-              )
-              if (isPairedWithCurrent) {
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                  text = "✓ මෙම ප්‍රශ්නයට තෝරාගෙන ඇත",
-                  fontSize = 8.sp,
-                  fontWeight = FontWeight.Bold,
-                  color = Color(0xFFA78BFA)
-                )
-              } else if (isPairedWithOther && pairedQNum != null) {
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                  text = "✓ [ප්‍රශ්න $pairedQNum ට ගලපා ඇත - ක්ලික් කළහොත් මෙයට මාරු වේ]",
-                  fontSize = 7.5.sp,
-                  color = Color(0xFF64748B)
-                )
+                Text("✕", fontSize = 10.sp, color = Color.White, fontWeight = FontWeight.Bold)
               }
             }
           }
         }
       }
     } else {
-      // ----------------------------------------------------
-      // MODE 1: FULL TWO-COLUMN TABLE (ALL 10 AT ONCE)
-      // ----------------------------------------------------
-      if (selectedLeft != null) {
-        item {
+      item {
+        Surface(
+          shape = RoundedCornerShape(6.dp),
+          color = Color(0xFF1E293B),
+          border = BorderStroke(0.8.dp, Color(0xFF334155)),
+          modifier = Modifier.fillMaxWidth()
+        ) {
+          Text(
+            text = "💡 A තීරුවෙන් ප්‍රශ්නයක් තෝරා, B තීරුවෙන් ඊට ගැළපෙන පිළිතුර මත ඔබන්න.",
+            fontSize = if (isCompact) 8.5.sp else 9.5.sp,
+            color = Color(0xFF94A3B8),
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+            textAlign = TextAlign.Center
+          )
+        }
+      }
+    }
+
+    item {
+      Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(if (isCompact) 4.dp else 6.dp)
+      ) {
+        // Left Column (A තීරුව - ප්‍රශ්න 10)
+        Column(
+          modifier = Modifier.weight(1f),
+          verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
           Surface(
-            shape = RoundedCornerShape(8.dp),
-            color = Color(0xFF5B21B6),
-            border = BorderStroke(1.dp, Color(0xFFA78BFA)),
+            shape = RoundedCornerShape(6.dp),
+            color = Color(0xFF8B5CF6).copy(alpha = 0.25f),
             modifier = Modifier.fillMaxWidth()
           ) {
-            Row(
-              modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
-              verticalAlignment = Alignment.CenterVertically
+            Text(
+              text = "A තීරුව (ප්‍රශ්න)",
+              fontSize = if (isCompact) 9.sp else 10.sp,
+              fontWeight = FontWeight.Bold,
+              color = Color(0xFFC4B5FD),
+              modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp),
+              textAlign = TextAlign.Center
+            )
+          }
+
+          matchData.forEachIndexed { itemIdx, item ->
+            val itemNum = itemIdx + 1
+            val isSelected = selectedLeft == item.leftText
+            val pairedWith = studentPairs[item.leftText]
+            val isCorrect = pairedWith == item.rightCorrectText
+
+            Surface(
+              shape = RoundedCornerShape(7.dp),
+              color = when {
+                isChecked && isCorrect -> Color(0xFF065F46)
+                isChecked && pairedWith != null && !isCorrect -> Color(0xFF7F1D1D)
+                isSelected -> Color(0xFF6D28D9)
+                pairedWith != null -> Color(0xFF1E1B4B)
+                else -> Color(0xFF1E293B)
+              },
+              border = BorderStroke(
+                if (isSelected) 1.5.dp else 1.dp,
+                when {
+                  isChecked && isCorrect -> Color(0xFF34D399)
+                  isChecked && pairedWith != null && !isCorrect -> Color(0xFFF87171)
+                  isSelected -> Color(0xFFA78BFA)
+                  pairedWith != null -> Color(0xFF818CF8)
+                  else -> Color(0xFF334155)
+                }
+              ),
+              modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                  selectedLeft = if (selectedLeft == item.leftText) null else item.leftText
+                }
+                .testTag("match_left_${item.id}")
             ) {
-              Text("🎯", fontSize = 11.sp)
-              Spacer(modifier = Modifier.width(6.dp))
-              Column(modifier = Modifier.weight(1f)) {
-                Text(
-                  text = "තෝරාගත් ප්‍රශ්න අංක $selectedLeftIndex (B තීරුවෙන් පිළිතුර මත ඔබන්න):",
-                  fontSize = 8.5.sp,
-                  fontWeight = FontWeight.Bold,
-                  color = Color(0xFFDDD6FE)
-                )
-                Text(
-                  text = selectedLeft!!,
-                  fontSize = 9.5.sp,
-                  fontWeight = FontWeight.Bold,
-                  color = Color.White,
-                  maxLines = 2,
-                  overflow = TextOverflow.Ellipsis
-                )
-              }
-              Spacer(modifier = Modifier.width(4.dp))
-              Surface(
-                onClick = { selectedLeft = null },
-                shape = CircleShape,
-                color = Color.White.copy(alpha = 0.2f),
-                modifier = Modifier.size(20.dp)
-              ) {
-                Box(contentAlignment = Alignment.Center) {
-                  Text("✕", fontSize = 10.sp, color = Color.White, fontWeight = FontWeight.Bold)
+              Column(modifier = Modifier.padding(horizontal = if (isCompact) 4.dp else 6.dp, vertical = 5.dp)) {
+                Row(verticalAlignment = Alignment.Top) {
+                  Text(
+                    text = "$itemNum. ",
+                    fontSize = if (isCompact) 8.5.sp else 9.5.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFFA78BFA)
+                  )
+                  Text(
+                    text = item.leftText,
+                    fontSize = if (isCompact) 8.5.sp else 9.5.sp,
+                    lineHeight = if (isCompact) 11.5.sp else 13.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color.White
+                  )
+                }
+                if (pairedWith != null) {
+                  Spacer(modifier = Modifier.height(3.dp))
+                  Surface(
+                    shape = RoundedCornerShape(4.dp),
+                    color = Color.Black.copy(alpha = 0.4f),
+                    modifier = Modifier.fillMaxWidth()
+                  ) {
+                    Row(
+                      modifier = Modifier.padding(horizontal = 3.dp, vertical = 2.dp),
+                      verticalAlignment = Alignment.CenterVertically
+                    ) {
+                      Text(
+                        text = "➔ $pairedWith",
+                        fontSize = 8.sp,
+                        lineHeight = 10.sp,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        color = if (isChecked) {
+                          if (isCorrect) Color(0xFF86EFAC) else Color(0xFFFCA5A5)
+                        } else Color(0xFFDDD6FE),
+                        modifier = Modifier.weight(1f)
+                      )
+                      Spacer(modifier = Modifier.width(2.dp))
+                      Text(
+                        text = "✕",
+                        fontSize = 8.sp,
+                        color = Color(0xFFFCA5A5),
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.clickable {
+                          val updated = studentPairs.toMutableMap()
+                          updated.remove(item.leftText)
+                          studentPairs = updated
+                          isChecked = false
+                        }
+                      )
+                    }
+                  }
                 }
               }
             }
           }
         }
-      }
 
-      item {
-        Row(
-          modifier = Modifier.fillMaxWidth(),
-          horizontalArrangement = Arrangement.spacedBy(if (isCompact) 4.dp else 6.dp)
+        // Right Column (B තීරුව - පිළිතුරු 10)
+        Column(
+          modifier = Modifier.weight(1f),
+          verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-          // Left Column (A තීරුව - ප්‍රශ්න 10)
-          Column(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+          Surface(
+            shape = RoundedCornerShape(6.dp),
+            color = Color(0xFF38BDF8).copy(alpha = 0.25f),
+            modifier = Modifier.fillMaxWidth()
           ) {
-            Surface(
-              shape = RoundedCornerShape(6.dp),
-              color = Color(0xFF8B5CF6).copy(alpha = 0.25f),
-              modifier = Modifier.fillMaxWidth()
-            ) {
-              Text(
-                text = "A තීරුව (ප්‍රශ්න)",
-                fontSize = if (isCompact) 9.sp else 10.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFFC4B5FD),
-                modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp),
-                textAlign = TextAlign.Center
-              )
-            }
-
-            matchData.forEachIndexed { itemIdx, item ->
-              val itemNum = itemIdx + 1
-              val isSelected = selectedLeft == item.leftText
-              val pairedWith = studentPairs[item.leftText]
-              val isCorrect = pairedWith == item.rightCorrectText
-
-              Surface(
-                shape = RoundedCornerShape(7.dp),
-                color = when {
-                  isChecked && isCorrect -> Color(0xFF065F46)
-                  isChecked && pairedWith != null && !isCorrect -> Color(0xFF7F1D1D)
-                  isSelected -> Color(0xFF6D28D9)
-                  pairedWith != null -> Color(0xFF1E1B4B)
-                  else -> Color(0xFF1E293B)
-                },
-                border = BorderStroke(
-                  if (isSelected) 1.5.dp else 1.dp,
-                  when {
-                    isChecked && isCorrect -> Color(0xFF34D399)
-                    isChecked && pairedWith != null && !isCorrect -> Color(0xFFF87171)
-                    isSelected -> Color(0xFFA78BFA)
-                    pairedWith != null -> Color(0xFF818CF8)
-                    else -> Color(0xFF334155)
-                  }
-                ),
-                modifier = Modifier
-                  .fillMaxWidth()
-                  .clickable {
-                    selectedLeft = if (selectedLeft == item.leftText) null else item.leftText
-                  }
-                  .testTag("match_left_${item.id}")
-              ) {
-                Column(modifier = Modifier.padding(horizontal = if (isCompact) 4.dp else 6.dp, vertical = 5.dp)) {
-                  Row(verticalAlignment = Alignment.Top) {
-                    Text(
-                      text = "$itemNum. ",
-                      fontSize = if (isCompact) 8.5.sp else 9.5.sp,
-                      fontWeight = FontWeight.Bold,
-                      color = Color(0xFFA78BFA)
-                    )
-                    Text(
-                      text = item.leftText,
-                      fontSize = if (isCompact) 8.5.sp else 9.5.sp,
-                      lineHeight = if (isCompact) 11.5.sp else 13.sp,
-                      fontWeight = FontWeight.Medium,
-                      color = Color.White
-                    )
-                  }
-                  if (pairedWith != null) {
-                    Spacer(modifier = Modifier.height(3.dp))
-                    Surface(
-                      shape = RoundedCornerShape(4.dp),
-                      color = Color.Black.copy(alpha = 0.4f),
-                      modifier = Modifier.fillMaxWidth()
-                    ) {
-                      Row(
-                        modifier = Modifier.padding(horizontal = 3.dp, vertical = 2.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                      ) {
-                        Text(
-                          text = "➔ $pairedWith",
-                          fontSize = 8.sp,
-                          lineHeight = 10.sp,
-                          maxLines = 2,
-                          overflow = TextOverflow.Ellipsis,
-                          color = if (isChecked) {
-                            if (isCorrect) Color(0xFF86EFAC) else Color(0xFFFCA5A5)
-                          } else Color(0xFFDDD6FE),
-                          modifier = Modifier.weight(1f)
-                        )
-                        Spacer(modifier = Modifier.width(2.dp))
-                        Text(
-                          text = "✕",
-                          fontSize = 8.sp,
-                          color = Color(0xFFFCA5A5),
-                          fontWeight = FontWeight.Bold,
-                          modifier = Modifier.clickable {
-                            val updated = studentPairs.toMutableMap()
-                            updated.remove(item.leftText)
-                            studentPairs = updated
-                            isChecked = false
-                          }
-                        )
-                      }
-                    }
-                  }
-                }
-              }
-            }
+            Text(
+              text = "B තීරුව (පිළිතුරු)",
+              fontSize = if (isCompact) 9.sp else 10.sp,
+              fontWeight = FontWeight.Bold,
+              color = Color(0xFFBAE6FD),
+              modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp),
+              textAlign = TextAlign.Center
+            )
           }
 
-          // Right Column (B තීරුව - පිළිතුරු 10)
-          Column(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
-          ) {
+          shuffledRight.forEach { rightText ->
+            val pairedKey = studentPairs.entries.find { it.value == rightText }?.key
+            val isAlreadyPaired = pairedKey != null
+            val pairedQNum = if (pairedKey != null) {
+              matchData.indexOfFirst { it.leftText == pairedKey } + 1
+            } else null
+
             Surface(
-              shape = RoundedCornerShape(6.dp),
-              color = Color(0xFF38BDF8).copy(alpha = 0.25f),
-              modifier = Modifier.fillMaxWidth()
-            ) {
-              Text(
-                text = "B තීරුව (පිළිතුරු)",
-                fontSize = if (isCompact) 9.sp else 10.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFFBAE6FD),
-                modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp),
-                textAlign = TextAlign.Center
-              )
-            }
-
-            shuffledRight.forEach { rightText ->
-              val pairedKey = studentPairs.entries.find { it.value == rightText }?.key
-              val isAlreadyPaired = pairedKey != null
-              val pairedQNum = if (pairedKey != null) {
-                matchData.indexOfFirst { it.leftText == pairedKey } + 1
-              } else null
-
-              Surface(
-                shape = RoundedCornerShape(7.dp),
-                color = when {
-                  selectedLeft != null && !isAlreadyPaired -> Color(0xFF1E293B)
-                  isAlreadyPaired -> Color(0xFF0F172A)
-                  else -> Color(0xFF1E293B)
-                },
-                border = BorderStroke(
-                  if (selectedLeft != null && !isAlreadyPaired) 1.5.dp else 1.dp,
-                  when {
-                    selectedLeft != null && !isAlreadyPaired -> Color(0xFF38BDF8)
-                    isAlreadyPaired -> Color(0xFF475569)
-                    else -> Color(0xFF334155)
-                  }
-                ),
-                modifier = Modifier
-                  .fillMaxWidth()
-                  .clickable {
-                    if (selectedLeft != null) {
-                      val updated = studentPairs.toMutableMap()
-                      val previousKey = updated.entries.find { it.value == rightText }?.key
-                      if (previousKey != null) {
-                        updated.remove(previousKey)
-                      }
-                      updated[selectedLeft!!] = rightText
-                      studentPairs = updated
-                      selectedLeft = null
-                      isChecked = false
+              shape = RoundedCornerShape(7.dp),
+              color = when {
+                selectedLeft != null && !isAlreadyPaired -> Color(0xFF1E293B)
+                isAlreadyPaired -> Color(0xFF0F172A)
+                else -> Color(0xFF1E293B)
+              },
+              border = BorderStroke(
+                if (selectedLeft != null && !isAlreadyPaired) 1.5.dp else 1.dp,
+                when {
+                  selectedLeft != null && !isAlreadyPaired -> Color(0xFF38BDF8)
+                  isAlreadyPaired -> Color(0xFF475569)
+                  else -> Color(0xFF334155)
+                }
+              ),
+              modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                  if (selectedLeft != null) {
+                    val updated = studentPairs.toMutableMap()
+                    val previousKey = updated.entries.find { it.value == rightText }?.key
+                    if (previousKey != null) {
+                      updated.remove(previousKey)
                     }
+                    updated[selectedLeft!!] = rightText
+                    studentPairs = updated
+                    selectedLeft = null
+                    isChecked = false
                   }
-              ) {
-                Column(modifier = Modifier.padding(horizontal = if (isCompact) 4.dp else 6.dp, vertical = 5.dp)) {
+                }
+            ) {
+              Column(modifier = Modifier.padding(horizontal = if (isCompact) 4.dp else 6.dp, vertical = 5.dp)) {
+                Text(
+                  text = rightText,
+                  fontSize = if (isCompact) 8.5.sp else 9.5.sp,
+                  lineHeight = if (isCompact) 11.5.sp else 13.sp,
+                  color = if (isAlreadyPaired) Color(0xFF94A3B8) else Color.White
+                )
+                if (isAlreadyPaired && pairedQNum != null) {
+                  Spacer(modifier = Modifier.height(2.dp))
                   Text(
-                    text = rightText,
-                    fontSize = if (isCompact) 8.5.sp else 9.5.sp,
-                    lineHeight = if (isCompact) 11.5.sp else 13.sp,
-                    color = if (isAlreadyPaired) Color(0xFF94A3B8) else Color.White
+                    text = "✓ [ප්‍රශ්න $pairedQNum ට ගැළපුවා]",
+                    fontSize = 7.5.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF34D399)
                   )
-                  if (isAlreadyPaired && pairedQNum != null) {
-                    Spacer(modifier = Modifier.height(2.dp))
-                    Text(
-                      text = "✓ [ප්‍රශ්න $pairedQNum ට ගැළපුවා]",
-                      fontSize = 7.5.sp,
-                      fontWeight = FontWeight.Bold,
-                      color = Color(0xFF34D399)
-                    )
-                  } else if (selectedLeft != null) {
-                    Spacer(modifier = Modifier.height(2.dp))
-                    Text(
-                      text = "තෝරන්න ➔",
-                      fontSize = 7.5.sp,
-                      fontWeight = FontWeight.Bold,
-                      color = Color(0xFF38BDF8)
-                    )
-                  }
+                } else if (selectedLeft != null) {
+                  Spacer(modifier = Modifier.height(2.dp))
+                  Text(
+                    text = "තෝරන්න ➔",
+                    fontSize = 7.5.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF38BDF8)
+                  )
                 }
               }
             }
@@ -3338,40 +3035,45 @@ fun TrueFalse500Content(
           modifier = Modifier.fillMaxWidth().testTag("focus_question_card")
         ) {
           Column(modifier = Modifier.padding(16.dp)) {
-            // Unit Name & Question Number Badge
+            // Unit Name & Question Number Badge (Ultra-Compact)
             Row(
               modifier = Modifier.fillMaxWidth(),
               horizontalArrangement = Arrangement.SpaceBetween,
               verticalAlignment = Alignment.CenterVertically
             ) {
               Surface(
-                shape = RoundedCornerShape(6.dp),
-                color = selectedSubject.primaryColor.copy(alpha = 0.2f)
+                shape = RoundedCornerShape(4.dp),
+                color = selectedSubject.primaryColor.copy(alpha = 0.2f),
+                modifier = Modifier.weight(1f)
               ) {
                 Text(
                   text = activeQ.unitName,
-                  fontSize = 11.sp,
+                  fontSize = 10.sp,
                   fontWeight = FontWeight.Bold,
                   color = selectedSubject.primaryColor,
-                  modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                  maxLines = 1,
+                  overflow = TextOverflow.Ellipsis,
+                  modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                 )
               }
 
+              Spacer(modifier = Modifier.width(6.dp))
+
               Surface(
-                shape = RoundedCornerShape(6.dp),
+                shape = RoundedCornerShape(4.dp),
                 color = Color(0xFF0F172A)
               ) {
                 Text(
-                  text = "ප්‍රශ්න ${effectiveIndex + 1} / ${displayedQuestions.size} (මුළු #${activeQ.number})",
-                  fontSize = 10.sp,
+                  text = "${effectiveIndex + 1}/${displayedQuestions.size} (#${activeQ.number})",
+                  fontSize = 9.5.sp,
                   fontWeight = FontWeight.Bold,
                   color = Color(0xFFCBD5E1),
-                  modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp)
+                  modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.dp)
                 )
               }
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Statement with Voice / TTS button
             Row(
@@ -3931,36 +3633,41 @@ fun TrueFalse500Content(
                 onFullScreenToggle(true)
               }
           ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-              // Top badges
+            Column(modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp)) {
+              // Top badges (Ultra-Compact)
               Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
               ) {
                 Surface(
-                  shape = RoundedCornerShape(6.dp),
-                  color = selectedSubject.primaryColor.copy(alpha = 0.2f)
+                  shape = RoundedCornerShape(4.dp),
+                  color = selectedSubject.primaryColor.copy(alpha = 0.2f),
+                  modifier = Modifier.weight(1f)
                 ) {
                   Text(
                     text = "${selectedSubject.displayName} • ${activeQ.unitName}",
-                    fontSize = 10.sp,
+                    fontSize = 9.5.sp,
                     fontWeight = FontWeight.Bold,
                     color = selectedSubject.primaryColor,
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                   )
                 }
 
+                Spacer(modifier = Modifier.width(6.dp))
+
                 Surface(
-                  shape = RoundedCornerShape(6.dp),
+                  shape = RoundedCornerShape(4.dp),
                   color = Color(0xFF334155)
                 ) {
                   Text(
-                    text = "අංක ${effectiveIndex + 1} / ${displayedQuestions.size} (මුළු #${activeQ.number})",
-                    fontSize = 10.sp,
+                    text = "${effectiveIndex + 1}/${displayedQuestions.size} (#${activeQ.number})",
+                    fontSize = 9.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFFCBD5E1),
-                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                    modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.dp)
                   )
                 }
               }

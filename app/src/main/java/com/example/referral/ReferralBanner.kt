@@ -31,7 +31,6 @@ fun ReferralBanner(modifier: Modifier = Modifier) {
     }
     
     fun shareToApp(packageName: String, appName: String, isGroup: Boolean) {
-        val downloadUrl = getSavedGitHubShareUrl(context)
         val shareText = """
             අ.පො.ස. සාමාන්‍ය පෙළ (10 සහ 11 වසර) හදාරන දූදරුවන්ටම විශේෂයි! 📚✨
 
@@ -62,7 +61,6 @@ fun ReferralBanner(modifier: Modifier = Modifier) {
 
 
             Playstore හරහා O/L Guru ඇප් එක ඩවුන්ලෝඩ් කරගන්න🤘🤘🤘
-            $downloadUrl
         """.trimIndent()
         
         try {

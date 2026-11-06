@@ -5104,7 +5104,6 @@ fun TopHeaderSection(
       val shareContext = LocalContext.current
       Surface(
         onClick = {
-          val activeGithubUrl = getSavedGitHubShareUrl(shareContext)
           val shareText = """
 අ.පො.ස. සාමාන්‍ය පෙළ (10 සහ 11 වසර) හදාරන දූදරුවන්ටම විශේෂයි! 📚✨
 
@@ -5135,7 +5134,6 @@ fun TopHeaderSection(
 
 
 Playstore හරහා O/L Guru ඇප් එක ඩවුන්ලෝඩ් කරගන්න🤘🤘🤘
-$activeGithubUrl
 """.trimIndent()
           val shareIntent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
