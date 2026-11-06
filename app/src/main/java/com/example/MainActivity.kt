@@ -96,6 +96,7 @@ import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.Quiz
 import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Pending
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.UploadFile
@@ -683,6 +684,8 @@ fun StudentPortalApp() {
       AppSecurityManager.enforceSecurityForUser(act, isAdmin)
     }
   }
+  
+
 
   var showAuthRequiredDialog by remember { mutableStateOf(false) }
   var authDialogInitialTab by remember { mutableStateOf(1) }
@@ -923,6 +926,25 @@ fun StudentPortalApp() {
       activeQuizSet = null
       showFlashcardsDialog = false
       showPdfQuizBottomSheet = false
+    }
+  }
+
+  // Dynamically toggle Screen Capture Protection based on current screen
+  // User explicitly requested to allow screenshots ONLY on the "HOME" screen (Main Dashboard)
+  LaunchedEffect(
+    currentScreen, isAdminAuthenticated, showAppLaunchSplash,
+    showIframePdfModal, activeQuizSet, showSanduTheoryFullReaderGlobal, 
+    showSinhalaVicharaDharaReaderGlobal, showAuthRequiredDialog, showPaymentApprovalDialog
+  ) {
+    (context as? Activity)?.let { act ->
+      val isHomeScreen = currentScreen == "HOME" && !showAppLaunchSplash
+      val isAnyRestrictedModalOpen = showIframePdfModal || activeQuizSet != null || 
+                                     showSanduTheoryFullReaderGlobal || showSinhalaVicharaDharaReaderGlobal ||
+                                     showAuthRequiredDialog || showPaymentApprovalDialog
+                                     
+      // Disable protection (allow screenshot) if user is Admin OR (on Home Screen AND no sensitive modal is open)
+      val shouldDisableProtection = isAdminAuthenticated || (isHomeScreen && !isAnyRestrictedModalOpen)
+      AppSecurityManager.applyScreenProtection(act, !shouldDisableProtection)
     }
   }
 
@@ -5070,37 +5092,40 @@ fun TopHeaderSection(
         onClick = {
           val activeGithubUrl = getSavedGitHubShareUrl(shareContext)
           val shareText = """
-අ.පො.ස. සාමාන්‍ය පෙළ (10 සහ 11 වසර) හදාරන දූදරුවන්ටම විශේෂයි! 📚✨
+අ.පො.ස. සාමාන්ය පෙළ (10 සහ 11 වසර) හදාරන දූදරුවන්ටම විශේෂයි! 📚✨
 
-ඔන්න ඔබේ විභාග සාර්ථක කරගන්න අවශ්‍ය සියලුම පහසුකම් දැන් එකම ඇප් එකකින්!
+ඔන්න ඔබේ විභාග සාර්ථක කරගන්න අවශ්ය සියලුම පහසුකම් දැන් එකම ඇප් එකකින්!
 
 පහත විශේෂාංග රැසක් මෙහි අන්තර්ගත වේ:
 
-10 සහ 11 ශ්‍රේණි සඳහා අදාළ සියලුම විෂයන්ගේ කෙටි සටහන් කට්ටල 📖
+10 සහ 11 ශ්රේණි සඳහා අදාළ සියලුම විෂයන්ගේ කෙටි සටහන් කට්ටල 📖
 
-සියලුම විෂයන්ගේ වාර විභාග ප්‍රශ්න පත්‍ර සහ වාර විභාග අනුමාන ප්‍රශ්න පත්‍ර 500ක් (සජීවීව උත්තර දී ප්‍රතිඵල බලාගත හැක) 📝
+සියලුම විෂයන්ගේ වාර විභාග ප්රශ්න පත්ර සහ වාර විභාග අනුමාන ප්රශ්න පත්ර 500ක් (සජීවීව උත්තර දී ප්රතිඵල බලාගත හැක) 📝
 
-සා/පෙළ පසුගිය ප්‍රශ්න පත්‍ර හා අනුමාන ප්‍රශ්න පත්‍ර 🎯
+සා/පෙළ පසුගිය ප්රශ්න පත්ර හා අනුමාන ප්රශ්න පත්ර 🎯
 
-සෑම විෂයකම පාඩමින් පාඩමට ප්‍රශ්න කාණ්ඩ සහ ක්විස් (Quizzes) ආකාරයේ ප්‍රශ්න 20,000ක් ❓
+සෑම විෂයකම පාඩමින් පාඩමට ප්රශ්න කාණ්ඩ සහ ක්විස් (Quizzes) ආකාරයේ ප්රශ්න 20,000ක් ❓
 
-කෙටි ප්‍රශ්න හා සත්‍ය/අසත්‍ය ප්‍රකාශන ප්‍රශ්න 30,000ක් 💡
+කෙටි ප්රශ්න හා සත්ය/අසත්ය ප්රකාශන ප්රශ්න 30,000ක් 💡
 
-සවන් දිය හැකි ආකාරයේ වොයිස් (Voice) ආශ්‍රිත පාඩම් 300ක් 🎧
+සවන් දිය හැකි ආකාරයේ වොයිස් (Voice) ආශ්රිත පාඩම් 300ක් 🎧
 
-සෑම විෂයකටම විශේෂාංග කොටසක් සහ විද්‍යාව, ඉතිහාසය විෂයන් සඳහා විශේෂ පාඩම් මාලා, මතක තබා ගැනීමේ ක්‍රමවේද හා සිතියම් 🗺️
+සෑම විෂයකටම විශේෂාංග කොටසක් සහ විද්යාව, ඉතිහාසය විෂයන් සඳහා විශේෂ පාඩම් මාලා, මතක තබා ගැනීමේ ක්රමවේද හා සිතියම් 🗺️
 
-ගණිතය කෙටි ප්‍රශ්න 4,000ක්
+ගණිතය කෙටි ප්රශ්න 4,000ක්
 
-ඉංග්‍රීසි භාෂාව මුල සිටම උගන්වන විශේෂ පංති විශේෂාංග 🇬🇧
+ඉංග්රීසි භාෂාව මුල සිටම උගන්වන විශේෂ පංති විශේෂාංග 🇬🇧
 
-මේ සියල්ල දැන්ම ලබාගෙන ඔබේ විභාග ජයග්‍රහණය තහවුරු කරගන්න!
+මේ සියල්ල දැන්ම ලබාගෙන ඔබේ විභාග ජයග්රහණය තහවුරු කරගන්න!
 🎁👇
+
+
+Playstore හරහා O/L Guru ඇප් එක ඩවුන්ලෝඩ් කරගන්න🤘🤘🤘
 $activeGithubUrl
 """.trimIndent()
           val shareIntent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
-            putExtra(Intent.EXTRA_SUBJECT, "O/L Study Portal App")
+            putExtra(Intent.EXTRA_SUBJECT, "O/L Guru App")
             putExtra(Intent.EXTRA_TEXT, shareText)
           }
           try {
@@ -6654,7 +6679,7 @@ fun getNotesForGrade(grade: String): List<ShortNoteItem> {
       topicSinhala = "11 ශ්‍රේණිය විද්‍යාව කෙටි සටහන්",
       readTime = "🔒 ආරක්ෂිත PDF • Google Drive",
       isPopular = true,
-      pdfUri = "https://drive.google.com/file/d/17TcFs1wECaHB4C3LMdC8mO2YDKrtrEOI/preview",
+      pdfUri = "https://drive.google.com/file/d/1vx9uXTL_pKexaA5g0IHPa47h6eKdINZl/preview",
       fileName = "Science_Short_Notes_Gr11.pdf",
       isPasswordProtected = false,
       password = null
@@ -6881,7 +6906,7 @@ fun getNotesForGrade(grade: String): List<ShortNoteItem> {
       topicSinhala = "10 ශ්‍රේණිය විද්‍යාව කෙටි සටහන්",
       readTime = "🔒 ආරක්ෂිත PDF • Google Drive",
       isPopular = true,
-      pdfUri = "https://drive.google.com/file/d/1vx9uXTL_pKexaA5g0IHPa47h6eKdINZl/preview",
+      pdfUri = "https://drive.google.com/file/d/17TcFs1wECaHB4C3LMdC8mO2YDKrtrEOI/preview",
       fileName = "Science_Short_Notes_Gr10.pdf",
       isPasswordProtected = false,
       password = null
@@ -8993,7 +9018,9 @@ fun LoginAndApprovalDialog(
   onAddNewContentClick: () -> Unit = {}
 ) {
   val context = LocalContext.current
-  var selectedTab by remember(initialTab) { mutableStateOf(initialTab) } // 0: Login, 1: Register, 2: Admin
+  val (currDevId, _) = getDeviceIdentifier(context)
+  val pendingUserForDevice = registeredUsers.find { it.boundDeviceId == currDevId && !it.isApproved && !isAuthorizedAdminUser(it.usernameOrPhone) }
+  var selectedTab by remember(initialTab) { mutableStateOf(if (pendingUserForDevice != null) 1 else initialTab) } // 0: Login, 1: Register, 2: Admin
 
   // Login Form State
   var loginPhone by remember { mutableStateOf("") }
@@ -9377,7 +9404,7 @@ fun LoginAndApprovalDialog(
                     Toast.makeText(context, "සාදරයෙන් පිළිගනිමු ${updatedUser.fullName}! (🎓 අනුමත ශිෂ්‍ය ගිණුම සක්‍රීයයි)", Toast.LENGTH_SHORT).show()
                   } else {
                     // WhatsApp Direct Sharing for Pending Users
-                    val whatsappMsg = "ආයුබෝවන් ඇඩ්මින්තුමනි!\n\nමම O/L Study Portal ඇප් එකේ මීට පෙර ලියාපදිංචි වී දැනට අනුමැතිය අපේක්ෂාවෙන් සිටිමි. කරුණාකර මගේ ගිණුම පරීක්ෂා කර අනුමත කරන්න.\n\n👤 නම: ${updatedUser.fullName}\n📞 අංකය: ${updatedUser.usernameOrPhone}\n📦 පැකේජය: ${updatedUser.requestedGradePackage}\n\nස්තූතියි!"
+                    val whatsappMsg = "ආයුබෝවන් ඇඩ්මින්!\n\nමම O/L Guru ඇප් එකේ මීට පෙර ලියාපදිංචි වී දැනට අනුමැතිය අපේක්ෂාවෙන් සිටිමි. කරුණාකර මගේ ගිණුම පරීක්ෂා කර අනුමත කරන්න.\n\n👤 නම: ${updatedUser.fullName}\n📞 අංකය: ${updatedUser.usernameOrPhone}\n📦 පැකේජය: 10 ශ්‍රේණිය හා 11 ශ්‍රේණිය\n\nස්තූතියි!"
                     val encodedMsg = Uri.encode(whatsappMsg)
                     val wpUri = Uri.parse("https://wa.me/94772843861?text=$encodedMsg")
                     val intent = Intent(Intent.ACTION_VIEW, wpUri)
@@ -9411,7 +9438,7 @@ fun LoginAndApprovalDialog(
                   onLoginSuccess(autoStudent)
 
                   // WhatsApp Direct Sharing for Auto-Registered Pending Users
-                  val whatsappMsg = "ආයුබෝවන් ඇඩ්මින්තුමනි!\n\nමම O/L Study Portal ඇප් එකේ අලුතින් ලියාපදිංචි වුනා. කරුණාකර මගේ ගිණුම පරීක්ෂා කර අනුමත කරන්න.\n\n👤 නම: ${autoStudent.fullName}\n📞 අංකය: ${autoStudent.usernameOrPhone}\n📦 පැකේජය: ${autoStudent.requestedGradePackage}\n\nස්තූතියි!"
+                  val whatsappMsg = "ආයුබෝවන් ඇඩ්මින්!\n\nමම O/L Guru ඇප් එකේ අලුතින් ලියාපදිංචි වුනා. කරුණාකර මගේ ගිණුම පරීක්ෂා කර අනුමත කරන්න.\n\n👤 නම: ${autoStudent.fullName}\n📞 අංකය: ${autoStudent.usernameOrPhone}\n📦 පැකේජය: 10 ශ්‍රේණිය හා 11 ශ්‍රේණිය\n\nස්තූතියි!"
                   val encodedMsg = Uri.encode(whatsappMsg)
                   val wpUri = Uri.parse("https://wa.me/94772843861?text=$encodedMsg")
                   val intent = Intent(Intent.ACTION_VIEW, wpUri)
@@ -9472,13 +9499,96 @@ fun LoginAndApprovalDialog(
           }
           1 -> {
             // REGISTER FORM
-            Text(
-              text = "නව ශිෂ්‍ය ලියාපදිංචිය (New Registration)",
-              fontWeight = FontWeight.Bold,
-              fontSize = 14.sp,
-              color = NeutralDark,
-              modifier = Modifier.fillMaxWidth()
-            )
+            if (pendingUserForDevice != null) {
+              // PROMINENT PENDING APPROVAL STATUS CARD
+              Surface(
+                shape = RoundedCornerShape(16.dp),
+                color = Color(0xFFFFF7ED),
+                border = BorderStroke(2.dp, Color(0xFFF97316)),
+                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+              ) {
+                Column(
+                  modifier = Modifier.padding(16.dp),
+                  horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                  Icon(
+                    imageVector = Icons.Default.Pending,
+                    contentDescription = "Pending",
+                    tint = Color(0xFFF97316),
+                    modifier = Modifier.size(56.dp)
+                  )
+                  Spacer(modifier = Modifier.height(14.dp))
+                  Text(
+                    text = "අනුමැතිය පොරොත්තු ලේඛනයේ ඇත",
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 17.sp,
+                    color = Color(0xFF9A3412),
+                    textAlign = TextAlign.Center
+                  )
+                  Text(
+                    text = "(Approval Pending)",
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF9A3412),
+                    textAlign = TextAlign.Center
+                  )
+                  
+                  Spacer(modifier = Modifier.height(14.dp))
+                  HorizontalDivider(color = Color(0xFFFFEDD5))
+                  Spacer(modifier = Modifier.height(14.dp))
+                  
+                  Text(
+                    text = "👤 නම: ${pendingUserForDevice.fullName}",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.5.sp,
+                    color = Color(0xFF431407)
+                  )
+                  Text(
+                    text = "📞 දුරකථනය: ${pendingUserForDevice.usernameOrPhone}",
+                    fontSize = 13.sp,
+                    color = Color(0xFF431407)
+                  )
+                  
+                  Spacer(modifier = Modifier.height(16.dp))
+                  
+                  Text(
+                    text = "ඔබ දැනටමත් සාර්ථකව ලියාපදිංචි වී ඇත. ඇඩ්මින් විසින් ඔබගේ විස්තර පරීක්ෂා කර අනුමත කරන තෙක් කරුණාකර රැඳී සිටින්න. අනුමත වූ පසු ඔබට සියලුම අන්තර්ගතයන් විවෘත වනු ඇත.",
+                    fontSize = 11.5.sp,
+                    color = Color(0xFF7C2D12),
+                    textAlign = TextAlign.Center,
+                    lineHeight = 17.sp
+                  )
+                  
+                  Spacer(modifier = Modifier.height(20.dp))
+                  
+                  Button(
+                    onClick = {
+                      val whatsappMsg = "ආයුබෝවන් ඇඩ්මින්!\n\nමම O/L Guru ඇප් එකේ ලියාපදිංචි වී අනුමැතිය අපේක්ෂාවෙන් සිටිමි. කරුණාකර මගේ ගිණුම පරීක්ෂා කර අනුමත කරන්න.\n\n👤 නම: ${pendingUserForDevice.fullName}\n📞 අංකය: ${pendingUserForDevice.usernameOrPhone}\n📦 පැකේජය: 10 ශ්‍රේණිය හා 11 ශ්‍රේණිය\n\nස්තූතියි!"
+                      val encodedMsg = Uri.encode(whatsappMsg)
+                      val wpUri = Uri.parse("https://wa.me/94772843861?text=$encodedMsg")
+                      val intent = Intent(Intent.ACTION_VIEW, wpUri)
+                      try {
+                        context.startActivity(intent)
+                      } catch (_: Exception) {}
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF97316)),
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.fillMaxWidth().height(46.dp)
+                  ) {
+                    Icon(Icons.Default.Chat, contentDescription = "WhatsApp")
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("ඇඩ්මින්ට WhatsApp පණිවිඩයක් යවන්න", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                  }
+                }
+              }
+            } else {
+              Text(
+                text = "නව ශිෂ්‍ය ලියාපදිංචිය (New Registration)",
+                fontWeight = FontWeight.Bold,
+                fontSize = 14.sp,
+                color = NeutralDark,
+                modifier = Modifier.fillMaxWidth()
+              )
             Spacer(modifier = Modifier.height(6.dp))
             Text(
               text = "ලියාපදිංචි වන මුල් දුරකථනයට පමණක් ගිණුම ආරක්ෂිතව සම්බන්ධ වේ (Device Locked).",
@@ -9735,7 +9845,7 @@ fun LoginAndApprovalDialog(
                   onLoginSuccess(newAcc)
                   
                   // WhatsApp Direct Sharing for Admin Approval
-                  val whatsappMsg = "ආයුබෝවන් ඇඩ්මින්තුමනි!\n\nමම O/L Study Portal ඇප් එකේ අලුතින් ලියාපදිංචි වුනා. කරුණාකර මගේ ගිණුම පරීක්ෂා කර අනුමත කරන්න.\n\n👤 නම: ${newAcc.fullName}\n📞 අංකය: ${newAcc.usernameOrPhone}\n📦 පැකේජය: ${newAcc.requestedGradePackage}\n📅 දිනය: ${newAcc.requestDate}\n\nස්තූතියි!"
+                  val whatsappMsg = "ආයුබෝවන් ඇඩ්මින්!\n\nමම O/L Guru ඇප් එකේ අලුතින් ලියාපදිංචි වුනා. කරුණාකර මගේ ගිණුම පරීක්ෂා කර අනුමත කරන්න.\n\n👤 නම: ${newAcc.fullName}\n📞 අංකය: ${newAcc.usernameOrPhone}\n📦 පැකේජය: 10 ශ්‍රේණිය හා 11 ශ්‍රේණිය\n📅 දිනය: ${newAcc.requestDate}\n\nස්තූතියි!"
                   val encodedMsg = Uri.encode(whatsappMsg)
                   val wpUri = Uri.parse("https://wa.me/94772843861?text=$encodedMsg")
                   val intent = Intent(Intent.ACTION_VIEW, wpUri)
@@ -9775,6 +9885,7 @@ fun LoginAndApprovalDialog(
               ) {
                 Text("ඇතුළුවන්න (Login)", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = BluePrimary)
               }
+            }
             }
           }
           2 -> {
