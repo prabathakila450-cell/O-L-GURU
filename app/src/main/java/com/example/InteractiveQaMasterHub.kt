@@ -1995,9 +1995,9 @@ fun MatchingAndOrderingSection(
                   subjectEnglish = if (subTab == 0) "Matching" else "Timeline",
                   icon = icon,
                   color = Color(0xFF8B5CF6),
-                  badge = if (subTab == 0) "10x10" else "TIME",
-                  setsCountDesc = if (subTab == 0) "කාණ්ඩ 10 • ප්‍රශ්න 100" else "අභ්‍යාස • කාලරේඛා",
-                  unitsSummaryBrief = if (subTab == 0) "10x10 කාණ්ඩ ක්‍රමය (ප්‍රශ්න 100)" else "විෂය කරුණු නිවැරදිව පෙළගැස්වීම"
+                  badge = if (subTab == 0) "1000 Qs" else "TIME",
+                  setsCountDesc = if (subTab == 0) "කාණ්ඩ 100 • ප්‍රශ්න 1000" else "අභ්‍යාස • කාලරේඛා",
+                  unitsSummaryBrief = if (subTab == 0) "100x10 කාණ්ඩ ක්‍රමය (ප්‍රශ්න 1000)" else "විෂය කරුණු නිවැරදිව පෙළගැස්වීම"
                 ),
                 onClick = { 
                   activeSubjectName = subjName

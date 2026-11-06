@@ -27,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -463,7 +464,11 @@ fun MistakeNotebookScreen(
               MistakeNotebookRepository.deleteMistake(context, item.id)
               refreshData()
             },
-            onReviewNotes = { onOpenNotesForSubject(item.subject) }
+            onReviewNotes = { onOpenNotesForSubject(item.subject) },
+            onResolvedCorrectly = {
+              MistakeNotebookRepository.deleteMistake(context, item.id)
+              refreshData()
+            }
           )
         }
       }
@@ -484,10 +489,21 @@ fun MistakeInteractiveCard(
   item: MistakeItem,
   onToggleMastered: () -> Unit,
   onDelete: () -> Unit,
-  onReviewNotes: () -> Unit
+  onReviewNotes: () -> Unit,
+  onResolvedCorrectly: () -> Unit = onDelete
 ) {
+  val context = LocalContext.current
   var selectedOption by remember { mutableStateOf<Int?>(null) }
   var showExplanation by remember { mutableStateOf(false) }
+  var isResolvedCorrectly by remember { mutableStateOf(false) }
+
+  LaunchedEffect(isResolvedCorrectly) {
+    if (isResolvedCorrectly) {
+      delay(1200L)
+      onResolvedCorrectly()
+      Toast.makeText(context, "✅ ප්‍රශ්නය නිවැරදි කර වරදවාගත් ප්‍රශ්න වලින් ඉවත් කරන ලදී!", Toast.LENGTH_SHORT).show()
+    }
+  }
 
   val subjectColor = when (item.subject) {
     "විද්‍යාව" -> Color(0xFF16A34A)
@@ -633,8 +649,13 @@ fun MistakeInteractiveCard(
 
           Surface(
             onClick = {
-              selectedOption = idx
-              showExplanation = true
+              if (!isResolvedCorrectly) {
+                selectedOption = idx
+                showExplanation = true
+                if (idx == item.correctOptionIndex) {
+                  isResolvedCorrectly = true
+                }
+              }
             },
             shape = RoundedCornerShape(8.dp),
             color = bgColor,
@@ -667,9 +688,57 @@ fun MistakeInteractiveCard(
                 fontWeight = if (isUserSelected || (showExplanation && isCorrect)) FontWeight.Bold else FontWeight.Normal,
                 modifier = Modifier.weight(1f)
               )
-              if (isPriorWrong && selectedOption == null) {
+              if (isUserSelected && isCorrect) {
+                Text("✓ නිවැරදියි", fontSize = 10.sp, color = Color(0xFF16A34A), fontWeight = FontWeight.Bold)
+              } else if (isPriorWrong && selectedOption == null) {
                 Text("⚠️ පෙර වරද", fontSize = 9.sp, color = Color(0xFFDC2626), fontWeight = FontWeight.Bold)
               }
+            }
+          }
+        }
+      }
+
+      // Success Banner when corrected
+      AnimatedVisibility(visible = isResolvedCorrectly) {
+        Card(
+          shape = RoundedCornerShape(10.dp),
+          colors = CardDefaults.cardColors(containerColor = Color(0xFFDCFCE7)),
+          border = BorderStroke(1.dp, Color(0xFF86EFAC)),
+          modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp)
+        ) {
+          Row(
+            modifier = Modifier.padding(10.dp),
+            verticalAlignment = Alignment.CenterVertically
+          ) {
+            Text("🎉", fontSize = 20.sp)
+            Spacer(modifier = Modifier.width(8.dp))
+            Column(modifier = Modifier.weight(1f)) {
+              Text(
+                text = "විශිෂ්ටයි! ඔබ ප්‍රශ්නය නිවැරදි කළා!",
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF166534)
+              )
+              Text(
+                text = "මෙම ප්‍රශ්නය වරදවාගත් ප්‍රශ්න ලැයිස්තුවෙන් ඉවත් වේ...",
+                fontSize = 10.5.sp,
+                color = Color(0xFF15803D)
+              )
+            }
+            Spacer(modifier = Modifier.width(6.dp))
+            Button(
+              onClick = {
+                onResolvedCorrectly()
+                Toast.makeText(context, "✅ ප්‍රශ්නය සාර්ථකව ඉවත් විය!", Toast.LENGTH_SHORT).show()
+              },
+              shape = RoundedCornerShape(6.dp),
+              colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF16A34A)),
+              contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
+              modifier = Modifier.height(28.dp)
+            ) {
+              Text("දැන්ම ඉවත් කරන්න", fontSize = 9.5.sp, fontWeight = FontWeight.Bold)
             }
           }
         }
@@ -729,16 +798,21 @@ fun MistakeInteractiveCard(
           }
 
           Button(
-            onClick = onToggleMastered,
+            onClick = {
+              onResolvedCorrectly()
+              Toast.makeText(context, "✅ ප්‍රශ්නය නිවැරදි කර ඉවත් කරන ලදී!", Toast.LENGTH_SHORT).show()
+            },
             shape = RoundedCornerShape(8.dp),
             colors = ButtonDefaults.buttonColors(
-              containerColor = if (item.isMastered) Color(0xFF64748B) else Color(0xFF16A34A)
+              containerColor = Color(0xFF16A34A)
             ),
             contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
             modifier = Modifier.height(32.dp)
           ) {
+            Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(13.dp))
+            Spacer(modifier = Modifier.width(4.dp))
             Text(
-              text = if (item.isMastered) "නැවත ලැයිස්තුවට" else "✅ ප්‍රගුණ කළා",
+              text = "නිවැරදියි (ඉවත් කරන්න)",
               fontSize = 10.5.sp,
               fontWeight = FontWeight.Bold
             )

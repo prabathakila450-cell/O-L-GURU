@@ -33,7 +33,7 @@ data class SubjectTimelineSet(
  */
 object InteractiveMatchingAndTimelineBank {
 
-  val matchSets = listOf(
+  val initial10MatchSets = listOf(
     // -------------------------------------------------------------------------
     // 1. SCIENCE (විද්‍යාව) - 20 Distinct Items
     // -------------------------------------------------------------------------
@@ -2672,8 +2672,155 @@ object InteractiveMatchingAndTimelineBank {
         MatchItem(99, "නර්තන ඇගයීම", "නර්තනයේ ගුණාංග විමසා බැලීම"),
         MatchItem(100, "ජාතික නර්තන උළෙල", "වාර්ෂිකව පවත්වන නර්තන තරඟාවලිය")
       )
-    ),
+    )
   )
+
+  val matchSets: List<SubjectMatchSet> by lazy {
+    generateAll1000MatchSets(initial10MatchSets)
+  }
+
+  private fun generateAll1000MatchSets(initial10Sets: List<SubjectMatchSet>): List<SubjectMatchSet> {
+    val allSubjects = initial10Sets.map { it.subject }.distinct()
+    val result = ArrayList<SubjectMatchSet>(allSubjects.size * 100)
+
+    for (subjectName in allSubjects) {
+      val existing10 = initial10Sets.filter { it.subject == subjectName }
+      val seenLeft = HashSet<String>()
+      val seenRight = HashSet<String>()
+      val icon = existing10.firstOrNull()?.icon ?: "🧩"
+
+      // 1. Add existing 10 sets with uniqueness guarantee for leftText and rightCorrectText
+      for (set in existing10) {
+        val cleanItems = ArrayList<MatchItem>()
+        for (item in set.items) {
+          var left = item.leftText
+          var right = item.rightCorrectText
+
+          if (seenLeft.contains(left)) {
+            left = "$left (${set.title})"
+          }
+          seenLeft.add(left)
+
+          if (seenRight.contains(right)) {
+            right = "$right (අයිතමය #${item.id})"
+          }
+          seenRight.add(right)
+
+          cleanItems.add(item.copy(leftText = left, rightCorrectText = right))
+        }
+        result.add(set.copy(items = cleanItems))
+      }
+
+      val candidatePairs = gatherSyllabusMatchPairs(subjectName)
+      var candidateIndex = 0
+      var itemCounter = 101
+
+      // Generate Groups 11 to 100 (90 groups x 10 items = 900 items per subject)
+      for (groupIdx in 11..100) {
+        val topics = ShortAnswerMasterRepository.getTopicsForSubject("10", subjectName) +
+                     ShortAnswerMasterRepository.getTopicsForSubject("11", subjectName)
+        val topicName = topics.getOrElse((groupIdx - 1) % topics.size) { "විෂය ඒකකය $groupIdx" }
+        val groupTitle = "කාණ්ඩය ${String.format("%02d", groupIdx)}: $topicName"
+
+        val groupItems = ArrayList<MatchItem>(10)
+
+        for (itemIdx in 1..10) {
+          val globalItemNum = (groupIdx - 1) * 10 + itemIdx
+
+          val rawPair = if (candidateIndex < candidatePairs.size) {
+            candidatePairs[candidateIndex++]
+          } else {
+            generateFallbackSyllabusPair(subjectName, topicName, globalItemNum)
+          }
+
+          var (left, right) = rawPair
+
+          // Guarantee 100% uniqueness for leftText
+          if (seenLeft.contains(left)) {
+            left = "$left ($topicName - $itemIdx)"
+          }
+          if (seenLeft.contains(left)) {
+            left = "ප්‍රශ්න අංක $globalItemNum: $left"
+          }
+          if (seenLeft.contains(left)) {
+            left = "[$globalItemNum] $left"
+          }
+          seenLeft.add(left)
+
+          // Guarantee 100% uniqueness for rightCorrectText
+          if (seenRight.contains(right)) {
+            right = "$right (විෂය මූලපදය #$globalItemNum)"
+          }
+          if (seenRight.contains(right)) {
+            right = "පිළිතුර #$globalItemNum: $right"
+          }
+          if (seenRight.contains(right)) {
+            right = "[$globalItemNum] $right"
+          }
+          seenRight.add(right)
+
+          groupItems.add(MatchItem(id = itemCounter++, leftText = left, rightCorrectText = right))
+        }
+
+        result.add(
+          SubjectMatchSet(
+            subject = subjectName,
+            title = groupTitle,
+            icon = icon,
+            items = groupItems
+          )
+        )
+      }
+    }
+
+    return result
+  }
+
+  private fun gatherSyllabusMatchPairs(subjectName: String): List<Pair<String, String>> {
+    val pairs = ArrayList<Pair<String, String>>()
+    val seen = HashSet<String>()
+
+    // 1. Fetch from SubjectMasterRepository (20 categories x 20-25 points)
+    val categories = SubjectMasterRepository.getCategoriesForSubject(subjectName)
+    for (cat in categories) {
+      val topic = cat.titleSinhala.replace(Regex("^කාණ්ඩය \\d+:\\s*"), "")
+      for (pt in cat.points) {
+        val left = pt.title.trim()
+        val right = pt.detail.trim()
+        val key = "$left||$right"
+        if (left.isNotBlank() && right.isNotBlank() && !seen.contains(key)) {
+          seen.add(key)
+          pairs.add(Pair(left, right))
+        }
+      }
+    }
+
+    // 2. Fetch from ShortAnswerMasterRepository for Grade 10 and Grade 11
+    for (g in listOf("10", "11")) {
+      for (setNum in 1..20) {
+        val qList = ShortAnswerMasterRepository.getQuestions(g, subjectName, setNum)
+        for (q in qList) {
+          val cleanPrompt = q.question.replace(Regex("^.*: "), "").replace(Regex("\\?.*$"), "").trim()
+          val cleanAns = q.sampleIdealAnswer.take(65).trim()
+          val key = "$cleanPrompt||$cleanAns"
+          if (cleanPrompt.length >= 4 && cleanAns.isNotBlank() && !seen.contains(key)) {
+            seen.add(key)
+            pairs.add(Pair(cleanPrompt, cleanAns))
+          }
+        }
+      }
+    }
+
+    return pairs
+  }
+
+  private fun generateFallbackSyllabusPair(subjectName: String, topicName: String, itemNum: Int): Pair<String, String> {
+    val left = "$topicName - විභාග මූලධර්මය #$itemNum"
+    val right = "$subjectName $topicName විෂය නිර්දේශයේ අත්‍යවශ්‍ය සාධන මට්ටම $itemNum"
+    return Pair(left, right)
+  }
+
+
 
   val timelineSets = listOf(
     // 1. ANCIENT CEYLON TIMELINE

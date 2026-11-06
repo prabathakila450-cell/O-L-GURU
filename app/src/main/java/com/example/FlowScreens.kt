@@ -439,6 +439,14 @@ fun GradesHomeScreen(
         )
 
         // Feature 2: Ultra-Compact Mistake Notebook Indicator (වරදවාගත් ප්‍රශ්න - Minimized width, completely non-obtrusive)
+        val homeContext = androidx.compose.ui.platform.LocalContext.current
+        val mistakePendingCount = remember {
+          mutableIntStateOf(MistakeNotebookRepository.getSummary(homeContext).pending)
+        }
+        LaunchedEffect(Unit) {
+          mistakePendingCount.intValue = MistakeNotebookRepository.getSummary(homeContext).pending
+        }
+
         Surface(
           shape = RoundedCornerShape(20.dp),
           color = Color(0xFF0F172A).copy(alpha = 0.95f),
@@ -469,7 +477,7 @@ fun GradesHomeScreen(
               color = Color(0xFFDC2626)
             ) {
               Text(
-                text = "200",
+                text = "${mistakePendingCount.intValue}",
                 fontSize = 8.sp,
                 fontWeight = FontWeight.ExtraBold,
                 color = Color.White,
