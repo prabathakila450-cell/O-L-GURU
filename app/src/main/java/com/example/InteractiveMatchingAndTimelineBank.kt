@@ -2801,7 +2801,8 @@ object InteractiveMatchingAndTimelineBank {
         val qList = ShortAnswerMasterRepository.getQuestions(g, subjectName, setNum)
         for (q in qList) {
           val cleanPrompt = q.question.replace(Regex("^.*: "), "").replace(Regex("\\?.*$"), "").trim()
-          val cleanAns = q.sampleIdealAnswer.take(65).trim()
+          // Extract complete, untruncated answer clause (preserving full sentences and words)
+          val cleanAns = q.sampleIdealAnswer.split("\n").firstOrNull { it.isNotBlank() }?.trim() ?: q.sampleIdealAnswer.trim()
           val key = "$cleanPrompt||$cleanAns"
           if (cleanPrompt.length >= 4 && cleanAns.isNotBlank() && !seen.contains(key)) {
             seen.add(key)

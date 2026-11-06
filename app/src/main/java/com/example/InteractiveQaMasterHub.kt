@@ -2246,19 +2246,31 @@ fun MatchingGameView(matchSet: SubjectMatchSet, onBack: () -> Unit) {
   var selectedLeft by remember(matchSet.title) { mutableStateOf<String?>(null) }
   var studentPairs by remember(matchSet.title) { mutableStateOf<Map<String, String>>(emptyMap()) }
   var isChecked by remember(matchSet.title) { mutableStateOf(false) }
+  var matchViewMode by remember(matchSet.title) { mutableIntStateOf(0) } // 0: Step-by-Step, 1: Two Columns
+  var currentQuestionIndex by remember(matchSet.title) { mutableIntStateOf(0) }
+
+  val dims = rememberScreenDimensions()
+  val isCompact = dims.isSmallWidth
+
+  val currentItem = matchData.getOrElse(currentQuestionIndex) { matchData.first() }
+
+  val selectedLeftIndex = if (selectedLeft != null) {
+    matchData.indexOfFirst { it.leftText == selectedLeft } + 1
+  } else -1
 
   LazyColumn(
     modifier = Modifier.fillMaxSize(),
     contentPadding = PaddingValues(bottom = 80.dp),
-    verticalArrangement = Arrangement.spacedBy(10.dp)
+    verticalArrangement = Arrangement.spacedBy(if (isCompact) 4.dp else 6.dp)
   ) {
+    // Header
     item {
       Card(
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(10.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
         border = BorderStroke(1.dp, Color(0xFF8B5CF6).copy(alpha = 0.5f))
       ) {
-        Column(modifier = Modifier.padding(12.dp)) {
+        Column(modifier = Modifier.padding(horizontal = if (isCompact) 8.dp else 10.dp, vertical = if (isCompact) 5.dp else 7.dp)) {
           Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -2267,13 +2279,13 @@ fun MatchingGameView(matchSet: SubjectMatchSet, onBack: () -> Unit) {
             Column(modifier = Modifier.weight(1f)) {
               Text(
                 text = "${matchSet.icon} ${matchSet.subject}",
-                fontSize = 11.sp,
+                fontSize = if (isCompact) 9.5.sp else 10.5.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFFA78BFA)
               )
               Text(
                 text = matchSet.title,
-                fontSize = 13.sp,
+                fontSize = if (isCompact) 11.sp else 12.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White
               )
@@ -2283,106 +2295,574 @@ fun MatchingGameView(matchSet: SubjectMatchSet, onBack: () -> Unit) {
               onClick = onBack,
               shape = RoundedCornerShape(8.dp),
               border = BorderStroke(1.dp, Color(0xFF8B5CF6)),
-              contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
+              contentPadding = PaddingValues(horizontal = 6.dp, vertical = 2.dp),
+              modifier = Modifier.height(26.dp)
             ) {
-              Text("⬅️ වෙනත් විෂයයක්", fontSize = 10.sp, color = Color(0xFFC4B5FD))
+              Text("⬅️ වෙනත් විෂයයක්", fontSize = if (isCompact) 8.5.sp else 9.5.sp, color = Color(0xFFC4B5FD))
             }
           }
-          Spacer(modifier = Modifier.height(4.dp))
-          Text(
-            text = "පළමුව A තීරුවෙන් කරුණක් තෝරා, පසුව B තීරුවෙන් අදාළ නිවැරදි ගැලපීම මත ඔබන්න.",
-            fontSize = 11.sp,
-            color = Color(0xFFCBD5E1)
-          )
         }
       }
     }
 
+    // View Mode Switcher
     item {
       Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
       ) {
-        // Left Column (A තීරුව)
-        Column(
-          modifier = Modifier.weight(1f),
-          verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
+        Text(
+          text = "දර්ශන මාදිලිය:",
+          fontSize = if (isCompact) 8.5.sp else 9.5.sp,
+          color = Color(0xFF94A3B8),
+          fontWeight = FontWeight.Medium
+        )
+        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
           Surface(
+            onClick = { matchViewMode = 0 },
             shape = RoundedCornerShape(6.dp),
-            color = Color(0xFF8B5CF6).copy(alpha = 0.25f),
-            modifier = Modifier.fillMaxWidth()
+            color = if (matchViewMode == 0) Color(0xFF8B5CF6) else Color(0xFF1E293B),
+            border = BorderStroke(1.dp, if (matchViewMode == 0) Color.White else Color(0xFF334155))
           ) {
             Text(
-              text = "A තීරුව (ප්‍රශ්න)",
-              fontSize = 11.sp,
-              fontWeight = FontWeight.Bold,
-              color = Color(0xFFC4B5FD),
-              modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
-              textAlign = TextAlign.Center
+              text = "🎯 එකින් එක ගැලපීම",
+              fontSize = if (isCompact) 8.5.sp else 9.sp,
+              fontWeight = if (matchViewMode == 0) FontWeight.Bold else FontWeight.Normal,
+              color = if (matchViewMode == 0) Color.White else Color(0xFFCBD5E1),
+              modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp)
             )
           }
 
-          matchData.forEachIndexed { index, item ->
-            val isSelected = selectedLeft == item.leftText
-            val pairedWith = studentPairs[item.leftText]
-            val isCorrect = pairedWith == item.rightCorrectText
+          Surface(
+            onClick = { matchViewMode = 1 },
+            shape = RoundedCornerShape(6.dp),
+            color = if (matchViewMode == 1) Color(0xFF8B5CF6) else Color(0xFF1E293B),
+            border = BorderStroke(1.dp, if (matchViewMode == 1) Color.White else Color(0xFF334155))
+          ) {
+            Text(
+              text = "📋 තීරූ 2 ම (10 ම)",
+              fontSize = if (isCompact) 8.5.sp else 9.sp,
+              fontWeight = if (matchViewMode == 1) FontWeight.Bold else FontWeight.Normal,
+              color = if (matchViewMode == 1) Color.White else Color(0xFFCBD5E1),
+              modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp)
+            )
+          }
+        }
+      }
+    }
+
+    if (matchViewMode == 0) {
+      // ----------------------------------------------------
+      // MODE 0: STEP-BY-STEP (ZERO SCROLLING, ALL 10 ANSWERS)
+      // ----------------------------------------------------
+      // Question Navigator Chips (1 to 10)
+      item {
+        LazyRow(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+          items(matchData.size) { idx ->
+            val item = matchData[idx]
+            val isCurrent = currentQuestionIndex == idx
+            val isPaired = studentPairs.containsKey(item.leftText)
+            val isPairedCorrect = isChecked && studentPairs[item.leftText] == item.rightCorrectText
 
             Surface(
-              shape = RoundedCornerShape(10.dp),
+              onClick = { currentQuestionIndex = idx },
+              shape = RoundedCornerShape(6.dp),
               color = when {
-                isChecked && isCorrect -> Color(0xFF065F46)
-                isChecked && pairedWith != null && !isCorrect -> Color(0xFF7F1D1D)
-                isSelected -> Color(0xFF6D28D9)
-                pairedWith != null -> Color(0xFF312E81)
+                isCurrent -> Color(0xFF8B5CF6)
+                isChecked && isPairedCorrect -> Color(0xFF065F46)
+                isChecked && isPaired -> Color(0xFF7F1D1D)
+                isPaired -> Color(0xFF1E3A8A)
                 else -> Color(0xFF1E293B)
               },
               border = BorderStroke(
-                if (isSelected) 2.dp else 1.dp,
-                when {
-                  isChecked && isCorrect -> Color(0xFF34D399)
-                  isChecked && pairedWith != null && !isCorrect -> Color(0xFFF87171)
-                  isSelected -> Color(0xFFA78BFA)
-                  pairedWith != null -> Color(0xFF818CF8)
-                  else -> Color(0xFF475569)
-                }
-              ),
-              modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                  selectedLeft = if (selectedLeft == item.leftText) null else item.leftText
-                }
-                .testTag("match_left_${item.id}")
+                if (isCurrent) 1.5.dp else 1.dp,
+                if (isCurrent) Color.White else Color(0xFF334155)
+              )
             ) {
-              Column(modifier = Modifier.padding(8.dp)) {
-                Row(verticalAlignment = Alignment.Top) {
-                  Text(
-                    text = "${index + 1}. ",
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFFA78BFA)
-                  )
-                  Text(
-                    text = item.leftText,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color.White
-                  )
+              Row(
+                modifier = Modifier.padding(horizontal = 7.dp, vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically
+              ) {
+                if (isPaired) {
+                  Text("✓", fontSize = 8.5.sp, color = if (isCurrent) Color.White else Color(0xFF38BDF8), fontWeight = FontWeight.Bold)
+                  Spacer(modifier = Modifier.width(2.dp))
                 }
-                if (pairedWith != null) {
-                  Spacer(modifier = Modifier.height(4.dp))
-                  Surface(
-                    shape = RoundedCornerShape(4.dp),
-                    color = Color.Black.copy(alpha = 0.35f),
-                    modifier = Modifier.fillMaxWidth()
-                  ) {
+                Text(
+                  text = "${idx + 1}",
+                  fontSize = 9.sp,
+                  fontWeight = FontWeight.Bold,
+                  color = if (isCurrent) Color.White else Color(0xFFCBD5E1)
+                )
+              }
+            }
+          }
+        }
+      }
+
+      // Active Question Card
+      item {
+        Card(
+          shape = RoundedCornerShape(10.dp),
+          colors = CardDefaults.cardColors(containerColor = Color(0xFF2E1065)),
+          border = BorderStroke(1.5.dp, Color(0xFFA78BFA)),
+          modifier = Modifier.fillMaxWidth()
+        ) {
+          Column(modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp)) {
+            Row(
+              modifier = Modifier.fillMaxWidth(),
+              horizontalArrangement = Arrangement.SpaceBetween,
+              verticalAlignment = Alignment.CenterVertically
+            ) {
+              Text(
+                text = "❓ ප්‍රශ්න අංක ${currentQuestionIndex + 1} / ${matchData.size} (A තීරුව):",
+                fontSize = if (isCompact) 9.5.sp else 10.5.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFFDDD6FE)
+              )
+              Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                Surface(
+                  onClick = { if (currentQuestionIndex > 0) currentQuestionIndex-- },
+                  shape = RoundedCornerShape(4.dp),
+                  color = Color.White.copy(alpha = 0.15f),
+                  modifier = Modifier.size(24.dp)
+                ) {
+                  Box(contentAlignment = Alignment.Center) {
+                    Text("◀", fontSize = 10.sp, color = Color.White)
+                  }
+                }
+                Surface(
+                  onClick = { if (currentQuestionIndex < matchData.size - 1) currentQuestionIndex++ },
+                  shape = RoundedCornerShape(4.dp),
+                  color = Color.White.copy(alpha = 0.15f),
+                  modifier = Modifier.size(24.dp)
+                ) {
+                  Box(contentAlignment = Alignment.Center) {
+                    Text("▶", fontSize = 10.sp, color = Color.White)
+                  }
+                }
+              }
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(
+              text = currentItem.leftText,
+              fontSize = if (isCompact) 10.sp else 11.sp,
+              lineHeight = if (isCompact) 14.sp else 15.sp,
+              fontWeight = FontWeight.SemiBold,
+              color = Color.White
+            )
+
+            val paired = studentPairs[currentItem.leftText]
+            if (paired != null) {
+              Spacer(modifier = Modifier.height(6.dp))
+              Surface(
+                shape = RoundedCornerShape(6.dp),
+                color = when {
+                  isChecked && paired == currentItem.rightCorrectText -> Color(0xFF065F46)
+                  isChecked -> Color(0xFF7F1D1D)
+                  else -> Color(0xFF1E1B4B)
+                },
+                border = BorderStroke(1.dp, if (isChecked) Color.Transparent else Color(0xFF818CF8))
+              ) {
+                Row(
+                  modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                  verticalAlignment = Alignment.CenterVertically
+                ) {
+                  Text(
+                    text = "➔ ගැළපූ පිළිතුර: $paired",
+                    fontSize = if (isCompact) 8.5.sp else 9.5.sp,
+                    lineHeight = 12.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = if (isChecked) {
+                      if (paired == currentItem.rightCorrectText) Color(0xFF86EFAC) else Color(0xFFFCA5A5)
+                    } else Color(0xFFDDD6FE),
+                    modifier = Modifier.weight(1f)
+                  )
+                  if (!isChecked) {
+                    Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                      text = "➔ $pairedWith",
-                      fontSize = 10.sp,
-                      color = if (isChecked) {
-                        if (isCorrect) Color(0xFF86EFAC) else Color(0xFFFCA5A5)
-                      } else Color(0xFFDDD6FE),
-                      modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
+                      text = "✕ ඉවත් කරන්න",
+                      fontSize = 8.5.sp,
+                      color = Color(0xFFFCA5A5),
+                      fontWeight = FontWeight.Bold,
+                      modifier = Modifier.clickable {
+                        val updated = studentPairs.toMutableMap()
+                        updated.remove(currentItem.leftText)
+                        studentPairs = updated
+                      }
+                    )
+                  }
+                }
+              }
+              if (isChecked && paired != currentItem.rightCorrectText) {
+                Spacer(modifier = Modifier.height(3.dp))
+                Text(
+                  text = "💡 නිවැරදි පිළිතුර: ${currentItem.rightCorrectText}",
+                  fontSize = 9.sp,
+                  fontWeight = FontWeight.Bold,
+                  color = Color(0xFF34D399)
+                )
+              }
+            }
+          }
+        }
+      }
+
+      // Answers Section Header
+      item {
+        Text(
+          text = "B තීරුවෙන් නිවැරදි පිළිතුර තෝරන්න (පිළිතුරු 10 ම මෙහි ඇත):",
+          fontSize = if (isCompact) 8.5.sp else 9.5.sp,
+          color = Color(0xFF38BDF8),
+          fontWeight = FontWeight.Bold
+        )
+      }
+
+      // All 10 answers in clean list
+      items(shuffledRight.size) { ansIdx ->
+        val rightText = shuffledRight[ansIdx]
+        val pairedKey = studentPairs.entries.find { it.value == rightText }?.key
+        val isPairedWithCurrent = pairedKey == currentItem.leftText
+        val isPairedWithOther = pairedKey != null && !isPairedWithCurrent
+        val pairedQNum = if (pairedKey != null) {
+          matchData.indexOfFirst { it.leftText == pairedKey } + 1
+        } else null
+
+        Surface(
+          shape = RoundedCornerShape(7.dp),
+          color = when {
+            isChecked && isPairedWithCurrent && currentItem.rightCorrectText == rightText -> Color(0xFF065F46)
+            isChecked && isPairedWithCurrent -> Color(0xFF7F1D1D)
+            isPairedWithCurrent -> Color(0xFF6D28D9)
+            isPairedWithOther -> Color(0xFF0F172A)
+            else -> Color(0xFF1E293B)
+          },
+          border = BorderStroke(
+            if (isPairedWithCurrent) 1.5.dp else 1.dp,
+            when {
+              isChecked && isPairedWithCurrent && currentItem.rightCorrectText == rightText -> Color(0xFF34D399)
+              isChecked && isPairedWithCurrent -> Color(0xFFF87171)
+              isPairedWithCurrent -> Color(0xFFA78BFA)
+              isPairedWithOther -> Color(0xFF334155)
+              else -> Color(0xFF475569)
+            }
+          ),
+          modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+              if (!isChecked) {
+                val updated = studentPairs.toMutableMap()
+                val prevKey = updated.entries.find { it.value == rightText }?.key
+                if (prevKey != null) updated.remove(prevKey)
+                updated[currentItem.leftText] = rightText
+                studentPairs = updated
+
+                // Automatically advance to next unanswered question
+                val nextUnanswered = matchData.indices.firstOrNull { i -> !updated.containsKey(matchData[i].leftText) }
+                if (nextUnanswered != null) {
+                  currentQuestionIndex = nextUnanswered
+                }
+              }
+            }
+            .testTag("match_step_ans_$ansIdx")
+        ) {
+          Row(
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically
+          ) {
+            Surface(
+              shape = CircleShape,
+              color = if (isPairedWithCurrent) Color(0xFFA78BFA) else Color(0xFF334155),
+              modifier = Modifier.size(20.dp)
+            ) {
+              Box(contentAlignment = Alignment.Center) {
+                Text(
+                  text = ('A' + (ansIdx % 26)).toString(),
+                  fontSize = 9.sp,
+                  fontWeight = FontWeight.Bold,
+                  color = if (isPairedWithCurrent) Color(0xFF1E1B4B) else Color.White
+                )
+              }
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+            Column(modifier = Modifier.weight(1f)) {
+              Text(
+                text = rightText,
+                fontSize = if (isCompact) 9.sp else 9.5.sp,
+                lineHeight = if (isCompact) 12.sp else 13.sp,
+                color = if (isPairedWithOther) Color(0xFF94A3B8) else Color.White
+              )
+              if (isPairedWithCurrent) {
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                  text = "✓ මෙම ප්‍රශ්නයට තෝරාගෙන ඇත",
+                  fontSize = 8.sp,
+                  fontWeight = FontWeight.Bold,
+                  color = Color(0xFFA78BFA)
+                )
+              } else if (isPairedWithOther && pairedQNum != null) {
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                  text = "✓ [ප්‍රශ්න $pairedQNum ට ගලපා ඇත - ක්ලික් කළහොත් මෙයට මාරු වේ]",
+                  fontSize = 7.5.sp,
+                  color = Color(0xFF64748B)
+                )
+              }
+            }
+          }
+        }
+      }
+    } else {
+      // ----------------------------------------------------
+      // MODE 1: FULL TWO-COLUMN TABLE (ALL 10 AT ONCE)
+      // ----------------------------------------------------
+      if (selectedLeft != null) {
+        item {
+          Surface(
+            shape = RoundedCornerShape(8.dp),
+            color = Color(0xFF5B21B6),
+            border = BorderStroke(1.dp, Color(0xFFA78BFA)),
+            modifier = Modifier.fillMaxWidth()
+          ) {
+            Row(
+              modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
+              verticalAlignment = Alignment.CenterVertically
+            ) {
+              Text("🎯", fontSize = 11.sp)
+              Spacer(modifier = Modifier.width(6.dp))
+              Column(modifier = Modifier.weight(1f)) {
+                Text(
+                  text = "තෝරාගත් ප්‍රශ්න අංක $selectedLeftIndex (B තීරුවෙන් පිළිතුර මත ඔබන්න):",
+                  fontSize = 8.5.sp,
+                  fontWeight = FontWeight.Bold,
+                  color = Color(0xFFDDD6FE)
+                )
+                Text(
+                  text = selectedLeft!!,
+                  fontSize = 9.5.sp,
+                  fontWeight = FontWeight.Bold,
+                  color = Color.White,
+                  maxLines = 2,
+                  overflow = TextOverflow.Ellipsis
+                )
+              }
+              Spacer(modifier = Modifier.width(4.dp))
+              Surface(
+                onClick = { selectedLeft = null },
+                shape = CircleShape,
+                color = Color.White.copy(alpha = 0.2f),
+                modifier = Modifier.size(20.dp)
+              ) {
+                Box(contentAlignment = Alignment.Center) {
+                  Text("✕", fontSize = 10.sp, color = Color.White, fontWeight = FontWeight.Bold)
+                }
+              }
+            }
+          }
+        }
+      }
+
+      item {
+        Row(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.spacedBy(if (isCompact) 4.dp else 6.dp)
+        ) {
+          // Left Column (A තීරුව - ප්‍රශ්න 10)
+          Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+          ) {
+            Surface(
+              shape = RoundedCornerShape(6.dp),
+              color = Color(0xFF8B5CF6).copy(alpha = 0.25f),
+              modifier = Modifier.fillMaxWidth()
+            ) {
+              Text(
+                text = "A තීරුව (ප්‍රශ්න)",
+                fontSize = if (isCompact) 9.sp else 10.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFFC4B5FD),
+                modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp),
+                textAlign = TextAlign.Center
+              )
+            }
+
+            matchData.forEachIndexed { itemIdx, item ->
+              val itemNum = itemIdx + 1
+              val isSelected = selectedLeft == item.leftText
+              val pairedWith = studentPairs[item.leftText]
+              val isCorrect = pairedWith == item.rightCorrectText
+
+              Surface(
+                shape = RoundedCornerShape(7.dp),
+                color = when {
+                  isChecked && isCorrect -> Color(0xFF065F46)
+                  isChecked && pairedWith != null && !isCorrect -> Color(0xFF7F1D1D)
+                  isSelected -> Color(0xFF6D28D9)
+                  pairedWith != null -> Color(0xFF1E1B4B)
+                  else -> Color(0xFF1E293B)
+                },
+                border = BorderStroke(
+                  if (isSelected) 1.5.dp else 1.dp,
+                  when {
+                    isChecked && isCorrect -> Color(0xFF34D399)
+                    isChecked && pairedWith != null && !isCorrect -> Color(0xFFF87171)
+                    isSelected -> Color(0xFFA78BFA)
+                    pairedWith != null -> Color(0xFF818CF8)
+                    else -> Color(0xFF334155)
+                  }
+                ),
+                modifier = Modifier
+                  .fillMaxWidth()
+                  .clickable {
+                    selectedLeft = if (selectedLeft == item.leftText) null else item.leftText
+                  }
+                  .testTag("match_left_${item.id}")
+              ) {
+                Column(modifier = Modifier.padding(horizontal = if (isCompact) 4.dp else 6.dp, vertical = 5.dp)) {
+                  Row(verticalAlignment = Alignment.Top) {
+                    Text(
+                      text = "$itemNum. ",
+                      fontSize = if (isCompact) 8.5.sp else 9.5.sp,
+                      fontWeight = FontWeight.Bold,
+                      color = Color(0xFFA78BFA)
+                    )
+                    Text(
+                      text = item.leftText,
+                      fontSize = if (isCompact) 8.5.sp else 9.5.sp,
+                      lineHeight = if (isCompact) 11.5.sp else 13.sp,
+                      fontWeight = FontWeight.Medium,
+                      color = Color.White
+                    )
+                  }
+                  if (pairedWith != null) {
+                    Spacer(modifier = Modifier.height(3.dp))
+                    Surface(
+                      shape = RoundedCornerShape(4.dp),
+                      color = Color.Black.copy(alpha = 0.4f),
+                      modifier = Modifier.fillMaxWidth()
+                    ) {
+                      Row(
+                        modifier = Modifier.padding(horizontal = 3.dp, vertical = 2.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                      ) {
+                        Text(
+                          text = "➔ $pairedWith",
+                          fontSize = 8.sp,
+                          lineHeight = 10.sp,
+                          maxLines = 2,
+                          overflow = TextOverflow.Ellipsis,
+                          color = if (isChecked) {
+                            if (isCorrect) Color(0xFF86EFAC) else Color(0xFFFCA5A5)
+                          } else Color(0xFFDDD6FE),
+                          modifier = Modifier.weight(1f)
+                        )
+                        Spacer(modifier = Modifier.width(2.dp))
+                        Text(
+                          text = "✕",
+                          fontSize = 8.sp,
+                          color = Color(0xFFFCA5A5),
+                          fontWeight = FontWeight.Bold,
+                          modifier = Modifier.clickable {
+                            val updated = studentPairs.toMutableMap()
+                            updated.remove(item.leftText)
+                            studentPairs = updated
+                            isChecked = false
+                          }
+                        )
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+
+          // Right Column (B තීරුව - පිළිතුරු 10)
+          Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+          ) {
+            Surface(
+              shape = RoundedCornerShape(6.dp),
+              color = Color(0xFF38BDF8).copy(alpha = 0.25f),
+              modifier = Modifier.fillMaxWidth()
+            ) {
+              Text(
+                text = "B තීරුව (පිළිතුරු)",
+                fontSize = if (isCompact) 9.sp else 10.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFFBAE6FD),
+                modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp),
+                textAlign = TextAlign.Center
+              )
+            }
+
+            shuffledRight.forEach { rightText ->
+              val pairedKey = studentPairs.entries.find { it.value == rightText }?.key
+              val isAlreadyPaired = pairedKey != null
+              val pairedQNum = if (pairedKey != null) {
+                matchData.indexOfFirst { it.leftText == pairedKey } + 1
+              } else null
+
+              Surface(
+                shape = RoundedCornerShape(7.dp),
+                color = when {
+                  selectedLeft != null && !isAlreadyPaired -> Color(0xFF1E293B)
+                  isAlreadyPaired -> Color(0xFF0F172A)
+                  else -> Color(0xFF1E293B)
+                },
+                border = BorderStroke(
+                  if (selectedLeft != null && !isAlreadyPaired) 1.5.dp else 1.dp,
+                  when {
+                    selectedLeft != null && !isAlreadyPaired -> Color(0xFF38BDF8)
+                    isAlreadyPaired -> Color(0xFF475569)
+                    else -> Color(0xFF334155)
+                  }
+                ),
+                modifier = Modifier
+                  .fillMaxWidth()
+                  .clickable {
+                    if (selectedLeft != null) {
+                      val updated = studentPairs.toMutableMap()
+                      val previousKey = updated.entries.find { it.value == rightText }?.key
+                      if (previousKey != null) {
+                        updated.remove(previousKey)
+                      }
+                      updated[selectedLeft!!] = rightText
+                      studentPairs = updated
+                      selectedLeft = null
+                      isChecked = false
+                    }
+                  }
+              ) {
+                Column(modifier = Modifier.padding(horizontal = if (isCompact) 4.dp else 6.dp, vertical = 5.dp)) {
+                  Text(
+                    text = rightText,
+                    fontSize = if (isCompact) 8.5.sp else 9.5.sp,
+                    lineHeight = if (isCompact) 11.5.sp else 13.sp,
+                    color = if (isAlreadyPaired) Color(0xFF94A3B8) else Color.White
+                  )
+                  if (isAlreadyPaired && pairedQNum != null) {
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                      text = "✓ [ප්‍රශ්න $pairedQNum ට ගැළපුවා]",
+                      fontSize = 7.5.sp,
+                      fontWeight = FontWeight.Bold,
+                      color = Color(0xFF34D399)
+                    )
+                  } else if (selectedLeft != null) {
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                      text = "තෝරන්න ➔",
+                      fontSize = 7.5.sp,
+                      fontWeight = FontWeight.Bold,
+                      color = Color(0xFF38BDF8)
                     )
                   }
                 }
@@ -2390,94 +2870,28 @@ fun MatchingGameView(matchSet: SubjectMatchSet, onBack: () -> Unit) {
             }
           }
         }
-
-        // Right Column (B තීරුව)
-        Column(
-          modifier = Modifier.weight(1f),
-          verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-          Surface(
-            shape = RoundedCornerShape(6.dp),
-            color = Color(0xFF38BDF8).copy(alpha = 0.25f),
-            modifier = Modifier.fillMaxWidth()
-          ) {
-            Text(
-              text = "B තීරුව (පිළිතුරු)",
-              fontSize = 11.sp,
-              fontWeight = FontWeight.Bold,
-              color = Color(0xFFBAE6FD),
-              modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
-              textAlign = TextAlign.Center
-            )
-          }
-
-          shuffledRight.forEach { rightText ->
-            val isAlreadyPaired = studentPairs.values.contains(rightText)
-
-            Surface(
-              shape = RoundedCornerShape(10.dp),
-              color = if (isAlreadyPaired) Color(0xFF1E293B).copy(alpha = 0.7f) else Color(0xFF1E293B),
-              border = BorderStroke(
-                1.dp,
-                if (isAlreadyPaired) Color(0xFF475569) else Color(0xFF38BDF8).copy(alpha = 0.5f)
-              ),
-              modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                  if (selectedLeft != null) {
-                    val updated = studentPairs.toMutableMap()
-                    // If rightText was previously used, remove the previous mapping
-                    val previousKey = updated.entries.find { it.value == rightText }?.key
-                    if (previousKey != null) {
-                      updated.remove(previousKey)
-                    }
-                    updated[selectedLeft!!] = rightText
-                    studentPairs = updated
-                    selectedLeft = null
-                    isChecked = false
-                  }
-                }
-            ) {
-              Column(modifier = Modifier.padding(8.dp)) {
-                Text(
-                  text = rightText,
-                  fontSize = 11.sp,
-                  color = if (isAlreadyPaired) Color(0xFF94A3B8) else Color.White
-                )
-                if (isAlreadyPaired) {
-                  Spacer(modifier = Modifier.height(2.dp))
-                  Text(
-                    text = "✓ ගැලපුවා",
-                    fontSize = 9.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF10B981)
-                  )
-                }
-              }
-            }
-          }
-        }
       }
     }
 
     item {
       Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(6.dp)
       ) {
         val allPaired = studentPairs.size == matchData.size
         Button(
           onClick = { isChecked = true },
           enabled = studentPairs.isNotEmpty(),
-          modifier = Modifier.weight(1f),
+          modifier = Modifier.weight(1f).height(if (isCompact) 34.dp else 38.dp),
           colors = ButtonDefaults.buttonColors(
             containerColor = if (allPaired) Color(0xFF10B981) else Color(0xFF8B5CF6)
           ),
-          shape = RoundedCornerShape(8.dp)
+          shape = RoundedCornerShape(8.dp),
+          contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp)
         ) {
           Text(
             text = if (allPaired) "පරීක්ෂා කරන්න (සියල්ල ගැලපුවා)" else "පරීක්ෂා කරන්න (${studentPairs.size}/${matchData.size})",
-            fontSize = 11.5.sp,
+            fontSize = if (isCompact) 9.5.sp else 11.sp,
             fontWeight = FontWeight.Bold
           )
         }
@@ -2489,9 +2903,11 @@ fun MatchingGameView(matchSet: SubjectMatchSet, onBack: () -> Unit) {
             isChecked = false
           },
           shape = RoundedCornerShape(8.dp),
-          colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFCBD5E1))
+          colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFCBD5E1)),
+          contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
+          modifier = Modifier.height(if (isCompact) 34.dp else 38.dp)
         ) {
-          Text("නැවත සකසන්න", fontSize = 11.sp)
+          Text("නැවත සකසන්න", fontSize = if (isCompact) 9.5.sp else 10.5.sp)
         }
       }
     }
@@ -2501,7 +2917,7 @@ fun MatchingGameView(matchSet: SubjectMatchSet, onBack: () -> Unit) {
         val correctCount = matchData.count { studentPairs[it.leftText] == it.rightCorrectText }
         val isAllCorrect = correctCount == matchData.size
         Card(
-          shape = RoundedCornerShape(12.dp),
+          shape = RoundedCornerShape(10.dp),
           colors = CardDefaults.cardColors(
             containerColor = if (isAllCorrect) Color(0xFF064E3B) else Color(0xFF1E293B)
           ),
@@ -2509,12 +2925,12 @@ fun MatchingGameView(matchSet: SubjectMatchSet, onBack: () -> Unit) {
           modifier = Modifier.fillMaxWidth().testTag("matching_result_card")
         ) {
           Column(
-            modifier = Modifier.padding(14.dp),
+            modifier = Modifier.padding(10.dp),
             horizontalAlignment = Alignment.CenterHorizontally
           ) {
             Text(
               text = if (isAllCorrect) "🎉 විශිෂ්ටයි! සියලු ගැලපීම් 10 ම 100% ක් නිවැරදියි!" else "📊 ප්‍රතිඵලය: ලකුණු $correctCount / ${matchData.size} ක් නිවැරදියි",
-              fontSize = 13.5.sp,
+              fontSize = 12.sp,
               fontWeight = FontWeight.Bold,
               color = Color.White
             )
@@ -2524,7 +2940,7 @@ fun MatchingGameView(matchSet: SubjectMatchSet, onBack: () -> Unit) {
                 "ඔබ මෙම කාණ්ඩය සාර්ථකව අවසන් කළා! ඉහළින් වෙනත් කාණ්ඩයක් තෝරා පුහුණු වන්න."
               else 
                 "කොළ පැහැයෙන් නිවැරදි ගැලපීම්ද, රතු පැහැයෙන් වැරදි ගැලපීම්ද දැක්වේ. නැවත උත්සාහ කිරීමට 'නැවත සකසන්න' ඔබන්න.",
-              fontSize = 11.sp,
+              fontSize = 10.sp,
               color = Color(0xFFCBD5E1),
               textAlign = TextAlign.Center
             )

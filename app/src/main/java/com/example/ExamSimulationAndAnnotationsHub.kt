@@ -457,145 +457,135 @@ fun LiveMockExamHallScreen(
           .padding(padding)
           .background(Color(0xFF090D16))
           .padding(horizontal = 16.dp),
-        contentPadding = PaddingValues(top = 16.dp, bottom = 140.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        contentPadding = PaddingValues(top = 8.dp, bottom = 120.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
       ) {
         if (activeSubject == null) {
           // =========================================================================
           // INITIAL SCREEN: COLORFUL COMPACT SUBJECT CARDS (අන්තර්ගතයන් සැඟවී ඇත)
           // =========================================================================
 
-          // Hero Card
+          // Ultra-Compact Hero Banner
           item {
             Card(
-              shape = RoundedCornerShape(16.dp),
+              shape = RoundedCornerShape(12.dp),
               colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
               border = BorderStroke(1.dp, Color(0xFF334155)),
-              elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+              elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
               modifier = Modifier.fillMaxWidth()
             ) {
-              Column(modifier = Modifier.padding(14.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+              Row(
+                modifier = Modifier
+                  .fillMaxWidth()
+                  .padding(horizontal = 10.dp, vertical = 6.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+              ) {
+                Row(
+                  verticalAlignment = Alignment.CenterVertically,
+                  modifier = Modifier.weight(1f)
+                ) {
                   Surface(
-                    shape = RoundedCornerShape(8.dp),
+                    shape = RoundedCornerShape(6.dp),
                     color = Color(0xFFEF4444)
                   ) {
                     Text(
-                      text = "OMR LIVE EXAM HALL",
+                      text = "OMR LIVE",
                       color = Color.White,
-                      fontSize = 10.sp,
+                      fontSize = 9.sp,
                       fontWeight = FontWeight.Black,
-                      modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                      modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                     )
                   }
-                  Spacer(modifier = Modifier.width(8.dp))
-                  Text("🔥 ප්‍රශ්න 60 පූර්ණ පෙරහුරුව", color = Color(0xFFFDE047), fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                  Spacer(modifier = Modifier.width(6.dp))
+                  Text(
+                    text = "$selectedGrade ශ්‍රේණිය • $selectedTerm වන වාරය (ආදර්ශ පත්‍ර 30 • ප්‍රශ්න 60)",
+                    color = Color.White,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                  )
                 }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                  text = "$selectedGrade ශ්‍රේණිය • $selectedTerm වන වාරය • සියලුම O/L විෂයයන් සඳහාම ආදර්ශ ප්‍රශ්න පත්‍ර 30 බැගින්!",
-                  style = MaterialTheme.typography.titleMedium,
-                  fontWeight = FontWeight.Bold,
-                  color = Color.White,
-                  lineHeight = 20.sp
-                )
-
-                Spacer(modifier = Modifier.height(6.dp))
-
-                Text(
-                  text = "✓ එක් වාරයකට ප්‍රශ්න පත්‍ර 30ක් • ✓ සෑම ප්‍රශ්න පත්‍රයක්ම එකිනෙකට වෙනස් • ✓ කිසිදු ප්‍රශ්නයක් නැවත නොයෙදේ • ✓ ප්‍රශ්න 60 OMR පත්‍රය • ✓ මිනිත්තු 60 Countdown • ✓ විස්තරාත්මක විවරණ",
-                  fontSize = 10.5.sp,
-                  color = Color(0xFF94A3B8)
-                )
+                Text("🔥 LIVE", color = Color(0xFFFDE047), fontSize = 10.sp, fontWeight = FontWeight.Bold)
               }
             }
           }
 
-          // Grade Selector Filter Row
+          // Ultra-Compact Unified Grade & Term Filter Row
           item {
-            Column {
-              Text("ශ්‍රේණිය තෝරන්න (Select Grade):", fontWeight = FontWeight.Bold, fontSize = 12.5.sp, color = Color.White)
-              Spacer(modifier = Modifier.height(6.dp))
-              LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                items(availableGrades) { gr ->
-                  val isSelected = selectedGrade == gr
-                  Surface(
-                    onClick = { selectedGrade = gr },
-                    shape = RoundedCornerShape(10.dp),
-                    color = if (isSelected) BluePrimary else Color(0xFF1E293B),
-                    border = BorderStroke(1.dp, if (isSelected) BluePrimary else Color(0xFF334155))
-                  ) {
-                    Text(
-                      text = "$gr ශ්‍රේණිය",
-                      color = if (isSelected) Color.White else Color(0xFFCBD5E1),
-                      fontWeight = FontWeight.Bold,
-                      fontSize = 11.5.sp,
-                      modifier = Modifier.padding(horizontal = 14.dp, vertical = 7.dp)
-                    )
-                  }
+            Row(
+              modifier = Modifier.fillMaxWidth(),
+              horizontalArrangement = Arrangement.spacedBy(6.dp),
+              verticalAlignment = Alignment.CenterVertically
+            ) {
+              // Grade Toggle Chip
+              Surface(
+                onClick = { selectedGrade = if (selectedGrade == "11") "10" else "11" },
+                shape = RoundedCornerShape(8.dp),
+                color = Color(0xFF1E293B),
+                border = BorderStroke(1.dp, Color(0xFF38BDF8))
+              ) {
+                Row(
+                  modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
+                  verticalAlignment = Alignment.CenterVertically
+                ) {
+                  Text(text = "ශ්‍රේණිය: ", fontSize = 10.sp, color = Color(0xFF94A3B8))
+                  Text(text = "$selectedGrade ⇄", fontSize = 10.5.sp, fontWeight = FontWeight.Bold, color = Color(0xFF38BDF8))
                 }
               }
-            }
-          }
 
-          // Term Selector (1st, 2nd, 3rd Term)
-          item {
-            Column {
-              Text("පාසල් වාරය තෝරන්න (School Term):", fontWeight = FontWeight.Bold, fontSize = 12.5.sp, color = Color.White)
-              Spacer(modifier = Modifier.height(6.dp))
+              // Term Tabs (1, 2, 3)
               Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                modifier = Modifier.weight(1f),
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
               ) {
                 listOf(
-                  Pair(1, "1 වන වාරය (Term 1)"),
-                  Pair(2, "2 වන වාරය (Term 2)"),
-                  Pair(3, "3 වන වාරය (Term 3)")
+                  Pair(1, "1 වාරය"),
+                  Pair(2, "2 වාරය"),
+                  Pair(3, "3 වාරය")
                 ).forEach { (tNum, tLabel) ->
                   val isSelected = selectedTerm == tNum
                   Surface(
                     onClick = { selectedTerm = tNum },
-                    shape = RoundedCornerShape(10.dp),
-                    color = Color(0xFF1E293B),
-                    border = BorderStroke(1.5.dp, if (isSelected) Color(0xFF38BDF8) else Color(0xFF334155)),
+                    shape = RoundedCornerShape(8.dp),
+                    color = if (isSelected) Color(0xFF2563EB) else Color(0xFF1E293B),
+                    border = BorderStroke(1.dp, if (isSelected) Color(0xFF38BDF8) else Color(0xFF334155)),
                     modifier = Modifier.weight(1f)
                   ) {
-                    Column(
-                      modifier = Modifier.padding(vertical = 8.dp, horizontal = 4.dp),
-                      horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                      Text(
-                        text = if (isSelected) "🌟 $tLabel" else tLabel,
-                        color = if (isSelected) Color(0xFFFDE047) else Color(0xFFCBD5E1),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 10.5.sp,
-                        textAlign = TextAlign.Center
-                      )
-                    }
+                    Text(
+                      text = tLabel,
+                      color = if (isSelected) Color.White else Color(0xFFCBD5E1),
+                      fontWeight = FontWeight.Bold,
+                      fontSize = 10.sp,
+                      textAlign = TextAlign.Center,
+                      modifier = Modifier.padding(vertical = 5.dp)
+                    )
                   }
                 }
               }
             }
           }
 
-          // Subject Search Bar
+          // Ultra-Compact Search Bar
           item {
             OutlinedTextField(
               value = subjectSearchQuery,
               onValueChange = { subjectSearchQuery = it },
-              placeholder = { Text("විෂය සොයන්න (Search Subject)...", fontSize = 11.5.sp, color = Color(0xFF94A3B8)) },
-              leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search", modifier = Modifier.size(18.dp), tint = Color(0xFF94A3B8)) },
+              placeholder = { Text("විෂය සොයන්න (Search Subject)...", fontSize = 11.sp, color = Color(0xFF94A3B8)) },
+              leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search", modifier = Modifier.size(16.dp), tint = Color(0xFF94A3B8)) },
               trailingIcon = {
                 if (subjectSearchQuery.isNotEmpty()) {
-                  IconButton(onClick = { subjectSearchQuery = "" }) {
-                    Icon(Icons.Default.Clear, contentDescription = "Clear", modifier = Modifier.size(16.dp), tint = Color(0xFF94A3B8))
+                  IconButton(
+                    onClick = { subjectSearchQuery = "" },
+                    modifier = Modifier.size(24.dp)
+                  ) {
+                    Icon(Icons.Default.Clear, contentDescription = "Clear", modifier = Modifier.size(14.dp), tint = Color(0xFF94A3B8))
                   }
                 }
               },
               singleLine = true,
-              shape = RoundedCornerShape(12.dp),
+              shape = RoundedCornerShape(10.dp),
               colors = OutlinedTextFieldDefaults.colors(
                 focusedContainerColor = Color(0xFF1E293B),
                 unfocusedContainerColor = Color(0xFF1E293B),
@@ -604,44 +594,40 @@ fun LiveMockExamHallScreen(
                 focusedBorderColor = Color(0xFF38BDF8),
                 unfocusedBorderColor = Color(0xFF334155)
               ),
-              modifier = Modifier.fillMaxWidth()
+              modifier = Modifier
+                .fillMaxWidth()
+                .defaultMinSize(minHeight = 38.dp)
             )
           }
 
-          // Section Title
+          // Ultra-Low-Profile Section Title Bar (උස හැකිතාක් අඩු කළ බාර් එක)
           item {
-            Column {
-              Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+            Row(
+              modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 1.dp),
+              horizontalArrangement = Arrangement.SpaceBetween,
+              verticalAlignment = Alignment.CenterVertically
+            ) {
+              Text(
+                text = "🎨 විෂය තෝරා සජීවී විභාග ශාලාවට පිවිසෙන්න:",
+                fontWeight = FontWeight.Bold,
+                fontSize = 11.5.sp,
+                color = Color.White
+              )
+              Surface(
+                shape = RoundedCornerShape(6.dp),
+                color = Color(0xFF1E293B),
+                border = BorderStroke(0.8.dp, Color(0xFF334155))
               ) {
                 Text(
-                  text = "🎨 විෂය තෝරා සජීවී විභාග ශාලාවට පිවිසෙන්න:",
+                  text = "විෂයන් 15",
+                  color = Color(0xFF60A5FA),
                   fontWeight = FontWeight.Bold,
-                  fontSize = 13.sp,
-                  color = Color.White
+                  fontSize = 9.sp,
+                  modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                 )
-                Surface(
-                  shape = RoundedCornerShape(8.dp),
-                  color = Color(0xFF1E293B),
-                  border = BorderStroke(1.dp, Color(0xFF334155))
-                ) {
-                  Text(
-                    text = "විෂයන් 15ක් • පත්‍ර 30 බැගින්",
-                    color = Color(0xFF60A5FA),
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 10.sp,
-                    modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp)
-                  )
-                }
               }
-              Spacer(modifier = Modifier.height(4.dp))
-              Text(
-                text = "ප්‍රශ්න පත්‍ර හා OMR පත්‍රය වෙත පිවිසීමට අදාළ විෂය කාඩ්පත මත Click කරන්න.",
-                fontSize = 10.5.sp,
-                color = Color(0xFF94A3B8)
-              )
             }
           }
 
@@ -842,42 +828,31 @@ fun LiveMockExamHallScreen(
           // 3. Syllabus Coverage Info Card
           item {
             Card(
-              shape = RoundedCornerShape(16.dp),
+              shape = RoundedCornerShape(12.dp),
               colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
               border = BorderStroke(1.dp, Color(0xFF334155)),
               modifier = Modifier.fillMaxWidth()
             ) {
-              Column(modifier = Modifier.padding(14.dp)) {
+              Column(modifier = Modifier.padding(horizontal = 10.dp, vertical = 7.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                  Icon(Icons.Default.MenuBook, contentDescription = "Syllabus", tint = Color(0xFF38BDF8), modifier = Modifier.size(18.dp))
-                  Spacer(modifier = Modifier.width(6.dp))
+                  Icon(Icons.Default.MenuBook, contentDescription = "Syllabus", tint = Color(0xFF38BDF8), modifier = Modifier.size(15.dp))
+                  Spacer(modifier = Modifier.width(5.dp))
                   Text(
                     text = "🎯 $selectedTerm වන වාර විෂය නිර්දේශ ආවරණය ($activeSubject):",
                     fontWeight = FontWeight.Bold,
-                    fontSize = 12.sp,
+                    fontSize = 11.5.sp,
                     color = Color.White
                   )
                 }
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(3.dp))
                 Text(
                   text = syllabusSummary,
-                  fontSize = 11.sp,
+                  fontSize = 10.5.sp,
                   color = Color(0xFFCBD5E1),
-                  lineHeight = 17.sp
+                  lineHeight = 15.sp,
+                  maxLines = 2,
+                  overflow = TextOverflow.Ellipsis
                 )
-                Spacer(modifier = Modifier.height(6.dp))
-                Surface(
-                  shape = RoundedCornerShape(6.dp),
-                  color = Color(0xFF0F172A)
-                ) {
-                  Text(
-                    text = "✓ පහත සෑම ප්‍රශ්න පත්‍රයකම මෙම ඒකකවලින් සමන්විත ප්‍රශ්න 60ක් අන්තර්ගතයි.",
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF60A5FA),
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
-                  )
-                }
               }
             }
           }
@@ -891,75 +866,50 @@ fun LiveMockExamHallScreen(
                 verticalAlignment = Alignment.CenterVertically
               ) {
                 Text(
-                  text = "$activeSubject සජීවී ආදර්ශ ප්‍රශ්න පත්‍ර (ප්‍රශ්න පත්‍ර 30):",
+                  text = "$activeSubject සජීවී ආදර්ශ ප්‍රශ්න පත්‍ර:",
                   fontWeight = FontWeight.Bold,
-                  fontSize = 13.5.sp,
+                  fontSize = 12.5.sp,
                   color = Color.White
                 )
                 Surface(
-                  shape = RoundedCornerShape(8.dp),
+                  shape = RoundedCornerShape(6.dp),
                   color = Color(0xFF1E293B),
                   border = BorderStroke(1.dp, Color(0xFF334155))
                 ) {
                   Text(
-                    text = "ප්‍රශ්න පත්‍ර 30ක් • ප්‍රශ්න 60 බැගින්",
+                    text = "ප්‍රශ්න පත්‍ර 30 • 60Q",
                     color = Color(0xFF4ADE80),
                     fontWeight = FontWeight.Bold,
-                    fontSize = 10.sp,
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                    fontSize = 9.5.sp,
+                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                   )
                 }
               }
 
-              Spacer(modifier = Modifier.height(8.dp))
-
-              // Notice Banner: 30 completely distinct papers
-              Surface(
-                shape = RoundedCornerShape(10.dp),
-                color = Color(0xFF1E293B),
-                border = BorderStroke(1.dp, Color(0xFF334155)),
-                modifier = Modifier.fillMaxWidth()
-              ) {
-                Row(
-                  modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                  verticalAlignment = Alignment.CenterVertically
-                ) {
-                  Icon(Icons.Default.CheckCircle, contentDescription = null, tint = Color(0xFF16A34A), modifier = Modifier.size(16.dp))
-                  Spacer(modifier = Modifier.width(8.dp))
-                  Text(
-                    text = "මෙම වාරයේ ප්‍රශ්න පත්‍ර 30ම එකිනෙකට සම්පූර්ණයෙන්ම වෙනස් ප්‍රශ්නවලින් සකසා ඇත. කිසිදු ප්‍රශ්නයක් නැවත නොයෙදේ.",
-                    fontSize = 11.sp,
-                    color = Color(0xFF15803D),
-                    fontWeight = FontWeight.SemiBold,
-                    lineHeight = 16.sp
-                  )
-                }
-              }
-
-              Spacer(modifier = Modifier.height(10.dp))
+              Spacer(modifier = Modifier.height(4.dp))
 
               // Search Bar
               OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
-                placeholder = { Text("ප්‍රශ්න පත්‍ර අංකය (1 - 30) හෝ නම සොයන්න...", fontSize = 12.sp) },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search", modifier = Modifier.size(18.dp), tint = NeutralMedium) },
+                placeholder = { Text("ප්‍රශ්න පත්‍ර අංකය (1 - 30) සොයන්න...", fontSize = 11.sp) },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search", modifier = Modifier.size(16.dp), tint = NeutralMedium) },
                 trailingIcon = {
                   if (searchQuery.isNotEmpty()) {
-                    IconButton(onClick = { searchQuery = "" }) {
-                      Icon(Icons.Default.Clear, contentDescription = "Clear", modifier = Modifier.size(16.dp))
+                    IconButton(onClick = { searchQuery = "" }, modifier = Modifier.size(24.dp)) {
+                      Icon(Icons.Default.Clear, contentDescription = "Clear", modifier = Modifier.size(14.dp))
                     }
                   }
                 },
                 singleLine = true,
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(8.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                   focusedContainerColor = Color.White,
                   unfocusedContainerColor = Color.White,
                   focusedBorderColor = BluePrimary,
                   unfocusedBorderColor = Color(0xFFCBD5E1)
                 ),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = 36.dp)
               )
 
               Spacer(modifier = Modifier.height(8.dp))
@@ -1047,13 +997,14 @@ fun LiveMockExamPaperCard(
   val focusTitle = MockExamDataBank.PAPER_FOCUS_TITLES.getOrElse(exam.paperNumber - 1) { "විෂය නිර්දේශ ආදර්ශ පත්‍රය" }
 
   Card(
-    shape = RoundedCornerShape(16.dp),
+    shape = RoundedCornerShape(12.dp),
     colors = CardDefaults.cardColors(containerColor = Color.White),
     border = BorderStroke(1.dp, Color(0xFFE2E8F0)),
-    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+    elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
     modifier = Modifier.fillMaxWidth()
   ) {
-    Column(modifier = Modifier.padding(16.dp)) {
+    Column(modifier = Modifier.padding(horizontal = 10.dp, vertical = 7.dp)) {
+      // 1. Compact Top Info Row: Paper No badge, Term, Time
       Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -1061,20 +1012,20 @@ fun LiveMockExamPaperCard(
       ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
           Surface(
-            shape = RoundedCornerShape(8.dp),
+            shape = RoundedCornerShape(6.dp),
             color = Color(0xFF0F172A)
           ) {
             Text(
               text = "ප්‍රශ්න පත්‍රය ${String.format("%02d", exam.paperNumber)} / 30",
-              fontSize = 11.sp,
+              fontSize = 10.sp,
               fontWeight = FontWeight.Black,
               color = Color(0xFFFDE047),
-              modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+              modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
             )
           }
-          Spacer(modifier = Modifier.width(6.dp))
+          Spacer(modifier = Modifier.width(5.dp))
           Surface(
-            shape = RoundedCornerShape(8.dp),
+            shape = RoundedCornerShape(6.dp),
             color = when (exam.subject) {
               "විද්‍යාව" -> Color(0xFFE8F5E9)
               "ගණිතය" -> Color(0xFFE3F2FD)
@@ -1082,126 +1033,126 @@ fun LiveMockExamPaperCard(
             }
           ) {
             Text(
-              text = "${exam.term} වන වාරය",
-              fontSize = 10.sp,
+              text = "${exam.term} වාරය",
+              fontSize = 9.5.sp,
               fontWeight = FontWeight.Bold,
               color = when (exam.subject) {
                 "විද්‍යාව" -> Color(0xFF1B5E20)
                 "ගණිතය" -> Color(0xFF0D47A1)
                 else -> Color(0xFF6B21A8)
               },
-              modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
+              modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.dp)
             )
           }
+          Spacer(modifier = Modifier.width(4.dp))
+          Text(
+            text = "• 60Q OMR",
+            fontSize = 9.5.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = Color(0xFF64748B)
+          )
         }
 
         Row(verticalAlignment = Alignment.CenterVertically) {
-          Icon(Icons.Default.Timer, contentDescription = "Time", tint = Color(0xFFD97706), modifier = Modifier.size(15.dp))
-          Spacer(modifier = Modifier.width(4.dp))
-          Text("${exam.durationMinutes} min", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFFD97706))
+          Icon(Icons.Default.Timer, contentDescription = "Time", tint = Color(0xFFD97706), modifier = Modifier.size(13.dp))
+          Spacer(modifier = Modifier.width(3.dp))
+          Text("${exam.durationMinutes} min", fontSize = 10.5.sp, fontWeight = FontWeight.Bold, color = Color(0xFFD97706))
         }
       }
 
-      Spacer(modifier = Modifier.height(8.dp))
+      Spacer(modifier = Modifier.height(3.dp))
 
-      Text(
-        text = exam.titleSinhala,
-        fontWeight = FontWeight.Bold,
-        fontSize = 14.sp,
-        color = NeutralDark
-      )
-
-      Spacer(modifier = Modifier.height(4.dp))
-
-      Text(
-        text = "විශේෂ ඉලක්කය: $focusTitle",
-        fontSize = 11.sp,
-        color = Color(0xFF475569)
-      )
-
-      Spacer(modifier = Modifier.height(8.dp))
-
-      // Badges row
-      Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-        Surface(shape = RoundedCornerShape(6.dp), color = Color(0xFFF1F5F9)) {
-          Text(text = "🎯 ප්‍රශ්න 60යි (MCQ)", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Color(0xFF334155), modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp))
-        }
-        Surface(shape = RoundedCornerShape(6.dp), color = Color(0xFFF1F5F9)) {
-          Text(text = "⭕ OMR Bubble Sheet", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Color(0xFF334155), modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp))
-        }
-        Surface(shape = RoundedCornerShape(6.dp), color = Color(0xFFF1F5F9)) {
-          Text(text = "💡 සම්පූර්ණ විවරණ", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Color(0xFF334155), modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp))
-        }
-      }
-
-      Spacer(modifier = Modifier.height(10.dp))
-
-      // Expandable Question Preview (shows first 3 questions)
-      Surface(
-        onClick = { isPreviewOpen = !isPreviewOpen },
-        shape = RoundedCornerShape(8.dp),
-        color = if (isPreviewOpen) Color(0xFFEFF6FF) else Color(0xFFF8FAFC),
-        border = BorderStroke(1.dp, if (isPreviewOpen) Color(0xFF93C5FD) else Color(0xFFE2E8F0)),
-        modifier = Modifier.fillMaxWidth()
+      // 2. Title & Benchmark Goal
+      Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
       ) {
-        Row(
-          modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-          horizontalArrangement = Arrangement.SpaceBetween,
-          verticalAlignment = Alignment.CenterVertically
-        ) {
-          Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-              if (isPreviewOpen) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-              contentDescription = "Preview",
-              tint = Color(0xFF2563EB),
-              modifier = Modifier.size(15.dp)
-            )
-            Spacer(modifier = Modifier.width(6.dp))
-            Text(
-              text = if (isPreviewOpen) "පෙරදසුන සඟවන්න" else "ප්‍රශ්න පෙරදසුන (ප්‍රශ්න 3ක් බලන්න)",
-              fontSize = 11.sp,
-              fontWeight = FontWeight.Bold,
-              color = Color(0xFF1E40AF)
-            )
-          }
-          Icon(
-            if (isPreviewOpen) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-            contentDescription = null,
-            tint = Color(0xFF2563EB),
-            modifier = Modifier.size(16.dp)
+        Column(modifier = Modifier.weight(1f)) {
+          Text(
+            text = exam.titleSinhala,
+            fontWeight = FontWeight.Bold,
+            fontSize = 12.sp,
+            color = NeutralDark,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+          )
+          Text(
+            text = "ඉලක්කය: $focusTitle",
+            fontSize = 9.5.sp,
+            color = Color(0xFF64748B),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
           )
         }
       }
 
+      Spacer(modifier = Modifier.height(4.dp))
+
+      // 3. Compact Single-line Indicators + Preview Trigger
+      Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+      ) {
+        Text(
+          text = "🎯 60 MCQ • ⭕ OMR Sheet • 💡 විවරණ",
+          fontSize = 9.sp,
+          color = Color(0xFF475569),
+          fontWeight = FontWeight.SemiBold
+        )
+        Row(
+          modifier = Modifier
+            .clickable { isPreviewOpen = !isPreviewOpen }
+            .padding(vertical = 2.dp, horizontal = 4.dp),
+          verticalAlignment = Alignment.CenterVertically
+        ) {
+          Icon(
+            if (isPreviewOpen) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+            contentDescription = "Preview",
+            tint = Color(0xFF2563EB),
+            modifier = Modifier.size(12.dp)
+          )
+          Spacer(modifier = Modifier.width(3.dp))
+          Text(
+            text = if (isPreviewOpen) "සඟවන්න" else "පෙරදසුන (3Q)",
+            fontSize = 9.5.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF2563EB)
+          )
+        }
+      }
+
+      // Expandable Question Preview (only when open)
       if (isPreviewOpen) {
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(4.dp))
         Column(
           modifier = Modifier
             .fillMaxWidth()
-            .background(Color(0xFFF8FAFC), RoundedCornerShape(8.dp))
-            .padding(10.dp),
-          verticalArrangement = Arrangement.spacedBy(8.dp)
+            .background(Color(0xFFF8FAFC), RoundedCornerShape(6.dp))
+            .padding(6.dp),
+          verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
           exam.questions.take(3).forEach { q ->
             Surface(
-              shape = RoundedCornerShape(6.dp),
+              shape = RoundedCornerShape(4.dp),
               color = Color.White,
-              border = BorderStroke(1.dp, Color(0xFFCBD5E1)),
+              border = BorderStroke(1.dp, Color(0xFFE2E8F0)),
               modifier = Modifier.fillMaxWidth()
             ) {
-              Column(modifier = Modifier.padding(8.dp)) {
+              Column(modifier = Modifier.padding(6.dp)) {
                 Text(
                   text = q.questionText,
-                  fontSize = 11.sp,
+                  fontSize = 10.5.sp,
                   fontWeight = FontWeight.Bold,
                   color = NeutralDark,
-                  lineHeight = 16.sp
+                  lineHeight = 15.sp
                 )
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(2.dp))
                 q.options.take(2).forEachIndexed { idx, opt ->
                   Text(
                     text = "(${idx + 1}) $opt",
-                    fontSize = 10.sp,
+                    fontSize = 9.5.sp,
                     color = Color(0xFF475569)
                   )
                 }
@@ -1211,33 +1162,41 @@ fun LiveMockExamPaperCard(
         }
       }
 
-      Spacer(modifier = Modifier.height(14.dp))
+      Spacer(modifier = Modifier.height(5.dp))
 
+      // 4. Compact Action Buttons Row
       Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(6.dp)
       ) {
         if (exam.pdfUri != null) {
           OutlinedButton(
             onClick = onOpenPdf,
-            shape = RoundedCornerShape(10.dp),
-            modifier = Modifier.weight(1f)
+            shape = RoundedCornerShape(8.dp),
+            contentPadding = PaddingValues(horizontal = 6.dp, vertical = 2.dp),
+            modifier = Modifier
+              .weight(1f)
+              .defaultMinSize(minHeight = 32.dp)
           ) {
-            Icon(Icons.Default.PictureAsPdf, contentDescription = "PDF", modifier = Modifier.size(16.dp))
-            Spacer(modifier = Modifier.width(4.dp))
-            Text("ප්‍රශ්න පත්‍රය (PDF)", fontSize = 11.sp)
+            Icon(Icons.Default.PictureAsPdf, contentDescription = "PDF", modifier = Modifier.size(14.dp))
+            Spacer(modifier = Modifier.width(3.dp))
+            Text("ප්‍රශ්න පත්‍රය (PDF)", fontSize = 10.sp)
           }
         }
 
         Button(
           onClick = onStartExam,
           colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2563EB)),
-          shape = RoundedCornerShape(10.dp),
-          modifier = Modifier.weight(1.4f).testTag("start_mock_exam_${exam.id}")
+          shape = RoundedCornerShape(8.dp),
+          contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
+          modifier = Modifier
+            .weight(1.3f)
+            .defaultMinSize(minHeight = 32.dp)
+            .testTag("start_mock_exam_${exam.id}")
         ) {
-          Icon(Icons.Default.PlayArrow, contentDescription = "Start", modifier = Modifier.size(18.dp))
-          Spacer(modifier = Modifier.width(6.dp))
-          Text("විභාගය අරඹන්න (60Q)", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+          Icon(Icons.Default.PlayArrow, contentDescription = "Start", modifier = Modifier.size(15.dp))
+          Spacer(modifier = Modifier.width(4.dp))
+          Text("විභාගය අරඹන්න (60Q)", fontWeight = FontWeight.Bold, fontSize = 11.sp)
         }
       }
     }
@@ -1252,6 +1211,8 @@ fun ActiveMockExamSession(
   onOpenMistakeNotebook: () -> Unit = {}
 ) {
   val context = LocalContext.current
+  val screenDims = rememberScreenDimensions()
+  val isCompact = screenDims.isSmallWidth || screenDims.isShortHeight
   var remainingSeconds by remember { mutableStateOf(exam.durationMinutes * 60) }
   var isTimerRunning by remember { mutableStateOf(true) }
   var currentQuestionIndex by remember { mutableStateOf(0) }
@@ -1741,7 +1702,7 @@ fun ActiveMockExamSession(
               // Compact tabs: Question View vs OMR Matrix
               Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                horizontalArrangement = Arrangement.spacedBy(if (isCompact) 4.dp else 6.dp),
                 verticalAlignment = Alignment.CenterVertically
               ) {
                 Surface(
@@ -1752,11 +1713,11 @@ fun ActiveMockExamSession(
                 ) {
                   Box(
                     contentAlignment = Alignment.Center,
-                    modifier = Modifier.padding(vertical = 5.dp)
+                    modifier = Modifier.padding(vertical = if (isCompact) 3.5.dp else 5.dp)
                   ) {
                     Text(
                       text = "📝 ප්‍රශ්නය සහ විකල්ප",
-                      fontSize = 11.sp,
+                      fontSize = if (isCompact) 9.5.sp else 11.sp,
                       fontWeight = if (activeTab == 0) FontWeight.Bold else FontWeight.Normal,
                       color = Color.White
                     )
@@ -1771,11 +1732,11 @@ fun ActiveMockExamSession(
                 ) {
                   Box(
                     contentAlignment = Alignment.Center,
-                    modifier = Modifier.padding(vertical = 5.dp)
+                    modifier = Modifier.padding(vertical = if (isCompact) 3.5.dp else 5.dp)
                   ) {
                     Text(
                       text = "⭕ OMR පත්‍රය (${answersMap.size}/${exam.questions.size})",
-                      fontSize = 11.sp,
+                      fontSize = if (isCompact) 9.5.sp else 11.sp,
                       fontWeight = if (activeTab == 1) FontWeight.Bold else FontWeight.Normal,
                       color = Color.White
                     )
@@ -1795,8 +1756,8 @@ fun ActiveMockExamSession(
           Row(
             modifier = Modifier
               .fillMaxWidth()
-              .padding(horizontal = 8.dp, vertical = if (isFullScreenMode) 4.dp else 6.dp),
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
+              .padding(horizontal = if (isCompact) 6.dp else 8.dp, vertical = if (isFullScreenMode || isCompact) 3.dp else 6.dp),
+            horizontalArrangement = Arrangement.spacedBy(if (isCompact) 4.dp else 6.dp),
             verticalAlignment = Alignment.CenterVertically
           ) {
             OutlinedButton(
@@ -1806,17 +1767,17 @@ fun ActiveMockExamSession(
               enabled = currentQuestionIndex > 0,
               modifier = Modifier
                 .weight(1f)
-                .height(36.dp),
+                .height(if (isCompact) 32.dp else 36.dp),
               shape = RoundedCornerShape(8.dp),
               contentPadding = PaddingValues(horizontal = 4.dp, vertical = 0.dp)
             ) {
               Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = null,
-                modifier = Modifier.size(14.dp)
+                modifier = Modifier.size(if (isCompact) 12.dp else 14.dp)
               )
               Spacer(modifier = Modifier.width(2.dp))
-              Text("පෙර", fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+              Text("පෙර", fontSize = if (isCompact) 9.5.sp else 11.sp, fontWeight = FontWeight.SemiBold)
             }
 
             Button(
@@ -1825,17 +1786,17 @@ fun ActiveMockExamSession(
               shape = RoundedCornerShape(8.dp),
               modifier = Modifier
                 .weight(1.3f)
-                .height(36.dp)
+                .height(if (isCompact) 32.dp else 36.dp)
                 .testTag("submit_exam_button"),
               contentPadding = PaddingValues(horizontal = 4.dp, vertical = 0.dp)
             ) {
               Icon(
                 imageVector = Icons.Default.CheckCircle,
                 contentDescription = "Submit",
-                modifier = Modifier.size(14.dp)
+                modifier = Modifier.size(if (isCompact) 12.dp else 14.dp)
               )
               Spacer(modifier = Modifier.width(3.dp))
-              Text("අවසන් කරන්න", fontWeight = FontWeight.Bold, fontSize = 11.sp)
+              Text("අවසන් කරන්න", fontWeight = FontWeight.Bold, fontSize = if (isCompact) 9.5.sp else 11.sp)
             }
 
             Button(
@@ -1847,15 +1808,15 @@ fun ActiveMockExamSession(
               shape = RoundedCornerShape(8.dp),
               modifier = Modifier
                 .weight(1f)
-                .height(36.dp),
+                .height(if (isCompact) 32.dp else 36.dp),
               contentPadding = PaddingValues(horizontal = 4.dp, vertical = 0.dp)
             ) {
-              Text("ඊළඟ", fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+              Text("ඊළඟ", fontSize = if (isCompact) 9.5.sp else 11.sp, fontWeight = FontWeight.SemiBold)
               Spacer(modifier = Modifier.width(2.dp))
               Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                 contentDescription = null,
-                modifier = Modifier.size(14.dp)
+                modifier = Modifier.size(if (isCompact) 12.dp else 14.dp)
               )
             }
           }
@@ -1873,8 +1834,13 @@ fun ActiveMockExamSession(
             .fillMaxSize()
             .padding(padding)
             .background(Color(0xFFF8FAFC)),
-          contentPadding = PaddingValues(start = 12.dp, top = 8.dp, end = 12.dp, bottom = 140.dp),
-          verticalArrangement = Arrangement.spacedBy(10.dp)
+          contentPadding = PaddingValues(
+            start = if (isCompact) 8.dp else 12.dp,
+            top = 6.dp,
+            end = if (isCompact) 8.dp else 12.dp,
+            bottom = if (isCompact) 60.dp else 120.dp
+          ),
+          verticalArrangement = Arrangement.spacedBy(if (isCompact) 6.dp else 10.dp)
         ) {
           // Question Header & Flag Toggle
           item {
@@ -1890,7 +1856,7 @@ fun ActiveMockExamSession(
                 Text(
                   text = "ප්‍රශ්නය ${currentQuestionIndex + 1} / ${exam.questions.size}",
                   fontWeight = FontWeight.Bold,
-                  fontSize = 11.sp,
+                  fontSize = if (isCompact) 9.5.sp else 11.sp,
                   color = NeutralDark,
                   modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
                 )
@@ -1912,12 +1878,12 @@ fun ActiveMockExamSession(
                     imageVector = if (isFlagged) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
                     contentDescription = "Review",
                     tint = if (isFlagged) Color(0xFFD97706) else NeutralMedium,
-                    modifier = Modifier.size(14.dp)
+                    modifier = Modifier.size(if (isCompact) 12.dp else 14.dp)
                   )
                   Spacer(modifier = Modifier.width(3.dp))
                   Text(
                     text = if (isFlagged) "නැවත බැලීමට (Marked)" else "නැවත බැලීමට ලකුණු කරන්න",
-                    fontSize = 10.sp,
+                    fontSize = if (isCompact) 9.sp else 10.sp,
                     color = if (isFlagged) Color(0xFFD97706) else NeutralMedium
                   )
                 }
@@ -1928,22 +1894,22 @@ fun ActiveMockExamSession(
           // Question Card
           item {
             Card(
-              shape = RoundedCornerShape(14.dp),
+              shape = RoundedCornerShape(12.dp),
               colors = CardDefaults.cardColors(containerColor = Color.White),
               elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
               border = BorderStroke(1.dp, Color(0xFFE2E8F0)),
               modifier = Modifier.fillMaxWidth()
             ) {
-              Column(modifier = Modifier.padding(14.dp)) {
+              Column(modifier = Modifier.padding(if (isCompact) 10.dp else 14.dp)) {
                 Text(
                   text = q.questionText,
                   fontWeight = FontWeight.Bold,
-                  fontSize = 14.sp,
+                  fontSize = if (isCompact) 12.sp else 14.sp,
                   color = NeutralDark,
-                  lineHeight = 21.sp
+                  lineHeight = if (isCompact) 17.sp else 21.sp
                 )
 
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(if (isCompact) 6.dp else 10.dp))
 
                 q.options.forEachIndexed { optIdx, optText ->
                   val bubbleNum = optIdx + 1
@@ -1953,21 +1919,24 @@ fun ActiveMockExamSession(
                     onClick = {
                       answersMap[q.id] = bubbleNum
                     },
-                    shape = RoundedCornerShape(10.dp),
+                    shape = RoundedCornerShape(8.dp),
                     color = if (isSelected) Color(0xFFEFF6FF) else Color(0xFFF8FAFC),
                     border = BorderStroke(1.5.dp, if (isSelected) BluePrimary else Color(0xFFE2E8F0)),
                     modifier = Modifier
                       .fillMaxWidth()
-                      .padding(vertical = 3.dp)
+                      .padding(vertical = if (isCompact) 2.dp else 3.dp)
                   ) {
                     Row(
-                      modifier = Modifier.padding(horizontal = 10.dp, vertical = 10.dp),
+                      modifier = Modifier.padding(
+                        horizontal = if (isCompact) 8.dp else 10.dp,
+                        vertical = if (isCompact) 6.dp else 10.dp
+                      ),
                       verticalAlignment = Alignment.CenterVertically
                     ) {
                       // OMR Circle Bubble
                       Box(
                         modifier = Modifier
-                          .size(26.dp)
+                          .size(if (isCompact) 22.dp else 26.dp)
                           .clip(CircleShape)
                           .background(if (isSelected) Color(0xFF1E293B) else Color.White)
                           .border(1.5.dp, if (isSelected) Color(0xFF1E293B) else Color(0xFF94A3B8), CircleShape),
@@ -1976,19 +1945,19 @@ fun ActiveMockExamSession(
                         Text(
                           text = "$bubbleNum",
                           fontWeight = FontWeight.Black,
-                          fontSize = 11.sp,
+                          fontSize = if (isCompact) 9.5.sp else 11.sp,
                           color = if (isSelected) Color.White else Color(0xFF64748B)
                         )
                       }
 
-                      Spacer(modifier = Modifier.width(10.dp))
+                      Spacer(modifier = Modifier.width(if (isCompact) 6.dp else 10.dp))
 
                       Text(
                         text = optText,
-                        fontSize = 12.5.sp,
+                        fontSize = if (isCompact) 11.sp else 12.5.sp,
+                        lineHeight = if (isCompact) 15.sp else 17.sp,
                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                        color = if (isSelected) BluePrimary else NeutralDark,
-                        lineHeight = 18.sp
+                        color = if (isSelected) BluePrimary else NeutralDark
                       )
                     }
                   }

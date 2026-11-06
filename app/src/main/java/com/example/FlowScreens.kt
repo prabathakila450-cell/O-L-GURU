@@ -269,14 +269,15 @@ fun GradesHomeScreen(
           }
         }
 
-        // NEW FEATURE: 🎙️ AI Voice Doubt Solver Hero Banner
+        // NEW FEATURE: 🎙️ AI Voice Doubt Solver Hero Banner (Ultra-Compact)
         Card(
-          shape = RoundedCornerShape(16.dp),
+          shape = RoundedCornerShape(10.dp),
           colors = CardDefaults.cardColors(containerColor = Color(0xFF091E3A)),
-          border = BorderStroke(1.2.dp, Color(0xFF38BDF8)),
+          border = BorderStroke(1.dp, Color(0xFF38BDF8)),
+          elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
           modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(10.dp))
             .clickable { onOpenVoiceDoubtSolver() }
             .testTag("home_voice_doubt_solver_card")
         ) {
@@ -292,7 +293,7 @@ fun GradesHomeScreen(
                   )
                 )
               )
-              .padding(12.dp),
+              .padding(horizontal = 10.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
           ) {
@@ -302,63 +303,68 @@ fun GradesHomeScreen(
             ) {
               Box(
                 modifier = Modifier
-                  .size(42.dp)
+                  .size(28.dp)
                   .clip(CircleShape)
                   .background(Color(0xFFEF4444)),
                 contentAlignment = Alignment.Center
               ) {
-                Text("🎙️", fontSize = 20.sp)
+                Text("🎙️", fontSize = 14.sp)
               }
-              Spacer(modifier = Modifier.width(10.dp))
-              Column {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+              Spacer(modifier = Modifier.width(8.dp))
+              Column(modifier = Modifier.weight(1f)) {
+                Row(
+                  verticalAlignment = Alignment.CenterVertically,
+                  horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
                   Text(
                     text = "AI ශිෂ්‍ය ගැටලු හඬ සහායකයා",
-                    fontSize = 13.sp,
+                    fontSize = 11.5.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    color = Color.White
+                    color = Color.White,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                   )
-                  Spacer(modifier = Modifier.width(6.dp))
                   Surface(
                     shape = RoundedCornerShape(4.dp),
                     color = Color(0xFF10B981)
                   ) {
                     Text(
-                      text = "VOICE EXPLAIN",
-                      fontSize = 8.sp,
-                      fontWeight = FontWeight.ExtraBold,
+                      text = "VOICE",
+                      fontSize = 7.5.sp,
+                      fontWeight = FontWeight.Black,
                       color = Color.White,
                       modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
                     )
                   }
                 }
-                Spacer(modifier = Modifier.height(2.dp))
                 Text(
-                  text = "ඕනෑම ගැටලුවක් විමසූ සැනින් සම්පූර්ණ හඬ පැහැදිලි කිරීම (Full Voice)",
-                  fontSize = 10.sp,
+                  text = "ඕනෑම ගැටලුවක් විමසූ සැනින් සම්පූර්ණ හඬ පැහැදිලි කිරීම්",
+                  fontSize = 9.sp,
                   color = Color(0xFFBAE6FD),
                   maxLines = 1,
                   overflow = TextOverflow.Ellipsis
                 )
               }
             }
+            Spacer(modifier = Modifier.width(6.dp))
             Icon(
               Icons.AutoMirrored.Filled.ArrowForward,
               contentDescription = "Open",
               tint = Color(0xFF38BDF8),
-              modifier = Modifier.size(18.dp)
+              modifier = Modifier.size(15.dp)
             )
           }
         }
 
-        // NEW FEATURE: 🔢 Math Quiz Master 4000 Hero Banner (App Home Screen)
+        // NEW FEATURE: 🔢 Math Quiz Master 4000 Hero Banner (Ultra-Compact)
         Card(
-          shape = RoundedCornerShape(16.dp),
+          shape = RoundedCornerShape(10.dp),
           colors = CardDefaults.cardColors(containerColor = Color(0xFF1E1B4B)),
-          border = BorderStroke(1.2.dp, Color(0xFF818CF8)),
+          border = BorderStroke(1.dp, Color(0xFF818CF8)),
+          elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
           modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(10.dp))
             .clickable { onOpenMathQuizMaster() }
             .testTag("home_math_quiz_master_card")
         ) {
@@ -374,7 +380,7 @@ fun GradesHomeScreen(
                   )
                 )
               )
-              .padding(12.dp),
+              .padding(horizontal = 10.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
           ) {
@@ -384,51 +390,55 @@ fun GradesHomeScreen(
             ) {
               Box(
                 modifier = Modifier
-                  .size(42.dp)
+                  .size(28.dp)
                   .clip(CircleShape)
                   .background(Color(0xFF4F46E5)),
                 contentAlignment = Alignment.Center
               ) {
-                Text("🔢", fontSize = 20.sp)
+                Text("🔢", fontSize = 14.sp)
               }
-              Spacer(modifier = Modifier.width(10.dp))
-              Column {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+              Spacer(modifier = Modifier.width(8.dp))
+              Column(modifier = Modifier.weight(1f)) {
+                Row(
+                  verticalAlignment = Alignment.CenterVertically,
+                  horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
                   Text(
-                    text = "ගණිතය ක්විස් මාස්ටර් (ප්‍රශ්න 4,000)",
-                    fontSize = 13.sp,
+                    text = "ගණිතය ක්විස් මාස්ටර් (4,000Q)",
+                    fontSize = 11.5.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    color = Color.White
+                    color = Color.White,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                   )
-                  Spacer(modifier = Modifier.width(6.dp))
                   Surface(
                     shape = RoundedCornerShape(4.dp),
                     color = Color(0xFF6366F1)
                   ) {
                     Text(
-                      text = "MATH 4,000",
-                      fontSize = 8.sp,
-                      fontWeight = FontWeight.ExtraBold,
+                      text = "MATH",
+                      fontSize = 7.5.sp,
+                      fontWeight = FontWeight.Black,
                       color = Color.White,
                       modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
                     )
                   }
                 }
-                Spacer(modifier = Modifier.height(2.dp))
                 Text(
-                  text = "10 සහ 11 ශ්‍රේණි • කාණ්ඩ 80 බැගින් ප්‍රශ්න සෙට් 25 • 100% නිවැරදි",
-                  fontSize = 10.sp,
+                  text = "10 සහ 11 ශ්‍රේණි • කාණ්ඩ 80 ක ප්‍රශ්න 4,000 ක්",
+                  fontSize = 9.sp,
                   color = Color(0xFFC7D2FE),
                   maxLines = 1,
                   overflow = TextOverflow.Ellipsis
                 )
               }
             }
+            Spacer(modifier = Modifier.width(6.dp))
             Icon(
               Icons.AutoMirrored.Filled.ArrowForward,
               contentDescription = "Open",
               tint = Color(0xFF818CF8),
-              modifier = Modifier.size(18.dp)
+              modifier = Modifier.size(15.dp)
             )
           }
         }
@@ -807,6 +817,9 @@ fun FeatureSubCardWithBg(
     else -> Color(0xFF0F172A) to Color(0xFF1E293B)
   }
 
+  val dims = rememberScreenDimensions()
+  val isCompact = dims.isSmallWidth
+
   Card(
     shape = RoundedCornerShape(10.dp),
     colors = CardDefaults.cardColors(containerColor = Color.Transparent),
@@ -819,7 +832,8 @@ fun FeatureSubCardWithBg(
     Box(
       modifier = Modifier
         .fillMaxWidth()
-        .height(54.dp)
+        .defaultMinSize(minHeight = if (isCompact) 58.dp else 56.dp)
+        .wrapContentHeight()
         .background(
           Brush.verticalGradient(
             colors = listOf(
@@ -831,16 +845,18 @@ fun FeatureSubCardWithBg(
     ) {
       Column(
         modifier = Modifier
-          .fillMaxSize()
-          .padding(horizontal = 8.dp, vertical = 5.dp),
-        verticalArrangement = Arrangement.SpaceBetween
+          .fillMaxWidth()
+          .padding(
+            horizontal = if (isCompact) 6.dp else 8.dp,
+            vertical = if (isCompact) 4.5.dp else 5.5.dp
+          )
       ) {
         Row(
           modifier = Modifier.fillMaxWidth(),
           horizontalArrangement = Arrangement.SpaceBetween,
           verticalAlignment = Alignment.CenterVertically
         ) {
-          Text(emoji, fontSize = 13.sp)
+          Text(emoji, fontSize = if (isCompact) 11.5.sp else 13.sp)
           if (badgeText != null) {
             Surface(
               shape = RoundedCornerShape(3.dp),
@@ -848,19 +864,21 @@ fun FeatureSubCardWithBg(
             ) {
               Text(
                 text = badgeText,
-                fontSize = 7.sp,
+                fontSize = if (isCompact) 6.5.sp else 7.sp,
                 fontWeight = FontWeight.ExtraBold,
                 color = Color.White,
-                modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp),
+                modifier = Modifier.padding(horizontal = if (isCompact) 3.dp else 4.dp, vertical = 1.dp),
                 maxLines = 1
               )
             }
           }
         }
-        Column {
+        Spacer(modifier = Modifier.height(if (isCompact) 2.5.dp else 3.5.dp))
+        Column(modifier = Modifier.fillMaxWidth()) {
           Text(
             text = title,
-            fontSize = 10.sp,
+            fontSize = if (isCompact) 9.sp else 10.sp,
+            lineHeight = if (isCompact) 12.sp else 13.5.sp,
             fontWeight = FontWeight.Bold,
             color = Color.White,
             maxLines = 1,
@@ -868,7 +886,8 @@ fun FeatureSubCardWithBg(
           )
           Text(
             text = subtitle,
-            fontSize = 8.sp,
+            fontSize = if (isCompact) 7.5.sp else 8.sp,
+            lineHeight = if (isCompact) 10.sp else 11.sp,
             color = Color(0xFFCBD5E1),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis

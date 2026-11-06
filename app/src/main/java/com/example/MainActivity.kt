@@ -1306,12 +1306,26 @@ fun StudentPortalApp() {
             .testTag("main_scaffold"),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-          if (currentScreen != "GRADE_10_TERM_TEST_PORTAL" && currentScreen != "GRADE_11_TERM_TEST_PORTAL" && !isHubFullScreen) {
+          val isImmersiveExamOrPortal = currentScreen in listOf(
+            "GRADE_10_TERM_TEST_PORTAL",
+            "GRADE_11_TERM_TEST_PORTAL",
+            "MOCK_EXAM",
+            "TIMED_PAST_PAPER_SIMULATOR",
+            "LIVE_DAILY_QUIZ"
+          ) || isHubFullScreen
+          if (!isImmersiveExamOrPortal) {
             TopBannerAdView()
           }
         },
         bottomBar = {
-          if (currentScreen != "GRADE_10_TERM_TEST_PORTAL" && currentScreen != "GRADE_11_TERM_TEST_PORTAL" && !isHubFullScreen) {
+          val isImmersiveExamOrPortal = currentScreen in listOf(
+            "GRADE_10_TERM_TEST_PORTAL",
+            "GRADE_11_TERM_TEST_PORTAL",
+            "MOCK_EXAM",
+            "TIMED_PAST_PAPER_SIMULATOR",
+            "LIVE_DAILY_QUIZ"
+          ) || isHubFullScreen
+          if (!isImmersiveExamOrPortal) {
             Column(modifier = Modifier.fillMaxWidth()) {
               PortalBottomNavigation(
                 selectedTab = selectedTabNav,
@@ -6216,8 +6230,11 @@ fun PortalBottomNavigation(
   selectedTab: Int,
   onTabSelected: (Int) -> Unit
 ) {
+  val dims = rememberScreenDimensions()
+  val isCompact = dims.isSmallWidth
+
   Surface(
-    shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+    shape = RoundedCornerShape(topStart = 18.dp, topEnd = 18.dp),
     color = SurfaceVariantLight,
     shadowElevation = 6.dp,
     modifier = Modifier.navigationBarsPadding()
@@ -6225,15 +6242,25 @@ fun PortalBottomNavigation(
     NavigationBar(
       containerColor = Color.Transparent,
       tonalElevation = 0.dp,
-      modifier = Modifier.height(60.dp)
+      modifier = Modifier.height(if (isCompact) 54.dp else 60.dp)
     ) {
-      val items = listOf(
-        Triple("මුල් පිටුව", Icons.Default.Home, "nav_home"),
-        Triple("ප්‍රගතිය", Icons.Default.WorkspacePremium, "nav_analytics"),
-        Triple("රචනා/ප්‍රශ්න", Icons.Default.Description, "nav_essay"),
-        Triple("සූත්‍ර", Icons.Default.MenuBook, "nav_formulas"),
-        Triple("AI Tutor", Icons.Default.AutoAwesome, "nav_ai_tutor")
-      )
+      val items = if (isCompact) {
+        listOf(
+          Triple("මුල", Icons.Default.Home, "nav_home"),
+          Triple("ප්‍රගතිය", Icons.Default.WorkspacePremium, "nav_analytics"),
+          Triple("රචනා", Icons.Default.Description, "nav_essay"),
+          Triple("සූත්‍ර", Icons.Default.MenuBook, "nav_formulas"),
+          Triple("AI", Icons.Default.AutoAwesome, "nav_ai_tutor")
+        )
+      } else {
+        listOf(
+          Triple("මුල් පිටුව", Icons.Default.Home, "nav_home"),
+          Triple("ප්‍රගතිය", Icons.Default.WorkspacePremium, "nav_analytics"),
+          Triple("රචනා/ප්‍රශ්න", Icons.Default.Description, "nav_essay"),
+          Triple("සූත්‍ර", Icons.Default.MenuBook, "nav_formulas"),
+          Triple("AI Tutor", Icons.Default.AutoAwesome, "nav_ai_tutor")
+        )
+      }
 
       items.forEachIndexed { index, (label, icon, testTag) ->
         val isSelected = selectedTab == index
@@ -6244,13 +6271,13 @@ fun PortalBottomNavigation(
             Icon(
               imageVector = icon,
               contentDescription = label,
-              modifier = Modifier.size(20.dp)
+              modifier = Modifier.size(if (isCompact) 18.dp else 20.dp)
             )
           },
           label = {
             Text(
               text = label,
-              fontSize = 10.sp,
+              fontSize = if (isCompact) 8.5.sp else 10.sp,
               fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
               maxLines = 1,
               overflow = TextOverflow.Ellipsis
