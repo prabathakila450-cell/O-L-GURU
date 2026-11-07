@@ -615,7 +615,9 @@ fun StudentPortalApp() {
       UserAccount("1", "අකිල ප්‍රභාත් දිසානායක (Admin)", "0772843861", "A20020521PD", isApproved = true, paymentStatus = "Approved", requestedGradePackage = "06 සිට 11 දක්වා සියලුම ශ්‍රේණි (All Grades Mega Pack)", approvedGrades = listOf("06", "07", "08", "09", "10", "11", "6 ශ්‍රේණිය", "7 ශ්‍රේණිය", "8 ශ්‍රේණිය", "9 ශ්‍රේණිය", "10 ශ්‍රේණිය", "11 ශ්‍රේණිය")),
       UserAccount("2", "අකිල ප්‍රභාත් දිසානායක (Admin)", "0717136085", "A20020521PD", isApproved = true, paymentStatus = "Approved", requestedGradePackage = "06 සිට 11 දක්වා සියලුම ශ්‍රේණි (All Grades Mega Pack)", approvedGrades = listOf("06", "07", "08", "09", "10", "11", "6 ශ්‍රේණිය", "7 ශ්‍රේණිය", "8 ශ්‍රේණිය", "9 ශ්‍රේණිය", "10 ශ්‍රේණිය", "11 ශ්‍රේණිය")),
       UserAccount("3", "අකිල ප්‍රභාත් දිසානායක (Admin)", "prabathakila450@gmail.com", "A20020521PD", isApproved = true, paymentStatus = "Approved", requestedGradePackage = "06 සිට 11 දක්වා සියලුම ශ්‍රේණි (All Grades Mega Pack)", approvedGrades = listOf("06", "07", "08", "09", "10", "11", "6 ශ්‍රේණිය", "7 ශ්‍රේණිය", "8 ශ්‍රේණිය", "9 ශ්‍රේණිය", "10 ශ්‍රේණිය", "11 ශ්‍රේණිය")),
-      UserAccount("student_01", "සාමාන්‍ය ශිෂ්‍ය ගිණුම (O/L Student)", "0771234567", "1234", isApproved = false, paymentStatus = "Pending Approval", requestedGradePackage = "06 සිට 11 දක්වා සියලුම ශ්‍රේණි (All Grades Mega Pack)", approvedGrades = listOf("06", "07", "08", "09", "10", "11", "6 ශ්‍රේණිය", "7 ශ්‍රේණිය", "8 ශ්‍රේණිය", "9 ශ්‍රේණිය", "10 ශ්‍රේණිය", "11 ශ්‍රේණිය"))
+      UserAccount("student_01", "සාමාන්‍ය ශිෂ්‍ය ගිණුම (O/L Student)", "0771234567", "1234", isApproved = false, paymentStatus = "Pending Approval", requestedGradePackage = "06 සිට 11 දක්වා සියලුම ශ්‍රේණි (All Grades Mega Pack)", approvedGrades = listOf("06", "07", "08", "09", "10", "11", "6 ශ්‍රේණිය", "7 ශ්‍රේණිය", "8 ශ්‍රේණිය", "9 ශ්‍රේණිය", "10 ශ්‍රේණිය", "11 ශ්‍රේණිය")),
+      UserAccount("student_02", "නිසල් ප්‍රනාන්දු", "0712345678", "1234", isApproved = false, paymentStatus = "Pending Approval (With Slip)", requestedGradePackage = "10 සහ 11 ශ්‍රේණි (O/L Combo Pack)", approvedGrades = listOf("10", "11", "10 ශ්‍රේණිය", "11 ශ්‍රේණිය"), requestDate = "2026-11-07 17:30", requestTimestamp = System.currentTimeMillis() - 3600000),
+      UserAccount("student_03", "කසුන් මධුෂාන්", "0719876543", "1234", isApproved = false, paymentStatus = "Pending Approval", requestedGradePackage = "10 ශ්‍රේණිය (Grade 10 Single Pack)", approvedGrades = listOf("10", "10 ශ්‍රේණිය"), requestDate = "2026-11-07 16:15", requestTimestamp = System.currentTimeMillis() - 7200000)
     )
 
     // Permanently filter out and prune any mock/fake demo accounts previously saved in local storage
@@ -875,18 +877,16 @@ fun StudentPortalApp() {
           "⚠️ ඔබගේ මාස 6ක (දින 180) ඇඩ්මින් අනුමැතිය අවසන් වී ඇත. කරුණාකර රු. 1,000 ගෙවා අනුමැතිය නැවත සක්‍රීය කරගන්න.",
           Toast.LENGTH_LONG
         ).show()
-        showPaymentApprovalDialog = true
+        authDialogInitialTab = 1
+        showAuthRequiredDialog = true
       } else {
         Toast.makeText(
           context,
           "🔒 ඇප් එක ඉන්ස්ටෝල් කිරීමෙන් පසු පැය 24ක නොමිලේ කාලය අවසන් වී ඇත. විශේෂාංග පරිශීලනය කිරීමට කරුණාකර ඇඩ්මින් අනුමැතිය (Admin Approval) ලබාගන්න.",
           Toast.LENGTH_LONG
         ).show()
-        if (loggedInUser == null) {
-          showAuthRequiredDialog = true
-        } else {
-          showPaymentApprovalDialog = true
-        }
+        authDialogInitialTab = 1
+        showAuthRequiredDialog = true
       }
     }
   }
@@ -957,11 +957,8 @@ fun StudentPortalApp() {
         "🔒 පැය 24ක නොමිලේ අත්හදා බැලීමේ කාලය අවසන් වී ඇත. විශේෂාංග පරිශීලනයට ඇඩ්මින් අනුමැතිය (Admin Approval) ලබාගන්න.",
         Toast.LENGTH_LONG
       ).show()
-      if (loggedInUser == null) {
-        showAuthRequiredDialog = true
-      } else {
-        showPaymentApprovalDialog = true
-      }
+      authDialogInitialTab = 1
+      showAuthRequiredDialog = true
     }
   }
 
@@ -994,7 +991,8 @@ fun StudentPortalApp() {
         "🔒 පැය 24ක නොමිලේ අත්හදා බැලීමේ කාලය අවසන් වී ඇත. PDF කියවීමට කරුණාකර ඇඩ්මින් අනුමැතිය (Admin Approval) ලබාගන්න.",
         Toast.LENGTH_LONG
       ).show()
-      showPaymentApprovalDialog = true
+      authDialogInitialTab = 1
+      showAuthRequiredDialog = true
       return
     }
 
@@ -1465,11 +1463,8 @@ fun StudentPortalApp() {
           isApproved = isApprovedUser,
           isAdmin = isAdminAuthenticated,
           onRequireApproval = {
-            if (loggedInUser == null) {
-              showAuthRequiredDialog = true
-            } else {
-              showPaymentApprovalDialog = true
-            }
+            authDialogInitialTab = 1
+            showAuthRequiredDialog = true
           },
           onBack = {
             currentScreen = if (selectedSubjectItem != null) "CONTENT" else "HOME"
@@ -1478,11 +1473,8 @@ fun StudentPortalApp() {
             val hasAccess = isApprovedUser || isFeatureTrialActive
             if (!hasAccess) {
               Toast.makeText(context, "🔒 මෙම පීඩීඑෆ් සටහන් හා ප්‍රශ්න පත්‍ර පරිශීලනය කිරීමට ඇඩ්මින් අනුමැතිය (Admin Approval) අවශ්‍ය වේ.", Toast.LENGTH_LONG).show()
-              if (loggedInUser == null) {
-                showAuthRequiredDialog = true
-              } else {
-                showPaymentApprovalDialog = true
-              }
+              authDialogInitialTab = 1
+              showAuthRequiredDialog = true
             } else {
               iframeModalPdfTitle = title
               iframeModalPdfUrl = formatToGoogleDriveEmbedUrl(url)
@@ -1578,11 +1570,8 @@ fun StudentPortalApp() {
             val hasAccess = isApprovedUser || isFeatureTrialActive
             if (!hasAccess) {
               Toast.makeText(context, "🔒 මෙම පීඩීඑෆ් සටහන් හා ප්‍රශ්න පත්‍ර පරිශීලනය කිරීමට ඇඩ්මින් අනුමැතිය (Admin Approval) අවශ්‍ය වේ.", Toast.LENGTH_LONG).show()
-              if (loggedInUser == null) {
-                showAuthRequiredDialog = true
-              } else {
-                showPaymentApprovalDialog = true
-              }
+              authDialogInitialTab = 1
+              showAuthRequiredDialog = true
             } else {
               iframeModalPdfTitle = title
               iframeModalPdfUrl = formatToGoogleDriveEmbedUrl(url)
@@ -1617,11 +1606,8 @@ fun StudentPortalApp() {
             val hasAccess = isApprovedUser || isFeatureTrialActive
             if (!hasAccess) {
               Toast.makeText(context, "🔒 මෙම පීඩීඑෆ් සටහන් හා ප්‍රශ්න පත්‍ර පරිශීලනය කිරීමට ඇඩ්මින් අනුමැතිය (Admin Approval) අවශ්‍ය වේ.", Toast.LENGTH_LONG).show()
-              if (loggedInUser == null) {
-                showAuthRequiredDialog = true
-              } else {
-                showPaymentApprovalDialog = true
-              }
+              authDialogInitialTab = 1
+              showAuthRequiredDialog = true
             } else {
               iframeModalPdfTitle = title
               iframeModalPdfUrl = formatToGoogleDriveEmbedUrl(url)
@@ -1648,11 +1634,8 @@ fun StudentPortalApp() {
             val hasAccess = isApprovedUser || isFeatureTrialActive
             if (!hasAccess) {
               Toast.makeText(context, "🔒 මෙම පීඩීඑෆ් පරිශීලනයට ඇඩ්මින් අනුමැතිය (Admin Approval) අවශ්‍ය වේ.", Toast.LENGTH_LONG).show()
-              if (loggedInUser == null) {
-                showAuthRequiredDialog = true
-              } else {
-                showPaymentApprovalDialog = true
-              }
+              authDialogInitialTab = 1
+              showAuthRequiredDialog = true
             } else {
               iframeModalPdfTitle = title
               iframeModalPdfUrl = formatToGoogleDriveEmbedUrl(url)
@@ -2934,74 +2917,7 @@ fun StudentPortalApp() {
         )
       }
 
-      // Unlimited Access Payment & Verification Modal Dialog
-      if (showPaymentApprovalDialog) {
-        UnlimitedAccessPaymentDialog(
-          initialPackage = preselectedGradeForApproval,
-          onDismiss = { showPaymentApprovalDialog = false },
-          onOpenLogin = {
-            showPaymentApprovalDialog = false
-            showAuthRequiredDialog = true
-          },
-          onSubmitReceipt = { name, phone, requestedPackage, receiptUri ->
-            val (devId, devName) = getDeviceIdentifier(context)
-            val status = if (receiptUri != null) "Pending Approval (With Slip)" else "Pending Approval (WhatsApp / Direct)"
-            val now = System.currentTimeMillis()
-            val nowFormatted = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date(now))
-            val existing = registeredUsers.find { it.usernameOrPhone.trim().equals(phone.trim(), ignoreCase = true) }
-            if (existing != null) {
-              if (existing.boundDeviceId != null && existing.boundDeviceId != devId && !isAuthorizedAdminUser(existing.usernameOrPhone)) {
-                Toast.makeText(
-                  context,
-                  "🚫 මෙම ගිණුම (${existing.usernameOrPhone}) දැනටමත් වෙනත් දුරකථනයකට (${existing.boundDeviceName ?: "වෙනත් දුරකථනයකට"}) සම්බන්ධ කර ඇත. එකම ගිණුමෙන් වෙනත් දුරකථනවලින් ලොග් විය නොහැක!",
-                  Toast.LENGTH_LONG
-                ).show()
-                return@UnlimitedAccessPaymentDialog
-              }
-              val idx = registeredUsers.indexOf(existing)
-              val updated = existing.copy(
-                fullName = name,
-                requestedGradePackage = requestedPackage,
-                slipImageUri = receiptUri?.toString() ?: existing.slipImageUri,
-                paymentStatus = status,
-                isApproved = false,
-                boundDeviceId = existing.boundDeviceId ?: devId,
-                boundDeviceName = existing.boundDeviceName ?: devName,
-                requestDate = nowFormatted,
-                requestTimestamp = now
-              )
-              if (idx >= 0) {
-                registeredUsers.removeAt(idx)
-              }
-              registeredUsers.add(0, updated)
-              if (loggedInUser?.id == existing.id || loggedInUser?.usernameOrPhone == existing.usernameOrPhone) {
-                loggedInUser = updated
-              }
-            } else {
-              val newId = System.currentTimeMillis().toString()
-              val newUser = UserAccount(
-                id = newId,
-                fullName = name,
-                usernameOrPhone = phone,
-                password = "1234",
-                isApproved = false,
-                requestedGradePackage = requestedPackage,
-                slipImageUri = receiptUri?.toString(),
-                paymentStatus = status,
-                boundDeviceId = devId,
-                boundDeviceName = devName,
-                boundDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date(now)),
-                requestDate = nowFormatted,
-                requestTimestamp = now
-              )
-              registeredUsers.add(0, newUser)
-              loggedInUser = newUser
-            }
-            saveUsersToPreferences(context, registeredUsers.toList())
-            saveLoggedInUserPhone(context, phone)
-          }
-        )
-      }
+
 
       // Receipt Preview Fullscreen Modal Dialog
       if (previewReceiptImageUrl != null) {
