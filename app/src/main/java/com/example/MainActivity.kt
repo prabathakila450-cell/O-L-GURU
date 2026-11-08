@@ -877,7 +877,7 @@ fun StudentPortalApp() {
           "⚠️ ඔබගේ මාස 6ක (දින 180) ඇඩ්මින් අනුමැතිය අවසන් වී ඇත. කරුණාකර රු. 1,000 ගෙවා අනුමැතිය නැවත සක්‍රීය කරගන්න.",
           Toast.LENGTH_LONG
         ).show()
-        authDialogInitialTab = 1
+        authDialogInitialTab = 0
         showAuthRequiredDialog = true
       } else {
         Toast.makeText(
@@ -885,7 +885,7 @@ fun StudentPortalApp() {
           "🔒 ඇප් එක ඉන්ස්ටෝල් කිරීමෙන් පසු පැය 24ක නොමිලේ කාලය අවසන් වී ඇත. විශේෂාංග පරිශීලනය කිරීමට කරුණාකර ඇඩ්මින් අනුමැතිය (Admin Approval) ලබාගන්න.",
           Toast.LENGTH_LONG
         ).show()
-        authDialogInitialTab = 1
+        authDialogInitialTab = 0
         showAuthRequiredDialog = true
       }
     }
@@ -8965,7 +8965,7 @@ fun LoginAndApprovalDialog(
     (it.boundDeviceId == currDevId || (!savedPhone.isNullOrBlank() && it.usernameOrPhone.trim().equals(savedPhone.trim(), ignoreCase = true))) 
     && !it.isApproved && !isAuthorizedAdminUser(it.usernameOrPhone) 
   }
-  var selectedTab by remember(initialTab) { mutableStateOf(if (pendingUserForDevice != null) 0 else initialTab.coerceIn(0, 1)) } // 0: Register, 1: Admin
+  var selectedTab by remember(initialTab) { mutableStateOf(if (pendingUserForDevice != null) 0 else 0) } // Force Registration tab (0) as default
 
   // Login Form State
   var loginPhone by remember { mutableStateOf("") }
@@ -9458,21 +9458,7 @@ fun LoginAndApprovalDialog(
                 } else {
                   val existing = registeredUsers.find { it.usernameOrPhone.trim().equals(cleanPhone, ignoreCase = true) }
                   if (existing != null) {
-                    val updatedExisting = existing.copy(
-                      slipImageUri = regSlipUri?.toString() ?: existing.slipImageUri,
-                      paymentStatus = if (regSlipUri != null) "Pending Approval (With Slip)" else existing.paymentStatus,
-                      boundDeviceId = existing.boundDeviceId ?: currDevId,
-                      boundDeviceName = existing.boundDeviceName ?: currDevName
-                    )
-                    val idx = registeredUsers.indexOf(existing)
-                    if (idx >= 0) registeredUsers[idx] = updatedExisting
-                    onUsersUpdated()
-                    onLoginSuccess(updatedExisting)
-                    if (updatedExisting.isApproved) {
-                      Toast.makeText(context, "සාදරයෙන් පිළිගනිමු ${updatedExisting.fullName}! සාර්ථකව Login විය.", Toast.LENGTH_SHORT).show()
-                    } else {
-                      Toast.makeText(context, "⏳ ඔබගේ ගිණුම ඇඩ්මින් අනුමැතිය සඳහා පොරොත්තු ලැයිස්තුවේ ඇත. ඇඩ්මින් පරීක්ෂා කර අනුමත කරන තෙක් මාස 6 සක්‍රීය නොවේ.", Toast.LENGTH_LONG).show()
-                    }
+                    Toast.makeText(context, "⚠️ ඔබ දැනටමත් ලියාපදිංචි වී ඇත! ඔබගේ ගිණුම ඇඩ්මින් අනුමැතිය සඳහා පොරොත්තු ලැයිස්තුවේ පවතී.", Toast.LENGTH_LONG).show()
                     return@Button
                   }
 
