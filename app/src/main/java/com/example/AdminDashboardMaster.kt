@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -164,6 +166,7 @@ fun AdminDashboardMasterDialog(
   onAddNewContentClick: () -> Unit = {}
 ) {
   val context = LocalContext.current
+  val coroutineScope = androidx.compose.runtime.rememberCoroutineScope()
   var selectedTab by remember { mutableStateOf(0) } // 0: Users, 1: Broadcast, 2: Content/Drive, 3: Settings
 
   // User Filter & Search State
@@ -399,7 +402,8 @@ fun AdminDashboardMasterDialog(
                   filterStatus = userFilterStatus,
                   onFilterStatusChange = { userFilterStatus = it },
                   onUsersUpdated = onUsersUpdated,
-                  onPreviewReceipt = onPreviewReceipt
+                  onPreviewReceipt = onPreviewReceipt,
+                  coroutineScope = coroutineScope
                 )
               }
               1 -> {
@@ -497,7 +501,8 @@ private fun UserManagementSection(
   filterStatus: String,
   onFilterStatusChange: (String) -> Unit,
   onUsersUpdated: () -> Unit,
-  onPreviewReceipt: (String) -> Unit
+  onPreviewReceipt: (String) -> Unit,
+  coroutineScope: kotlinx.coroutines.CoroutineScope
 ) {
   val context = LocalContext.current
 
@@ -718,21 +723,35 @@ private fun UserManagementSection(
             val idx = registeredUsers.indexOf(user)
             if (idx != -1) {
               val gradesToAssign = getApprovedGradesForPackage(user.requestedGradePackage)
-              registeredUsers[idx] = user.copy(
+              val updatedUser = user.copy(
                 isApproved = true,
                 paymentStatus = "Approved",
                 approvedGrades = gradesToAssign,
                 approvalTimestamp = System.currentTimeMillis()
               )
+              registeredUsers[idx] = updatedUser
               onUsersUpdated()
+              
+              // Cloud Sync
+              coroutineScope.launch {
+                CloudAuthManager.syncUserToCloud(context, updatedUser)
+              }
+              
               Toast.makeText(context, "${user.fullName} හට මාස 6කට (දින 180) සාර්ථකව අනුමත කරන ලදී!", Toast.LENGTH_SHORT).show()
             }
           },
           onRevoke = {
             val idx = registeredUsers.indexOf(user)
             if (idx != -1) {
-              registeredUsers[idx] = user.copy(isApproved = false, paymentStatus = "Revoked")
+              val updatedUser = user.copy(isApproved = false, paymentStatus = "Revoked")
+              registeredUsers[idx] = updatedUser
               onUsersUpdated()
+              
+              // Cloud Sync
+              coroutineScope.launch {
+                CloudAuthManager.syncUserToCloud(context, updatedUser)
+              }
+              
               Toast.makeText(context, "${user.fullName} අනුමැතිය අවලංගු කරන ලදී.", Toast.LENGTH_SHORT).show()
             }
           },

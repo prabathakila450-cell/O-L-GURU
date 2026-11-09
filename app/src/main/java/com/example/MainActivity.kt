@@ -16,9 +16,13 @@ import android.view.WindowManager
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
+import android.util.Log
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import com.google.firebase.Firebase
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
@@ -127,6 +131,15 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.credentials.CredentialManager
+import androidx.credentials.CustomCredential
+import androidx.credentials.GetCredentialRequest
+import androidx.credentials.exceptions.GetCredentialCancellationException
+import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.Companion.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
+import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.auth.auth
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedButton
@@ -186,11 +199,14 @@ import com.example.ui.theme.NeutralDark
 import com.example.ui.theme.NeutralMedium
 import com.example.ui.theme.SurfaceVariantLight
 
+import com.google.firebase.firestore.IgnoreExtraProperties
+
+@IgnoreExtraProperties
 data class UserAccount(
-  val id: String,
-  val fullName: String,
-  val usernameOrPhone: String,
-  val password: String,
+  val id: String = "",
+  val fullName: String = "",
+  val usernameOrPhone: String = "",
+  val password: String = "",
   var isApproved: Boolean = false,
   val registerDate: String = "2026-08-11",
   var slipImageUri: String? = null,
@@ -520,6 +536,46 @@ fun openPdfFile(context: Context, pdfUriString: String?) {
   }
 }
 
+fun onGoogleSignInClicked(
+  context: Context,
+  credentialManager: CredentialManager,
+  onAuthSuccess: () -> Unit,
+  onAuthError: (String) -> Unit,
+  scope: kotlinx.coroutines.CoroutineScope,
+  onAuthCancelled: () -> Unit = {}
+) {
+  val clientId = try {
+    context.getString(R.string.default_web_client_id)
+  } catch (e: Exception) {
+    onAuthError("Google Sign-In configuration missing: default_web_client_id not found")
+    return
+  }
+
+  val signInOption = GetSignInWithGoogleOption.Builder(serverClientId = clientId).build()
+  val request = GetCredentialRequest.Builder().addCredentialOption(signInOption).build()
+
+  scope.launch {
+    try {
+      val result = credentialManager.getCredential(context as Activity, request)
+      val credential = result.credential
+      if (credential is CustomCredential && credential.type == TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+        val googleIdToken = GoogleIdTokenCredential.createFrom(credential.data).idToken
+        val authCredential = GoogleAuthProvider.getCredential(googleIdToken, null)
+        com.google.firebase.Firebase.auth.signInWithCredential(authCredential).await()
+        onAuthSuccess()
+      } else {
+        onAuthError("Unexpected credential type")
+      }
+    } catch (e: GetCredentialCancellationException) {
+      Log.w("Auth", "Google Sign-In flow cancelled or dismissed: ${e.message}", e)
+      onAuthCancelled()
+    } catch (e: Exception) {
+      Log.e("Auth", "Google Sign-In failed", e)
+      onAuthError(e.localizedMessage ?: "Sign in failed")
+    }
+  }
+}
+
 class MainActivity : ComponentActivity() {
   private var clipboardListener: ClipboardManager.OnPrimaryClipChangedListener? = null
 
@@ -614,10 +670,7 @@ fun StudentPortalApp() {
     val defaultAdminUsers = listOf(
       UserAccount("1", "අකිල ප්‍රභාත් දිසානායක (Admin)", "0772843861", "A20020521PD", isApproved = true, paymentStatus = "Approved", requestedGradePackage = "06 සිට 11 දක්වා සියලුම ශ්‍රේණි (All Grades Mega Pack)", approvedGrades = listOf("06", "07", "08", "09", "10", "11", "6 ශ්‍රේණිය", "7 ශ්‍රේණිය", "8 ශ්‍රේණිය", "9 ශ්‍රේණිය", "10 ශ්‍රේණිය", "11 ශ්‍රේණිය")),
       UserAccount("2", "අකිල ප්‍රභාත් දිසානායක (Admin)", "0717136085", "A20020521PD", isApproved = true, paymentStatus = "Approved", requestedGradePackage = "06 සිට 11 දක්වා සියලුම ශ්‍රේණි (All Grades Mega Pack)", approvedGrades = listOf("06", "07", "08", "09", "10", "11", "6 ශ්‍රේණිය", "7 ශ්‍රේණිය", "8 ශ්‍රේණිය", "9 ශ්‍රේණිය", "10 ශ්‍රේණිය", "11 ශ්‍රේණිය")),
-      UserAccount("3", "අකිල ප්‍රභාත් දිසානායක (Admin)", "prabathakila450@gmail.com", "A20020521PD", isApproved = true, paymentStatus = "Approved", requestedGradePackage = "06 සිට 11 දක්වා සියලුම ශ්‍රේණි (All Grades Mega Pack)", approvedGrades = listOf("06", "07", "08", "09", "10", "11", "6 ශ්‍රේණිය", "7 ශ්‍රේණිය", "8 ශ්‍රේණිය", "9 ශ්‍රේණිය", "10 ශ්‍රේණිය", "11 ශ්‍රේණිය")),
-      UserAccount("student_01", "සාමාන්‍ය ශිෂ්‍ය ගිණුම (O/L Student)", "0771234567", "1234", isApproved = false, paymentStatus = "Pending Approval", requestedGradePackage = "06 සිට 11 දක්වා සියලුම ශ්‍රේණි (All Grades Mega Pack)", approvedGrades = listOf("06", "07", "08", "09", "10", "11", "6 ශ්‍රේණිය", "7 ශ්‍රේණිය", "8 ශ්‍රේණිය", "9 ශ්‍රේණිය", "10 ශ්‍රේණිය", "11 ශ්‍රේණිය")),
-      UserAccount("student_02", "නිසල් ප්‍රනාන්දු", "0712345678", "1234", isApproved = false, paymentStatus = "Pending Approval (With Slip)", requestedGradePackage = "10 සහ 11 ශ්‍රේණි (O/L Combo Pack)", approvedGrades = listOf("10", "11", "10 ශ්‍රේණිය", "11 ශ්‍රේණිය"), requestDate = "2026-11-07 17:30", requestTimestamp = System.currentTimeMillis() - 3600000),
-      UserAccount("student_03", "කසුන් මධුෂාන්", "0719876543", "1234", isApproved = false, paymentStatus = "Pending Approval", requestedGradePackage = "10 ශ්‍රේණිය (Grade 10 Single Pack)", approvedGrades = listOf("10", "10 ශ්‍රේණිය"), requestDate = "2026-11-07 16:15", requestTimestamp = System.currentTimeMillis() - 7200000)
+      UserAccount("3", "අකිල ප්‍රභාත් දිසානායක (Admin)", "prabathakila450@gmail.com", "A20020521PD", isApproved = true, paymentStatus = "Approved", requestedGradePackage = "06 සිට 11 දක්වා සියලුම ශ්‍රේණි (All Grades Mega Pack)", approvedGrades = listOf("06", "07", "08", "09", "10", "11", "6 ශ්‍රේණිය", "7 ශ්‍රේණිය", "8 ශ්‍රේණිය", "9 ශ්‍රේණිය", "10 ශ්‍රේණිය", "11 ශ්‍රේණිය"))
     )
 
     // Permanently filter out and prune any mock/fake demo accounts previously saved in local storage
@@ -655,11 +708,48 @@ fun StudentPortalApp() {
     list.addAll(merged)
     list
   }
+
   var loggedInUser by remember { mutableStateOf<UserAccount?>(null) }
   var isAdminAuthenticated by remember { mutableStateOf(false) }
   var isAdminBarUnlocked by remember { mutableStateOf(false) }
   var showAdminBarUnlockDialog by remember { mutableStateOf(false) }
   var showExpiredStudentsDialog by remember { mutableStateOf(false) }
+
+  // Cloud Sync: Observe users from Firestore and merge with local state
+  val coroutineScope = androidx.compose.runtime.rememberCoroutineScope()
+  LaunchedEffect(Unit) {
+    CloudAuthManager.observeAllUsers(context).collect { cloudUsers ->
+      cloudUsers.forEach { cloudUser ->
+        val existingIndex = registeredUsers.indexOfFirst { 
+          it.usernameOrPhone.trim().equals(cloudUser.usernameOrPhone.trim(), ignoreCase = true) 
+        }
+        if (existingIndex >= 0) {
+          // Cloud data takes precedence for approval status
+          val local = registeredUsers[existingIndex]
+          if (local.isApproved != cloudUser.isApproved || local.approvalTimestamp != cloudUser.approvalTimestamp) {
+            registeredUsers[existingIndex] = local.copy(
+              isApproved = cloudUser.isApproved,
+              approvalTimestamp = cloudUser.approvalTimestamp,
+              paymentStatus = cloudUser.paymentStatus
+            )
+          }
+        } else {
+          // Add new user from cloud
+          registeredUsers.add(cloudUser)
+        }
+      }
+      saveUsersToPreferences(context, registeredUsers.toList())
+    }
+  }
+
+  // Periodic Sync for logged-in user to ensure they are on cloud
+  LaunchedEffect(loggedInUser) {
+    loggedInUser?.let { user ->
+      coroutineScope.launch {
+        CloudAuthManager.syncUserToCloud(context, user)
+      }
+    }
+  }
 
   // Sync Security Policies dynamically with authentication role
   LaunchedEffect(isAdminAuthenticated) {
@@ -8959,6 +9049,7 @@ fun LoginAndApprovalDialog(
   onAddNewContentClick: () -> Unit = {}
 ) {
   val context = LocalContext.current
+  val coroutineScope = androidx.compose.runtime.rememberCoroutineScope()
   val (currDevId, _) = getDeviceIdentifier(context)
   val savedPhone = getSavedLoggedInUserPhone(context)
   val pendingUserForDevice = registeredUsers.find { 
@@ -9269,14 +9360,9 @@ fun LoginAndApprovalDialog(
                   lineHeight = 16.sp
                 )
                 
-                Spacer(modifier = Modifier.height(4.dp))
-                
-                Text(
-                  text = "වැඩි විස්තර - ඇඩ්මින් 0772843861",
-                  fontSize = 11.sp,
-                  fontWeight = FontWeight.Bold,
-                  color = Color(0xFFC62828)
-                )
+                Spacer(modifier = Modifier.height(10.dp))
+
+
 
                 Spacer(modifier = Modifier.height(10.dp))
                 HorizontalDivider(color = Color(0xFFBFDBFE))
@@ -9295,6 +9381,8 @@ fun LoginAndApprovalDialog(
                 CopyableDetailBar("ශාඛාව (Branch)", "අඹන්පොල ශාඛාව (Bank of Ceylon)")
               }
             }
+
+
 
             androidx.compose.material3.OutlinedTextField(
               value = regName,
@@ -9449,19 +9537,25 @@ fun LoginAndApprovalDialog(
                 val cleanPhone = regPhone.trim()
                 if (regName.isBlank() || cleanPhone.isBlank()) {
                   Toast.makeText(context, "කරුණාකර සියලු විස්තර ඇතුළත් කරන්න", Toast.LENGTH_SHORT).show()
-                } else if (AppSecurityManager.isVpnConnected(context)) {
+                  return@Button
+                }
+                if (AppSecurityManager.isVpnConnected(context)) {
                   Toast.makeText(context, "🚫 VPN සක්‍රීයව පවතී! VPN ක්‍රියාවිරහිත කර ලියාපදිංචි වන්න.", Toast.LENGTH_LONG).show()
-                } else if (isAuthorizedAdminUser(cleanPhone)) {
+                  return@Button
+                }
+                if (isAuthorizedAdminUser(cleanPhone)) {
                   Toast.makeText(context, "❌ මෙම දුරකථන අංකය / Email එක ඇඩ්මින්වරයාගේ නිල ගිණුමකි. ලියාපදිංචි විය නොහැක. කරුණාකර 'ඇඩ්මින්' මඟින් පිවිසෙන්න.", Toast.LENGTH_LONG).show()
                   selectedTab = 1
                   return@Button
-                } else {
-                  val existing = registeredUsers.find { it.usernameOrPhone.trim().equals(cleanPhone, ignoreCase = true) }
-                  if (existing != null) {
-                    Toast.makeText(context, "⚠️ ඔබ දැනටමත් ලියාපදිංචි වී ඇත! ඔබගේ ගිණුම ඇඩ්මින් අනුමැතිය සඳහා පොරොත්තු ලැයිස්තුවේ පවතී.", Toast.LENGTH_LONG).show()
-                    return@Button
-                  }
+                }
+                val existing = registeredUsers.find { it.usernameOrPhone.trim().equals(cleanPhone, ignoreCase = true) }
+                if (existing != null) {
+                  Toast.makeText(context, "⚠️ ඔබ දැනටමත් ලියාපදිංචි වී ඇත! ඔබගේ ගිණුම ඇඩ්මින් අනුමැතිය සඳහා පොරොත්තු ලැයිස්තුවේ පවතී.", Toast.LENGTH_LONG).show()
+                  return@Button
+                }
 
+                // Helper to perform the actual registration and sync
+                val performRegistration = {
                   val currentNow = System.currentTimeMillis()
                   val currentNowFormatted = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date(currentNow))
                   val newAcc = UserAccount(
@@ -9484,6 +9578,11 @@ fun LoginAndApprovalDialog(
                   onUsersUpdated()
                   onLoginSuccess(newAcc)
                   
+                  // Cloud Sync
+                  coroutineScope.launch {
+                    CloudAuthManager.syncUserToCloud(context, newAcc)
+                  }
+                  
                   // WhatsApp Direct Sharing for Admin Approval
                   val whatsappMsg = "ආයුබෝවන් ඇඩ්මින්!\n\nමම O/L Guru ඇප් එකේ අලුතින් ලියාපදිංචි වුනා. කරුණාකර මගේ ගිණුම පරීක්ෂා කර අනුමත කරන්න.\n\n👤 නම: ${newAcc.fullName}\n📞 අංකය: ${newAcc.usernameOrPhone}\n📦 පැකේජය: 10 ශ්‍රේණිය හා 11 ශ්‍රේණිය\n📅 දිනය: ${newAcc.requestDate}\n\nස්තූතියි!"
                   val encodedMsg = Uri.encode(whatsappMsg)
@@ -9501,6 +9600,17 @@ fun LoginAndApprovalDialog(
                   regPassword = ""
                   regSlipUri = null
                   regSlipName = null
+                }
+
+                // Automatic Cloud Sync (Google Sign-In) before registration
+                if (com.google.firebase.Firebase.auth.currentUser == null) {
+                  onGoogleSignInClicked(context, androidx.credentials.CredentialManager.create(context), {
+                    performRegistration()
+                  }, { err ->
+                    Toast.makeText(context, "⚠️ Cloud Sync අසාර්ථකයි: $err. කරුණාකර නැවත උත්සාහ කරන්න.", Toast.LENGTH_LONG).show()
+                  }, coroutineScope)
+                } else {
+                  performRegistration()
                 }
               },
               colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF137333)),
